@@ -14,14 +14,15 @@ from cerberus import Validator
 class SCConfigManager:
     """Loads the configuration from a YAML file, validates it, and provides access to the configuration values."""
 
-    def __init__(self, config_file: str, default_config: dict, validation_schema: dict | None = None, placeholders: dict | None = None):
+    def __init__(self, config_file: str, default_config: dict | None = None, validation_schema: dict | None = None, placeholders: dict | None = None):
         """Initializes the configuration manager."""
         self._config = {}    # Intialise the actual config object
         self.config_file = config_file
         self.logger_function = None  # Placeholder for a logger function
 
         # Make a note of the app directory
-        self.app_dir = Path(__file__).parent
+        self.app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
+
 
         # Determine the file path for the log file
         current_dir = Path.cwd()
@@ -33,11 +34,11 @@ class SCConfigManager:
         # If the config file doesn't exist and we have a default config, write that to file
         if not self.config_path.exists():
             if default_config is None:
-                print(f"Cannot find config file {self.config_file} and no default config provided.", file=sys.stderr)
-                sys.exit(1)
-            else:
-                with Path(self.config_path).open("w", encoding="utf-8") as file:
-                    yaml.dump(default_config, file)
+                msg = f"Cannot find config file {self.config_file} and no default config provided."
+                raise RuntimeError(msg)
+
+            with Path(self.config_path).open("w", encoding="utf-8") as file:
+                yaml.dump(default_config, file)
 
         # Load the configuration from file, which might be the default
         with Path(self.config_path).open(encoding="utf-8") as file:
@@ -55,8 +56,8 @@ class SCConfigManager:
                 v = Validator()
 
                 if not v.validate(self._config, validation_schema):
-                    print(f"Validation error for config file {self.config_file}: {v.errors}", file=sys.stderr)
-                    sys.exit(1)
+                    msg = f"Validation error for config file {self.config_file}: {v.errors}"
+                    raise RuntimeError(msg)
 
 
     def register_logger(self, logger_function: callable) -> None:
@@ -83,8 +84,8 @@ class SCConfigManager:
                         if recursive_check(config_value, placeholder_value):
                             return True
                     elif config_value == placeholder_value:
-                        print(f"Placeholder value '{key}: {placeholder_value}' found in config file. Please fix this.", file=sys.stderr)
-                        sys.exit(1)
+                        msg = f"Placeholder value '{key}: {placeholder_value}' found in config file. Please fix this."
+                        raise RuntimeError(msg)
             return False
 
         if placeholders is None:

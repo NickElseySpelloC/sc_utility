@@ -57,7 +57,7 @@ class SCLogger:
         self.file_logging_enabled = self.logfile_name is not None
 
         # Make a note of the app directory
-        self.app_dir = Path(__file__).parent
+        self.app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
 
         if self.file_logging_enabled:
             # Determine the file path for the log file

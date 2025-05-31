@@ -6,9 +6,10 @@ Details to follow
 
 ## Example code
 
+    import sys
+
     from config_schemas import ConfigSchema
-    from sc_config_mgr import SCConfigManager
-    from sc_logging import SCLogger
+    from sc_utility import SCConfigManager, SCLogger
 
     CONFIG_FILE = "config.yaml"
 
@@ -20,12 +21,16 @@ Details to follow
         schemas = ConfigSchema()
 
         # Initialize the SC_ConfigManager class
-        config = SCConfigManager(
-            config_file=CONFIG_FILE,
-            default_config=schemas.default,  # Replace with your default config if needed
-            validation_schema=schemas.validation,  # Replace with your validation schema if needed
-            placeholders=schemas.placeholders  # Replace with your placeholders if needed
-        )
+        try:
+            config = SCConfigManager(
+                config_file=CONFIG_FILE,
+                default_config=schemas.default,  # Replace with your default config if needed
+                validation_schema=schemas.validation,  # Replace with your validation schema if needed
+                placeholders=schemas.placeholders  # Replace with your placeholders if needed
+            )
+        except RuntimeError as e:
+            print(f"Configuration file error: {e}", file=sys.stderr)
+            return
 
         config_value = config.get("AmberAPI", "APIKey", default="this is the default value")
         if config_value is None:
@@ -34,7 +39,11 @@ Details to follow
             print(f"Configuration loaded successfully. Sample value: {config_value}")
 
         # Initialize the SC_Logger class
-        logger = SCLogger(config.get_logger_settings())
+        try:
+            logger = SCLogger(config.get_logger_settings())
+        except RuntimeError as e:
+            print(f"Logger initialisation error: {e}", file=sys.stderr)
+            return
 
         logger.log_message("This is a test message at the debug level.", "debug")
         # logger.log_message("This is a test message at the error level.", "error")
@@ -57,3 +66,8 @@ Details to follow
     if __name__ == "__main__":
         main()
 
+
+
+## Exceptions 
+
+The initialisation functions throw RuntimeError exceptions if a fatal error is encountered. 
