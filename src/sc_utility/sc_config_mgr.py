@@ -23,13 +23,8 @@ class SCConfigManager:
         # Make a note of the app directory
         self.app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
 
-
         # Determine the file path for the log file
-        current_dir = Path.cwd()
-
-        self.config_path = current_dir / self.config_file
-        if not self.config_path.exists():
-            self.config_path = self.app_dir / self.config_file
+        self.config_path = self.select_file_location(self.config_file)
 
         # If the config file doesn't exist and we have a default config, write that to file
         if not self.config_path.exists():
@@ -58,6 +53,20 @@ class SCConfigManager:
                 if not v.validate(self._config, validation_schema):
                     msg = f"Validation error for config file {self.config_file}: {v.errors}"
                     raise RuntimeError(msg)
+
+    def select_file_location(self, file_name: str) -> Path:
+        """
+        Selects the file location for the given file name.
+
+        :param file_name: The name of the file to locate.
+        :return: The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.
+        """
+        current_dir = Path.cwd()
+        app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
+        file_path = current_dir / file_name
+        if not file_path.exists():
+            file_path = app_dir / file_name
+        return file_path
 
 
     def register_logger(self, logger_function: callable) -> None:
