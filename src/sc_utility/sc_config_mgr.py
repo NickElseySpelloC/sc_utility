@@ -18,7 +18,10 @@ class SCConfigManager:
         """Initializes the configuration manager."""
         self._config = {}    # Intialise the actual config object
         self.config_file = config_file
+        self.config_last_modified = None  # Last modified time of the config file
         self.logger_function = None  # Placeholder for a logger function
+        self.validation_schema = validation_schema
+        self.placeholders = placeholders
 
         # Make a note of the app directory
         self.app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
@@ -35,24 +38,51 @@ class SCConfigManager:
             with Path(self.config_path).open("w", encoding="utf-8") as file:
                 yaml.dump(default_config, file)
 
+        # Now load the config file
+        self.load_config()
+
+
+    def load_config(self):
         # Load the configuration from file, which might be the default
         with Path(self.config_path).open(encoding="utf-8") as file:
             try:
                 self._config = yaml.safe_load(file)
 
             except yaml.YAMLError as e:
-                print(f"YAML error in config file {self.config_file}: {e}", file=sys.stderr)
+                msg = f"YAML error in config file {self.config_file}: {e}"
+                raise RuntimeError(msg) from e
 
-            # Make sure there are no placeholders in the config file, exit if there are
-            self.check_for_placeholders(placeholders)
+            else:
+                # Make sure there are no placeholders in the config file, exit if there are
+                self.check_for_placeholders(self.placeholders)
 
-            # If we have a validation schema, validate the config
-            if validation_schema is not None:
-                v = Validator()
+                # If we have a validation schema, validate the config
+                if self.validation_schema is not None:
+                    v = Validator()
 
-                if not v.validate(self._config, validation_schema):
-                    msg = f"Validation error for config file {self.config_file}: {v.errors}"
-                    raise RuntimeError(msg)
+                    if not v.validate(self._config, self.validation_schema):
+                        msg = f"Validation error for config file {self.config_file}: {v.errors}"
+                        raise RuntimeError(msg)
+
+        self.config_last_modified = self.config_path.stat().st_mtime
+
+
+    def check_for_config_changes(self):
+        """
+        Check if the configuration file has changed. If it has, reload the configuration.
+
+        :return: True if the configuration has changed, False otherwise.
+        """
+        # get the last modified time of the config file
+        last_modified = self.config_path.stat().st_mtime
+
+        if self.config_last_modified is None or last_modified > self.config_last_modified:
+            # The config file has changed, reload it
+            self.load_config()
+            self.config_last_modified = last_modified
+            return True
+
+        return False
 
     def select_file_location(self, file_name: str) -> Path:
         """
@@ -135,6 +165,7 @@ class SCConfigManager:
             "file_verbosity": self.get(config_section, "LogfileVerbosity", default="detailed"),
             "console_verbosity": self.get(config_section, "ConsoleVerbosity", default="summary"),
             "max_lines": self.get(config_section, "LogfileMaxLines", default=10000),
+            "log_process_id": self.get(config_section, "LogProcessId", default=False),
         }
         return logger_settings
 

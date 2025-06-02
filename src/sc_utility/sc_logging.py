@@ -5,6 +5,7 @@ Provides general purpose logging functions.
 """
 
 import inspect
+import os
 import smtplib
 import sys
 import traceback
@@ -34,11 +35,13 @@ class SCLogger:
             self.file_verbosity = logger_settings["file_verbosity"]
             self.console_verbosity= logger_settings["console_verbosity"]
             self.max_lines = logger_settings["max_lines"]
+            self.log_process_id = logger_settings["log_process_id"]
         else:
             self.logfile_name = logfile_name
             self.file_verbosity = file_verbosity
             self.console_verbosity= console_verbosity
             self.max_lines = max_lines
+            self.log_process_id = False
 
         self.verbosity_levels = {
             "none": 0,
@@ -73,26 +76,34 @@ class SCLogger:
         # Setup the path to the fatal error tracking file
         self.fatal_error_file_path = self.app_dir / f"{self.app_dir.name}_fatal_error.txt"
 
+        # Save process ID
+        self.process_id = os.getpid()
+
 
     def _initialise_monitoring_logfile(self) -> None:
         """Initialise the monitoring log file. If it exists, truncate it to the max number of lines."""
         if not self.file_logging_enabled:
             return
 
-        if Path(self.logfile_path).exists():
+        self.trim_logfile()
+
+    def trim_logfile(self) -> None:
+        """Trims the log file to the maximum number of lines specified."""
+        if not self.file_logging_enabled:
+            return
+
+        if self.logfile_path.exists() and self.max_lines > 0:
             # Monitoring log file exists - truncate excess lines if needed.
-            with Path(self.logfile_path).open(encoding="utf-8") as file:
+            with self.logfile_path.open(encoding="utf-8") as file:
+                lines = file.readlines()
 
-                if self.max_lines > 0:
-                    lines = file.readlines()
+                if len(lines) > self.max_lines:
+                    # Keep the last max_lines rows
+                    keep_lines = lines[-self.max_lines:] if len(lines) > self.max_lines else lines
 
-                    if len(lines) > self.max_lines:
-                        # Keep the last max_lines rows
-                        keep_lines = lines[-self.max_lines:] if len(lines) > self.max_lines else lines
-
-                        # Overwrite the file with only the last 1000 lines
-                        with Path(self.logfile_path).open("w", encoding="utf-8") as file2:
-                            file2.writelines(keep_lines)
+                    # Overwrite the file with only the last 1000 lines
+                    with self.logfile_path.open("w", encoding="utf-8") as file2:
+                        file2.writelines(keep_lines)
 
     def log_message(self, message: str, verbosity: str = "summary") -> None:
         """Writes a log message to the console and/or a file based on verbosity settings."""
@@ -103,6 +114,10 @@ class SCLogger:
         logfile_level = self.verbosity_levels.get(self.file_verbosity, 0)
         console_level = self.verbosity_levels.get(self.console_verbosity, 0)
         message_level = self.verbosity_levels.get(verbosity, 0)
+
+        process_str = ""
+        if self.log_process_id:
+            process_str = f" Proc {self.process_id}"
 
         # Deal with console message first
         if console_level >= message_level and console_level > 0:
@@ -117,13 +132,13 @@ class SCLogger:
         if self.file_logging_enabled:
             error_str = " ERROR" if verbosity == "error" else " WARNING" if verbosity == "warning" else ""
             if logfile_level >= message_level and logfile_level > 0:
-                with Path(self.logfile_path).open("a", encoding="utf-8") as file:
+                with self.logfile_path.open("a", encoding="utf-8") as file:
                     if message == "":
                         file.write("\n")
                     else:
                         # Use the local timezone for the log timestamp
                         local_tz = datetime.now().astimezone().tzinfo
-                        file.write(f"{datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S')}{error_str}: {message}\n")
+                        file.write(f"{datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S')}{process_str}{error_str}: {message}\n")
 
     def register_email_settings(self, email_settings: dict | None) -> None:
         """
@@ -255,6 +270,8 @@ class SCLogger:
         with Path(self.fatal_error_file_path).open("w", encoding="utf-8") as file:
             file.write(message)
 
-
+    def get_process_id(self) -> int:
+        """Returns the process ID of the current process."""
+        return self.process_id
 
 
