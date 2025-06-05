@@ -88,9 +88,23 @@ class SCConfigManager:
         """
         Selects the file location for the given file name.
 
-        :param file_name: The name of the file to locate.
+        :param file_name: The name of the file to locate. Can be just a file name, or a relative or absolute path.
         :return: The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.
         """
+        # Check to see if file_name is a full path or just a file name
+        file_path = Path(file_name)
+
+        # Check if file_name is an absolute path, return this even if it does not exist
+        if file_path.is_absolute():
+            return file_path
+
+        # Check if file_name contains any parent directories (i.e., is a relative path)
+        # If so, return this even if it does not exist
+        if file_path.parent != Path("."):  # noqa: PTH201
+            # It's a relative path
+            return (Path.cwd() / file_path).resolve()
+
+        # Otherwise, assume it's just a file name and look for it in the current directory and the script directory
         current_dir = Path.cwd()
         app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
         file_path = current_dir / file_name
