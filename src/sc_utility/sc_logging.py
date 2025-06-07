@@ -197,7 +197,7 @@ class SCLogger:
             file_path = app_dir / file_name
         return file_path
 
-    def send_email(self, subject: str, body: str) -> bool:
+    def send_email(self, subject: str, body: str) -> bool:  # noqa: PLR0912
         """
         Sends an email using the SMTP server previously specified in register_email_settings().
 
@@ -215,22 +215,33 @@ class SCLogger:
             self.logger.log_fatal_error("body argument must be a string containing the body content or a file path.")
             return False
 
-        # Default to treating the body a file path and see if we can resolve it
-        payload_path = self.select_file_location(body)
-        if payload_path.exists():
-            # If the body is a file path, read the content
-            with payload_path.open("r", encoding="utf-8") as file:
-                payload = file.read()
+        # See if the body string is something that looks like a file path
+        try:
+            payload_path = self.select_file_location(body)
+        except OSError:
+            # Nothing to do here
+            payload_path = None
 
-            # Determine the payload type based on the file extension
-            if payload_path.suffix.lower() == ".html":
-                payload_type = "html"
-            elif payload_path.suffix.lower() == ".txt":
-                payload_type = "plain"
+        # Default to treating the body a file path and see if we can resolve it
+        if payload_path is not None:
+            if payload_path.exists():
+                # If the body is a file path, read the content
+                with payload_path.open("r", encoding="utf-8") as file:
+                    payload = file.read()
+
+                # Determine the payload type based on the file extension
+                if payload_path.suffix.lower() == ".html":
+                    payload_type = "html"
+                elif payload_path.suffix.lower() == ".txt":
+                    payload_type = "plain"
+                else:
+                    self.logger.log_fatal_error(f"Unsupported file type for email body: {payload_path.suffix}")
+                    return False
             else:
-                self.logger.log_fatal_error(f"Unsupported file type for email body: {payload_path.suffix}")
-                return False
-        else:
+                payload_path = None
+
+        if payload_path is None:
+            # If fall through to here, then the body was not a file path or the file did not exist
             # Assume that the body is a string containing the content
             payload = body  # Default to the body as text content
             if body.startswith(("<html", "<!DOCTYPE html")):
