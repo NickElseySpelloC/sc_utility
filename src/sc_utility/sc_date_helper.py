@@ -1,7 +1,7 @@
 """Some basic shorts for handling dates."""
 
-
 from datetime import date, datetime, timedelta
+from pathlib import Path
 
 
 class DateHelper:
@@ -64,3 +64,20 @@ class DateHelper:
         """Get today's date in string format."""
         date_today = DateHelper.today()
         return DateHelper.format_date(date_today, date_format)
+
+    @staticmethod
+    def get_file_date(file_path: str | Path) -> date:
+        """
+        Get the last modified date of a file.
+
+        param file_path: Path to the file. Cane be a string or a Path object.
+        return: The last modified date of the file as a date object, or None if the file does not exist.
+        """
+        if isinstance(file_path, str):
+            file_path = Path(file_path)
+
+        if not file_path.exists():
+            return None
+
+        local_tz = datetime.now().astimezone().tzinfo
+        return datetime.fromtimestamp(file_path.stat().st_mtime, tz=local_tz).date()
