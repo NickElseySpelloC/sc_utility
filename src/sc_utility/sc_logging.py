@@ -169,10 +169,74 @@ class SCLogger:
         # Store the email settings in the config object
         self.email_settings = email_settings
 
+    def select_file_location(self, file_name: str) -> Path:
+        """
+        Selects the file location for the given file name.
+
+        :param file_name: The name of the file to locate. Can be just a file name, or a relative or absolute path.
+        :return: The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.
+        """
+        # Check to see if file_name is a full path or just a file name
+        file_path = Path(file_name)
+
+        # Check if file_name is an absolute path, return this even if it does not exist
+        if file_path.is_absolute():
+            return file_path
+
+        # Check if file_name contains any parent directories (i.e., is a relative path)
+        # If so, return this even if it does not exist
+        if file_path.parent != Path("."):  # noqa: PTH201
+            # It's a relative path
+            return (Path.cwd() / file_path).resolve()
+
+        # Otherwise, assume it's just a file name and look for it in the current directory and the script directory
+        current_dir = Path.cwd()
+        app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
+        file_path = current_dir / file_name
+        if not file_path.exists():
+            file_path = app_dir / file_name
+        return file_path
+
     def send_email(self, subject: str, body: str) -> bool:
-        """Sends an email using the SMTP server previously specified in register_email_settings()."""
+        """
+        Sends an email using the SMTP server previously specified in register_email_settings().
+
+        param body: This argument can be one of 4 things:
+            1. A string containing the HTML body of the email
+            2. A string containing the path to an HTML file to read the body from
+            3. A string containing the text body of the email
+            4. A string containing the path to an text file to read the body from
+        """
         if self.email_settings is None:
             return False # No email settings registered, so skip sending the email
+
+        # First confirm that the body argument was passed as a string
+        if not isinstance(body, str):
+            self.logger.log_fatal_error("body argument must be a string containing the body content or a file path.")
+            return False
+
+        # Default to treating the body a file path and see if we can resolve it
+        payload_path = self.select_file_location(body)
+        if payload_path.exists():
+            # If the body is a file path, read the content
+            with payload_path.open("r", encoding="utf-8") as file:
+                payload = file.read()
+
+            # Determine the payload type based on the file extension
+            if payload_path.suffix.lower() == ".html":
+                payload_type = "html"
+            elif payload_path.suffix.lower() == ".txt":
+                payload_type = "plain"
+            else:
+                self.logger.log_fatal_error(f"Unsupported file type for email body: {payload_path.suffix}")
+                return False
+        else:
+            # Assume that the body is a string containing the content
+            payload = body  # Default to the body as text content
+            if body.startswith(("<html", "<!DOCTYPE html")):
+                payload_type="html"
+            else:
+                payload_type="plain"
 
         # Load the Gmail SMTP server configuration
         sender_email = self.email_settings.get("SMTPUsername")
@@ -187,7 +251,10 @@ class SCLogger:
                 msg["Subject"] = self.email_settings.get("SubjectPrefix") + subject
             else:
                 msg["Subject"] = subject
-            msg.attach(MIMEText(body, "plain"))
+
+            # Attach the payload as either plain text or HTML
+            part = MIMEText(payload, payload_type)
+            msg.attach(part)
 
             # Connect to the Gmail SMTP server
             with smtplib.SMTP(self.email_settings.get("SMTPServer"), self.email_settings.get("SMTPPort", 587)) as server:
@@ -201,6 +268,7 @@ class SCLogger:
 
         else:
             return True  # Email sent successfully
+
 
     def log_fatal_error(self, message: str, report_stack: bool=False, calling_function: str | None=None) -> None:  # noqa: FBT001, FBT002
         """
