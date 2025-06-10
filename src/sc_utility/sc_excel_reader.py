@@ -143,11 +143,17 @@ class ExcelReader:
                 sheet_name=sheet_name,
                 usecols=",".join(usecols),
                 skiprows=min_row - 1,   # skip up to the header row (Excel is 1-based)
-                nrows=nrows
+                nrows=nrows,
+                header=None     # Don't treat the first row as header so that we avoid the bug where pandas renames columns it thinks are duplicates
             )
 
             # Strip whitespace from column names
-            table_df.columns = table_df.columns.map(str).str.strip()
+            table_df.columns = table_df.iloc[0].map(str).str.strip()
+
+            # Define the first row as the header
+            table_df = table_df[1:].reset_index(drop=True)
+
+            # Extract to dictionary
             table_data = table_df.to_dict(orient="records")
 
         except (ImportError, ValueError, AttributeError) as e:
@@ -196,11 +202,17 @@ class ExcelReader:
                 sheet_name=sheet_name,
                 usecols=",".join(usecols),
                 skiprows=min_row - 1,  # skip to the first row of the range
-                nrows=nrows
+                nrows=nrows,
+                header=None     # Don't treat the first row as header so that we avoid the bug where pandas renames columns it thinks are duplicates
             )
 
             # Strip whitespace from column names
-            table_df.columns = table_df.columns.map(str).str.strip()
+            table_df.columns = table_df.iloc[0].map(str).str.strip()
+
+            # Define the first row as the header
+            table_df = table_df[1:].reset_index(drop=True)
+
+            # Extract to dictionary
             table_data = table_df.to_dict(orient="records")
 
         except (ImportError, ValueError, AttributeError) as e:
