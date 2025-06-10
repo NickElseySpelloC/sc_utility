@@ -7,6 +7,7 @@ Provides general purpose logging functions.
 import inspect
 import os
 import smtplib
+import platform
 import sys
 import traceback
 from datetime import datetime
@@ -53,6 +54,9 @@ class SCLogger:
             "all": 6,
         }
 
+        # Platform specific settings
+        self.os_name = self.get_os()
+
         # Use the register_email_settings method to set up email settings
         self.email_settings = None
 
@@ -79,6 +83,14 @@ class SCLogger:
         # Save process ID
         self.process_id = os.getpid()
 
+    def get_os(self) -> str:
+        """Returns the name of the operating system."""
+        platform_name = platform.system().lower()
+
+        if platform_name == "darwin":
+            platform_name = "macos"
+
+        return platform_name
 
     def _initialise_monitoring_logfile(self) -> None:
         """Initialise the monitoring log file. If it exists, truncate it to the max number of lines."""
@@ -169,6 +181,29 @@ class SCLogger:
         # Store the email settings in the config object
         self.email_settings = email_settings
 
+    def is_probable_path(self, possible_path: str) -> bool:
+        """
+        Checks if the given string is likely to be a file path.
+
+        This method checks if the string is an absolute path, contains a path separator, or has a file extension.
+        :param possible_path: The string to check.
+        :return: True if the string is likely a file path, False otherwise.
+        """
+        max_path = 260 if self.os_name == "windows" else os.pathconf("/", "PC_PATH_MAX")
+
+        if len(possible_path) > max_path:
+            # If the path is longer than the maximum allowed path length, it cannot be a valid path
+            return False
+
+        p = Path(possible_path)
+        # Check if it's absolute, or contains a path separator, or has a file extension
+        return (
+            p.is_absolute() or
+            "/" in possible_path or "\\" in possible_path or
+            (p.suffix.lower() is not None and p.suffix.lower() != "")
+        )
+
+
     def select_file_location(self, file_name: str) -> Path:
         """
         Selects the file location for the given file name.
@@ -176,6 +211,10 @@ class SCLogger:
         :param file_name: The name of the file to locate. Can be just a file name, or a relative or absolute path.
         :return: The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.
         """
+        # Look at the file_name and see if it looks like a path
+        if not self.is_probable_path(file_name):
+            return None
+
         # Check to see if file_name is a full path or just a file name
         file_path = Path(file_name)
 
@@ -196,6 +235,7 @@ class SCLogger:
         if not file_path.exists():
             file_path = app_dir / file_name
         return file_path
+
 
     def send_email(self, subject: str, body: str) -> bool:  # noqa: PLR0912
         """
