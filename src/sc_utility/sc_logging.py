@@ -6,8 +6,8 @@ Provides general purpose logging functions.
 
 import inspect
 import os
-import smtplib
 import platform
+import smtplib
 import sys
 import traceback
 from datetime import datetime
@@ -181,9 +181,9 @@ class SCLogger:
         # Store the email settings in the config object
         self.email_settings = email_settings
 
-    def is_probable_path(self, possible_path: str) -> bool:
+    def is_probable_path(self, possible_path: str | Path) -> bool:
         """
-        Checks if the given string is likely to be a file path.
+        Checks if the given string or Path object is likely to be a file path.
 
         This method checks if the string is an absolute path, contains a path separator, or has a file extension.
         :param possible_path: The string to check.
@@ -191,16 +191,25 @@ class SCLogger:
         """
         max_path = 260 if self.os_name == "windows" else os.pathconf("/", "PC_PATH_MAX")
 
-        if len(possible_path) > max_path:
+        path_obj = None
+        if isinstance(possible_path, Path):
+            path_str = str(possible_path)
+            path_obj = possible_path
+        else:
+            path_str = possible_path
+
+        if len(path_str) > max_path:
             # If the path is longer than the maximum allowed path length, it cannot be a valid path
             return False
 
-        p = Path(possible_path)
+        if path_obj is None:
+            path_obj = Path(possible_path)
+
         # Check if it's absolute, or contains a path separator, or has a file extension
         return (
-            p.is_absolute() or
-            "/" in possible_path or "\\" in possible_path or
-            (p.suffix.lower() is not None and p.suffix.lower() != "")
+            path_obj.is_absolute() or
+            "/" in path_str or "\\" in path_str or
+            (path_obj.suffix.lower() is not None and path_obj.suffix.lower() != "")
         )
 
 
@@ -251,8 +260,8 @@ class SCLogger:
             return False # No email settings registered, so skip sending the email
 
         # First confirm that the body argument was passed as a string
-        if not isinstance(body, str):
-            self.logger.log_fatal_error("body argument must be a string containing the body content or a file path.")
+        if not isinstance(body, str) and not isinstance(body, Path):
+            self.log_fatal_error("body argument must be a string containing the body content or a file path.")
             return False
 
         # See if the body string is something that looks like a file path
@@ -261,6 +270,9 @@ class SCLogger:
         except OSError:
             # Nothing to do here
             payload_path = None
+
+        payload = body  # Default to the body as text content
+        payload_type="plain"
 
         # Default to treating the body a file path and see if we can resolve it
         if payload_path is not None:
@@ -275,7 +287,7 @@ class SCLogger:
                 elif payload_path.suffix.lower() == ".txt":
                     payload_type = "plain"
                 else:
-                    self.logger.log_fatal_error(f"Unsupported file type for email body: {payload_path.suffix}")
+                    self.log_fatal_error(f"Unsupported file type for email body: {payload_path.suffix}")
                     return False
             else:
                 payload_path = None
@@ -392,5 +404,3 @@ class SCLogger:
     def get_process_id(self) -> int:
         """Returns the process ID of the current process."""
         return self.process_id
-
-
