@@ -1,5 +1,4 @@
-"""
-Spello Consulting Configuration Manager Module.
+"""Spello Consulting Configuration Manager Module.
 
 Management of a YAML log file.
 """
@@ -15,7 +14,18 @@ class SCConfigManager:
     """Loads the configuration from a YAML file, validates it, and provides access to the configuration values."""
 
     def __init__(self, config_file: str, default_config: dict | None = None, validation_schema: dict | None = None, placeholders: dict | None = None):
-        """Initializes the configuration manager."""
+        """Initializes the configuration manager.
+
+        Args:
+            config_file (str): The relative or absolute path to the configuration file.
+            default_config (Optional[dict], optional): A default configuration dict to use if the config file does not exist.
+            validation_schema (Optional[dict], optional): A cerberus style validation schema dict to validate the config file against.
+            placeholders (Optional[dict], optional): A dictionary of placeholders to check in the config. If any of these are found, a exception will be raised.
+
+        Raises:
+            RuntimeError: If the config file does not exist and no default config is provided, or if there are YAML errors in the config file.
+
+        """
         self._config = {}    # Intialise the actual config object
         self.config_file = config_file
         self.config_last_modified = None  # Last modified time of the config file
@@ -41,9 +51,12 @@ class SCConfigManager:
         # Now load the config file
         self.load_config()
 
-
     def load_config(self):
-        # Load the configuration from file, which might be the default
+        """Load the configuration from the config file specified to the __init__ method.
+
+        Raises:
+            RuntimeError: If there are YAML errors in the config file, if placeholders are found, or if validation fails.
+        """
         with Path(self.config_path).open(encoding="utf-8") as file:
             try:
                 self._config = yaml.safe_load(file)
@@ -66,12 +79,11 @@ class SCConfigManager:
 
         self.config_last_modified = self.config_path.stat().st_mtime
 
+    def check_for_config_changes(self) -> bool:
+        """Check if the configuration file has changed. If it has, reload the configuration.
 
-    def check_for_config_changes(self):
-        """
-        Check if the configuration file has changed. If it has, reload the configuration.
-
-        :return: True if the configuration has changed, False otherwise.
+        Returns:
+            result (bool): True if the configuration has changed, False otherwise.
         """
         # get the last modified time of the config file
         last_modified = self.config_path.stat().st_mtime
@@ -85,11 +97,13 @@ class SCConfigManager:
         return False
 
     def select_file_location(self, file_name: str) -> Path:
-        """
-        Selects the file location for the given file name.
+        """Selects the file location for the given file name.
 
-        :param file_name: The name of the file to locate. Can be just a file name, or a relative or absolute path.
-        :return: The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.
+        Args:
+            file_name (str): The name of the file to locate. Can be just a file name, or a relative or absolute path.
+
+        Returns:
+            file_path (Path): The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.
         """
         # Check to see if file_name is a full path or just a file name
         file_path = Path(file_name)
@@ -112,23 +126,28 @@ class SCConfigManager:
             file_path = app_dir / file_name
         return file_path
 
-
     def register_logger(self, logger_function: callable) -> None:
-        """
-        Registers a logger function to be used for logging messages.
+        """Registers a logger function to be used for logging messages.
 
-        :param logger_function: The function to use for logging messages.
+        Args:
+            logger_function (callable): The function to use for logging messages.
         """
         self.logger_function = logger_function
 
-
     def check_for_placeholders(self, placeholders: dict) -> bool:
-        """
-        Recursively scan self._config for any instances of a key found in placeholders.
+        """Recursively scan self._config for any instances of a key found in placeholders.
 
         If the keys and values match (including nested), return True.
-        :param placeholders: A dictionary of placeholders to check in the config.
-        """
+
+        Args:
+            placeholders (dict): A dictionary of placeholders to check in the config.
+
+        Raises:
+            RuntimeError: If any placeholder is found in the config file, an exception will be raised with a message indicating the placeholder and its value.
+
+        Returns:
+            result (bool): True if any placeholders are found in the config, otherwise False.
+        """  # noqa: DOC502
         def recursive_check(config_section, placeholder_section):
             for key, placeholder_value in placeholder_section.items():
                 if key in config_section:
@@ -147,15 +166,17 @@ class SCConfigManager:
         return recursive_check(self._config, placeholders)
 
     def get(self, *keys, default=None):
-        """
-        Retrieve a value from the config dictionary using a sequence of nested keys.
+        """Retrieve a value from the config dictionary using a sequence of nested keys.
 
         Example:
             value = config_mgr.get("DeviceType", "WebsiteAccessKey")
 
-        :param keys: Sequence of keys to traverse the config dictionary.
-        :param default: Value to return if the key path does not exist.
-        :return: The value if found, otherwise the default.
+        Args:
+            keys (*keys): Sequence of keys to traverse the config dictionary.
+            default (Optional[variable], optional): Value to return if the key path does not exist.
+
+        Returns:
+            value (variable): The value if found, otherwise the default.
 
         """
         value = self._config
@@ -168,11 +189,13 @@ class SCConfigManager:
             return value
 
     def get_logger_settings(self, config_section: str | None = "Files") -> dict:
-        """
-        Returns the logger settings from the config file.
+        """Returns the logger settings from the config file.
 
-        :param config_section: The section in the config file where logger settings are stored.
-        :return: A dictionary of logger settings that can be passed to the SCLogger() class initialization.
+        Args:
+            config_section (Optional[str], optional): The section in the config file where logger settings are stored.
+
+        Returns:
+            settings (dict): A dictionary of logger settings that can be passed to the SCLogger() class initialization.
         """
         logger_settings = {
             "logfile_name": self.get(config_section, "LogfileName", default="default_logfile.log"),
@@ -183,13 +206,14 @@ class SCConfigManager:
         }
         return logger_settings
 
-
     def get_email_settings(self, config_section: str | None = "Email") -> dict:
-        """
-        Returns the email settings from the config file.
+        """Returns the email settings from the config file.
 
-        :param config_section: The section in the config file where email settings are stored.
-        :return: A dictionary of email settings or None if email is disabled or not configured correctly.
+        Args:
+            config_section (Optional[str], optional): The section in the config file where email settings are stored.
+
+        Returns:
+            settings (dict): A dictionary of email settings or None if email is disabled or not configured correctly.
         """
         # fir check to see if we have an EnableEmail setting
         enable_email = self.get(config_section, "EnableEmail", default=True)
@@ -210,4 +234,3 @@ class SCConfigManager:
             return email_settings
 
         return None
-

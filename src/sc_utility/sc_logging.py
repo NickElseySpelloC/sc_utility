@@ -23,24 +23,25 @@ class SCLogger:
         """
         Initializes the logger with configuration settings.
 
-        param logger_settings: A dictionary containing logger settings. If provided, it should include the same keys as the individual parameters below:
+        If logger_settings are provided, it will override the individual parameters.
 
-        param logfile_name: str, the name of the log file (optional, defaults to None)
-        param file_verbosity: str, verbosity level for file logging (optional, defaults to "detailed")
-        param console_verbosity: str, verbosity level for console logging (optional, defaults to "summary")
-        param max_lines: int, maximum number of lines to keep in the log file (optional, defaults to 10000)
-        If logger_settings is provided, it will override the individual parameters.
+        Args:
+            logger_settings (Optional[dict], optional): A dictionary containing logger settings. If provided, it should include the same keys as the individual parameters below:
+            logfile_name (Optional[str], optional): The name of the log file. If None, no file logging will be done.
+            file_verbosity (Optional[str], optional): Verbosity level for file logging
+            console_verbosity  (Optional[str], optional): Verbosity level for console logging
+            max_lines  (Optional[int], optional): Maximum number of lines to keep in the log file
         """
         if logger_settings is not None:
             self.logfile_name = logger_settings["logfile_name"]
             self.file_verbosity = logger_settings["file_verbosity"]
-            self.console_verbosity= logger_settings["console_verbosity"]
+            self.console_verbosity = logger_settings["console_verbosity"]
             self.max_lines = logger_settings["max_lines"]
             self.log_process_id = logger_settings["log_process_id"]
         else:
             self.logfile_name = logfile_name
             self.file_verbosity = file_verbosity
-            self.console_verbosity= console_verbosity
+            self.console_verbosity = console_verbosity
             self.max_lines = max_lines
             self.log_process_id = False
 
@@ -83,8 +84,13 @@ class SCLogger:
         # Save process ID
         self.process_id = os.getpid()
 
-    def get_os(self) -> str:
-        """Returns the name of the operating system."""
+    def get_os(self) -> str:  # noqa: PLR6301
+        """Returns the name of the operating system.
+
+        Returns:
+            os_string (str): The name of the operating system in lowercase.
+        """
+        # Get the platform name and convert it to lowercase
         platform_name = platform.system().lower()
 
         if platform_name == "darwin":
@@ -118,7 +124,16 @@ class SCLogger:
                         file2.writelines(keep_lines)
 
     def log_message(self, message: str, verbosity: str = "summary") -> None:
-        """Writes a log message to the console and/or a file based on verbosity settings."""
+        """Writes a log message to the console and/or a file based on verbosity settings.
+
+        Args:
+            message (str): The message to log.
+            verbosity (str): The verbosity level for the message. Must be one of "none", "error", "warning", "summary", "detailed", "debug", or "all".
+
+        Raises:
+            ValueError: If an invalid verbosity level is provided.
+
+        """
         if verbosity not in self.verbosity_levels:
             exception_msg = f"log_message(): Invalid verbosity passed, must be one of {list(self.verbosity_levels.keys())}."
             raise ValueError(exception_msg)
@@ -145,7 +160,7 @@ class SCLogger:
             error_str = " ERROR" if verbosity == "error" else " WARNING" if verbosity == "warning" else ""
             if logfile_level >= message_level and logfile_level > 0:
                 with self.logfile_path.open("a", encoding="utf-8") as file:
-                    if message == "":
+                    if not message:
                         file.write("\n")
                     else:
                         # Use the local timezone for the log timestamp
@@ -156,13 +171,22 @@ class SCLogger:
         """
         Registers email settings for sending emails.
 
-        param email_settings: A dictionary object containing email settings. Keys should include:
-            - SendEmailsTo: str, the email address to send emails to
-            - SMTPServer: str, the SMTP server address
-            - SMTPPort: int, the SMTP server port (optional, defaults to 587)
-            - SMTPUsername: str, the username for the SMTP server
-            - SMTPPassword: str, the password for the SMTP server (preferably an App Password)
-            - SubjectPrefix: str, a prefix for email subjects (optional, default to None)
+        Use the SCConfigManager.get_email_settings() method to get a dictionary containing the email settings. Otherwise, you can pass a
+        dictionary directly to this method with these keys:
+            SendEmailsTo: str, the email address to send emails to
+            SMTPServer: str, the SMTP server address
+            SMTPPort: int, the SMTP server port (optional, defaults to 587)
+            SMTPUsername: str, the username for the SMTP server
+            SMTPPassword: str, the password for the SMTP server (preferably an App Password)
+            SubjectPrefix: str, a prefix for email subjects (optional, default to None)
+
+        Args:
+            email_settings (Optional[dict], optional): A dictionary containing email settings. If empty or None, no email settings will be registered.
+
+        Raises:
+            TypeError: If email_settings is not a dictionary.
+            ValueError: If any required keys are missing from the email_settings dictionary.
+
         """
         if email_settings == {} or email_settings is None:
             return  # No email settings provided, so skip registration
@@ -186,8 +210,12 @@ class SCLogger:
         Checks if the given string or Path object is likely to be a file path.
 
         This method checks if the string is an absolute path, contains a path separator, or has a file extension.
-        :param possible_path: The string to check.
-        :return: True if the string is likely a file path, False otherwise.
+
+        Args:
+            possible_path (str): The string to check.
+
+        Returns:
+            result (bool): True if the string is likely a file path, False otherwise.
         """
         max_path = 260 if self.os_name == "windows" else os.pathconf("/", "PC_PATH_MAX")
 
@@ -209,16 +237,18 @@ class SCLogger:
         return (
             path_obj.is_absolute() or
             "/" in path_str or "\\" in path_str or
-            (path_obj.suffix.lower() is not None and path_obj.suffix.lower() != "")
+            (path_obj.suffix.lower() is not None and path_obj.suffix.lower())
         )
-
 
     def select_file_location(self, file_name: str) -> Path:
         """
         Selects the file location for the given file name.
 
-        :param file_name: The name of the file to locate. Can be just a file name, or a relative or absolute path.
-        :return: The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.
+        Args:
+            file_name (str): The name of the file to locate. Can be just a file name, or a relative or absolute path.
+
+        Returns:
+            location (Path): The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.
         """
         # Look at the file_name and see if it looks like a path
         if not self.is_probable_path(file_name):
@@ -245,19 +275,23 @@ class SCLogger:
             file_path = app_dir / file_name
         return file_path
 
-
     def send_email(self, subject: str, body: str) -> bool:  # noqa: PLR0912
         """
         Sends an email using the SMTP server previously specified in register_email_settings().
 
-        param body: This argument can be one of 4 things:
-            1. A string containing the HTML body of the email
-            2. A string containing the path to an HTML file to read the body from
-            3. A string containing the text body of the email
-            4. A string containing the path to an text file to read the body from
+        Args:
+            subject (str): The subject of the email.
+            body (str): The body of the email. This argument can be one of 4 things:
+                1. A string containing the HTML body of the email
+                2. A string containing the path to an HTML file to read the body from
+                3. A string containing the text body of the email
+                4. A string containing the path to an text file to read the body from
+
+        Returns:
+            result (bool): True if the email was sent successfully, False otherwise.
         """
         if self.email_settings is None:
-            return False # No email settings registered, so skip sending the email
+            return False  # No email settings registered, so skip sending the email
 
         # First confirm that the body argument was passed as a string
         if not isinstance(body, str) and not isinstance(body, Path):
@@ -272,7 +306,7 @@ class SCLogger:
             payload_path = None
 
         payload = body  # Default to the body as text content
-        payload_type="plain"
+        payload_type = "plain"
 
         # Default to treating the body a file path and see if we can resolve it
         if payload_path is not None:
@@ -297,9 +331,9 @@ class SCLogger:
             # Assume that the body is a string containing the content
             payload = body  # Default to the body as text content
             if body.startswith(("<html", "<!DOCTYPE html")):
-                payload_type="html"
+                payload_type = "html"
             else:
-                payload_type="plain"
+                payload_type = "plain"
 
         # Load the Gmail SMTP server configuration
         sender_email = self.email_settings.get("SMTPUsername")
@@ -332,15 +366,19 @@ class SCLogger:
         else:
             return True  # Email sent successfully
 
-
-    def log_fatal_error(self, message: str, report_stack: bool=False, calling_function: str | None=None) -> None:  # noqa: FBT001, FBT002
+    def log_fatal_error(self, message: str, report_stack: bool = False, calling_function: str | None = None) -> None:  # noqa: FBT001, FBT002
         """
         Log a fatal error, send an email if configured to so and then exit the program.
 
-        param message: The error message to log.
-        param report_stack: If True, include the stack trace in the log message.
-        param calling_function: The name of the function that called this method, if known. If None, the calling function will be determined automatically.
-        """
+        Args:
+            message (str): The error message to log.
+            report_stack (Optional[bool], optional): If True, include the stack trace in the log message.
+            calling_function (Optional[str], optional): The name of the function that called this method, if known. If None, the calling function will be determined automatically.
+
+        Raises:
+            SystemExit: Exits the program with a status code of 1 after logging the fatal error.
+
+        """  # noqa: DOC502
         function_name = None
         if calling_function is None:
             stack = inspect.stack()
@@ -380,7 +418,6 @@ class SCLogger:
         # Exit the program
         sys.exit(1)
 
-
     def get_fatal_error(self) -> bool:
         """Returns True if a fatal error was previously reported, false otherwise."""
         return Path(self.fatal_error_file_path).exists()
@@ -389,7 +426,8 @@ class SCLogger:
         """
         Clear a previously logged fatal error.
 
-        Returns True if the file was deleted, False if it did not exist.
+        Returns:
+            result (bool): True if the file was deleted, False if it did not exist.
         """
         if Path(self.fatal_error_file_path).exists():
             Path(self.fatal_error_file_path).unlink()
@@ -397,10 +435,20 @@ class SCLogger:
         return False
 
     def set_fatal_error(self, message: str) -> None:
-        """Create a fatal error tracking file and write the message to it."""
+        """
+        Create a fatal error tracking file and write the message to it.
+
+        Args:
+            message (str): The error message to write to the fatal error file.
+        """
         with Path(self.fatal_error_file_path).open("w", encoding="utf-8") as file:
             file.write(message)
 
     def get_process_id(self) -> int:
-        """Returns the process ID of the current process."""
+        """
+        Returns the process ID of the current process.
+
+        Returns:
+            process_id (int): The process ID of the current process.
+        """
         return self.process_id

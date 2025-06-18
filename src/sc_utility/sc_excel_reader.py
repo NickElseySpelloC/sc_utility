@@ -10,11 +10,22 @@ from openpyxl.utils.exceptions import InvalidFileException
 
 
 class ExcelReader:
+    """
+    A class to read and extract data from Excel files (.xlsx, .xlsm, .xlsb).
+
+    This class provides methods to load workbooks, extract data from sheets,
+    tables, and named ranges, with robust error handling.
+    """
+
     def __init__(self, file_path: Path | str):
         """
         Initializes the ExcelReader with the path to the Excel file.
 
-        :param file_path: Path to the Excel file, specified as a Path object or string.
+        Args:
+            file_path (str | Path): Path to the Excel file, specified as a Path object or string.
+
+        Raises:
+            ImportError: If the file does not exist, is not a valid Excel file, or if the openpyxl library cannot be imported.
         """
         if isinstance(file_path, str):
             file_path = Path(file_path)
@@ -23,7 +34,7 @@ class ExcelReader:
             raise ImportError(msg)
 
         # Check extension to see if it's an Excel file
-        if file_path.suffix.lower() not in (".xlsx", ".xlsm", ".xlsb"):
+        if file_path.suffix.lower() not in {".xlsx", ".xlsm", ".xlsb"}:
             msg = f"File {file_path} is not a valid Excel file."
             raise ImportError(msg)
 
@@ -33,9 +44,15 @@ class ExcelReader:
         """
         Load an Excel workbook with robust error handling.
 
-        :param: data_only (bool): Whether to return cell values (not formulas).
-        :param: read_only (bool): Use openpyxl's read-only mode for large files.
-        :return: Workbook object or None if loading fails.
+        Args:
+            data_only (Optional[bool], optional): Whether to return cell values (not formulas).
+            read_only (Optional[bool], optional): Use openpyxl's read-only mode for large files.
+
+        Raises:
+            ImportError: If the file cannot be loaded due to various reasons (e.g., file not found, permission denied, invalid format).
+
+        Returns:
+            object (workbook): Workbook object or None if loading fails.
         """
         warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
         try:
@@ -57,7 +74,6 @@ class ExcelReader:
                 return wb
 
         raise ImportError(msg)   # Raise an error with the message if loading fails
-        return None  # Return None or a fallback value if loading fails
 
     def extract_data(self, source_name: str, source_type: str) -> dict:
         """
@@ -68,9 +84,15 @@ class ExcelReader:
         - A named range (range)
         - An Excel table (table)
 
-        :param source_name: Name of the sheet, table, or range to extract.
-        :param source_type: Type of source ('sheet', 'table', or 'range').
-        :return: Data extracted as a dictionary.
+        Args:
+            source_name (str): Name of the sheet, table, or range to extract.
+            source_type (str): Type of source ('sheet', 'table', or 'range').
+
+        Raises:
+            ImportError: If the source type is invalid or if there are issues extracting data.
+
+        Returns:
+            data (dict): Data extracted as a dictionary.
         """
         if source_type == "sheet":
             return self.extract_from_sheet(source_name)
@@ -86,8 +108,14 @@ class ExcelReader:
         """
         Extracts a sheet from an Excel file and returns it as a DataFrame.
 
-        :param sheet_name: Name of the sheet to extract.
-        :return: DataFrame containing the sheet data.
+        Args:
+            sheet_name (str): Name of the sheet to extract.
+
+        Raises:
+            ImportError: If the sheet cannot be loaded or if there are issues with the file.
+
+        Returns:
+            data (DataFrame): A DataFrame containing the sheet data.
         """
         try:
             table_df = pd.read_excel(self.file_path, sheet_name=sheet_name)
@@ -112,13 +140,19 @@ class ExcelReader:
         """
         Extracts a table from an Excel file and returns it as a DataFrame.
 
-        :param file_path: Path to the Excel file.
-        :param table_name: Name of the table to extract.
-        :return: DataFrame containing the table data.
+        Args:
+            table_name (str): Name of the table to extract.
+
+        Raises:
+            ImportError: If the table cannot be loaded or if there are issues with the file.
+
+        Returns:
+            data (DataFrame): A DataFrame containing the table data.
         """
         # load_excel_workbook() will raise an ImportError if there's an issue. Let this be caught by the caller.
         wb = self.load_excel_workbook(data_only=True, read_only=False)
         found = False
+        selected_sheet = None
         for sheet_name in wb.sheetnames:
             ws = wb[sheet_name]
             if table_name in ws.tables:
@@ -126,6 +160,7 @@ class ExcelReader:
                 table_range = table.ref  # e.g., "B3:F12"
                 min_col, min_row, max_col, max_row = range_boundaries(table_range)
                 found = True
+                selected_sheet = sheet_name
                 break  # Stop scanning after finding the first match
 
         if not found:
@@ -140,7 +175,7 @@ class ExcelReader:
             # Read the specific table range using pandas
             table_df = pd.read_excel(
                 self.file_path,
-                sheet_name=sheet_name,
+                sheet_name=selected_sheet,
                 usecols=",".join(usecols),
                 skiprows=min_row - 1,   # skip up to the header row (Excel is 1-based)
                 nrows=nrows,
@@ -166,9 +201,14 @@ class ExcelReader:
         """
         Extracts a table from an Excel file and returns it as a DataFrame.
 
-        :param file_path: Path to the Excel file.
-        :param range_name: Name of the range to extract.
-        :return: DataFrame containing the table data.
+        Args:
+            range_name (str): Name of the range to extract.
+
+        Raises:
+            ImportError: If the table cannot be loaded or if there are issues with the file.
+
+        Returns:
+            data (DataFrame): A DataFrame containing the range data.
         """
         # load_excel_workbook() will raise an ImportError if there's an issue. Let this be caught by the caller.
         wb = self.load_excel_workbook(data_only=True, read_only=True)
@@ -218,6 +258,5 @@ class ExcelReader:
         except (ImportError, ValueError, AttributeError) as e:
             msg = f"Error loading data range '{range_name}' from Excel file {self.file_path}: {e}"
             raise ImportError(msg) from e
-            return None
         else:
             return table_data

@@ -1,0 +1,23 @@
+site_name: Spello Consulting Utility Library
+site_url: https://github.com/NickElseySpelloC/sc_utility
+
+theme:
+  name: material
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google  # or numpy, sphinx
+            show_source: false
+
+nav:
+  - Home: index.md
+  - Getting Started: guide.md
+  - API Reference:
+      - DateHelper: reference/datehelper.md
+      - ExcelReader: reference/excelreader.md
+      - SCConfigManager: reference/configmanager.md
+      - SCLogging: reference/logging.md
