@@ -1426,7 +1426,7 @@ dictionary directly to this method with these keys:
 
 
 <h2 id="sc_utility.sc_logging.SCLogger.send_email" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">send_email</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">send_email</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">test_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1481,6 +1481,22 @@ dictionary directly to this method with these keys:
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>test_mode</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, the email will not be sent, but a message will be logged indicating that the email would have been sent. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
             </td>
           </tr>
       </tbody>

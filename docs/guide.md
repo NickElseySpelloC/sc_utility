@@ -63,24 +63,27 @@ Here's the example file - the library expects to find the Files and Email sectio
 
 # Example code
 
-Here's an example main.py module that shows how to use the library classes. Use the **API Reference** navigation to view the API methods for each class.
+Here's an example module that shows how to use the library classes. Use the **API Reference** navigation to view the API methods for each class. The code example and the companion config and Excel files is available in the examples/ folder in the Github repo.
 
+    import platform
+    import pprint
     import sys
 
-    from config_schemas import ConfigSchema
-    from sc_utility import SCConfigManager, SCLogger
+    from example_config_schemas import ConfigSchema
+    from sc_utility import DateHelper, ExcelReader, SCConfigManager, SCLogger
 
-    CONFIG_FILE = "config.yaml"
+    CONFIG_FILE = "example_config.yaml"
     EXCEL_FILE = "sample_excel.xlsx"
+
 
     def main():
         """Main function to run the example code."""
-        print(f"Hello from sc-utility! running on {platform.system()}")
+        print(f"Hello from sc-utility running on {platform.system()}")
 
-        # Get our config schema, validation schema, and placeholders
+        # Get our default schema, validation schema, and placeholders
         schemas = ConfigSchema()
 
-        # Initialize the SCConfigManager class
+        # Initialize the SC_ConfigManager class
         try:
             config = SCConfigManager(
                 config_file=CONFIG_FILE,
@@ -92,39 +95,51 @@ Here's an example main.py module that shows how to use the library classes. Use 
             print(f"Configuration file error: {e}", file=sys.stderr)
             return
 
-        # Get some parameteer from the config file
+        # Print a value from the sample config file
         print(f"API key = {config.get('AmberAPI', 'APIKey')}")
 
-        # Initialize the SCLogger class
+        # Initialize the SC_Logger class
         try:
             logger = SCLogger(config.get_logger_settings())
         except RuntimeError as e:
             print(f"Logger initialisation error: {e}", file=sys.stderr)
             return
 
-        # Log a message to the log file
-        logger.log_message("This is a test message at the debug level.", "debug")
+        logger.log_message("This is a test message at the summary level.", "summary")
 
         # Setup email
         email_settings = config.get_email_settings()
-        logger.register_email_settings(email_settings)
 
-        text_msg = "Hello world from the sc_utility library."
-        if logger.send_email("Hello world", text_msg):
-            logger.log_message("Email sent OK.", "detailed")
+        if email_settings is not None:
+            logger.register_email_settings(email_settings)
 
-        # Test the ExcelReader class
+            text_msg = "Hello world from sc-utility example code."
+            if logger.send_email("Hello world", text_msg):
+                logger.log_message("Email sent OK.", "detailed")
+
+        # Use DateHelper to get the current date and time
+        prior_date = DateHelper.today_add_days(-7)
+        print(f"Prior date (7 days ago): {prior_date}")
+
+        # Create an instance of ExcelReader
+        print("Testing ExcelReader...")
         excel_reader = ExcelReader(EXCEL_FILE)
+
+        # Extract a table
         try:
             table_data = excel_reader.extract_data(source_name="Table1", source_type="table")
-            print(f"Extracted table data: {table_data}")
         except ImportError as e:
-            logger.log_fatal_error(f"Error extracting table: {e}")
+            print(f"Error extracting table: {e}")
+            sys.exit(1)
+        else:
+            print("Table data extracted successfully:\n")
+            pprint.pprint(table_data)
 
-        # See if there was a fatal error during a prior run. 
+        # See if we have a fatal error from a previous run
         if logger.get_fatal_error():
             print("Prior fatal error detected.")
             logger.clear_fatal_error()
+
 
     if __name__ == "__main__":
         main()

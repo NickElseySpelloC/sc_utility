@@ -51,11 +51,14 @@ class SCConfigManager:
         # Now load the config file
         self.load_config()
 
-    def load_config(self):
+    def load_config(self) -> bool:
         """Load the configuration from the config file specified to the __init__ method.
 
         Raises:
             RuntimeError: If there are YAML errors in the config file, if placeholders are found, or if validation fails.
+
+        Returns:
+            result (bool): True if the configuration was loaded successfully, otherwise False.
         """
         with Path(self.config_path).open(encoding="utf-8") as file:
             try:
@@ -74,10 +77,11 @@ class SCConfigManager:
                     v = Validator()
 
                     if not v.validate(self._config, self.validation_schema):
-                        msg = f"Validation error for config file {self.config_file}: {v.errors}"
+                        msg = f"Validation error for config file {self.config_path}: {v.errors}"
                         raise RuntimeError(msg)
 
         self.config_last_modified = self.config_path.stat().st_mtime
+        return True
 
     def check_for_config_changes(self) -> bool:
         """Check if the configuration file has changed. If it has, reload the configuration.
@@ -156,7 +160,7 @@ class SCConfigManager:
                         if recursive_check(config_value, placeholder_value):
                             return True
                     elif config_value == placeholder_value:
-                        msg = f"Placeholder value '{key}: {placeholder_value}' found in config file. Please fix this."
+                        msg = f"Placeholder value '{key}: {placeholder_value}' found in config file {self.config_path}. Please fix this."
                         raise RuntimeError(msg)
             return False
 

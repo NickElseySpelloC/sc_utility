@@ -275,7 +275,7 @@ class SCLogger:
             file_path = app_dir / file_name
         return file_path
 
-    def send_email(self, subject: str, body: str) -> bool:  # noqa: PLR0912
+    def send_email(self, subject: str, body: str, test_mode: bool = False) -> bool:  # noqa: FBT001, FBT002, PLR0912
         """
         Sends an email using the SMTP server previously specified in register_email_settings().
 
@@ -286,6 +286,7 @@ class SCLogger:
                 2. A string containing the path to an HTML file to read the body from
                 3. A string containing the text body of the email
                 4. A string containing the path to an text file to read the body from
+            test_mode (bool, optional): If True, the email will not be sent, but a message will be logged indicating that the email would have been sent. Defaults to False.
 
         Returns:
             result (bool): True if the email was sent successfully, False otherwise.
@@ -357,7 +358,10 @@ class SCLogger:
             with smtplib.SMTP(self.email_settings.get("SMTPServer"), self.email_settings.get("SMTPPort", 587)) as server:
                 server.starttls()  # Upgrade the connection to secure
                 server.login(sender_email, self.email_settings.get("SMTPPassword"))  # Log in using App Password
-                server.sendmail(sender_email, send_to, msg.as_string())  # Send the email
+                if test_mode:
+                    self.log_message(f"Test mode: Email with subject '{msg['Subject']}' would be sent to {send_to}.", "summary")
+                else:
+                    server.sendmail(sender_email, send_to, msg.as_string())  # Send the email
 
         except RuntimeError as e:
             self.log_fatal_error(f"send_email(): Failed to send email with subject {msg['Subject']}: {e}")

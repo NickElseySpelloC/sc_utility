@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sc_utility"
-version = "1.2.0"
+version = "1.2.2"
 description = "Shared utilities for logging and configuration management"
 authors = [{ name = "Nick Elsey", email = "nick@spelloconsulting.com" }]
 readme = "README.md"
@@ -19,10 +19,15 @@ dependencies = [
     "openpyxl>=3.1.5",
     "pandas>=2.0.3",
     "pdoc>=14.7.0",
+    "pre-commit>=3.5.0",
+    "pytest>=8.3.5",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
     "tzdata>=2025.2",
 ]
+
+[project.optional-dependencies]
+dev = ["pytest"]
 
 [project.urls]
 Homepage = "https://github.com/NickElseySpelloC"

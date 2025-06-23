@@ -19,7 +19,7 @@ class DateHelper:
 
         Args:
             date_obj (date): The date object to format.
-            date_format (Optional[str], optional): The format string to use for formatting the date. 
+            date_format (Optional[str], optional): The format string to use for formatting the date.
 
         Returns:
             date_str (str): The formatted date string, or None if date_obj is None.
@@ -29,7 +29,7 @@ class DateHelper:
         return date_obj.strftime(date_format)
 
     @staticmethod
-    def parse_date(date_str: str, date_format: str | None="%Y-%m-%d") -> date:
+    def parse_date(date_str: str, date_format: str | None = "%Y-%m-%d") -> date:
         """
         Parse a date string to a date object.
 
@@ -123,7 +123,6 @@ class DateHelper:
         """
         date_today = DateHelper.today()
         return DateHelper.add_days(date_today, days)
-
 
     @staticmethod
     def today_str(date_format: str | None = "%Y-%m-%d") -> str:
