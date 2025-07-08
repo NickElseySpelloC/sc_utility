@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://github.com/NickElseySpelloC/sc_utility/reference/excelreader/">
+        <link rel="canonical" href="https://github.com/NickElseySpelloC/sc_utility/reference/csvreader/">
       
       
-        <link rel="prev" href="../datehelper/">
+        <link rel="prev" href="../../guide/">
       
       
-        <link rel="next" href="../configmanager/">
+        <link rel="next" href="../datehelper/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>ExcelReader - Spello Consulting Utility Library</title>
+        <title>CSVReader - Spello Consulting Utility Library</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#excel-reader" class="md-skip">
+        <a href="#csv-reader" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ExcelReader
+              CSVReader
             
           </span>
         </div>
@@ -279,10 +279,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../csvreader/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    CSVReader
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -293,6 +315,98 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_csv_reader.CSVReader" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSVReader
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.merge_data_sets" class="md-nav__link">
+    <span class="md-ellipsis">
+      merge_data_sets
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.read_csv" class="md-nav__link">
+    <span class="md-ellipsis">
+      read_csv
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.sort_csv_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      sort_csv_data
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.trim_csv_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      trim_csv_data
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.update_csv_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_csv_file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.write_csv" class="md-nav__link">
+    <span class="md-ellipsis">
+      write_csv
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -325,32 +439,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    ExcelReader
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../excelreader/" class="md-nav__link">
         
   
   
@@ -361,89 +453,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader" class="md-nav__link">
-    <span class="md-ellipsis">
-      ExcelReader
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.extract_data" class="md-nav__link">
-    <span class="md-ellipsis">
-      extract_data
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.extract_from_range" class="md-nav__link">
-    <span class="md-ellipsis">
-      extract_from_range
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.extract_from_sheet" class="md-nav__link">
-    <span class="md-ellipsis">
-      extract_from_sheet
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.extract_from_table" class="md-nav__link">
-    <span class="md-ellipsis">
-      extract_from_table
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.load_excel_workbook" class="md-nav__link">
-    <span class="md-ellipsis">
-      load_excel_workbook
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -529,16 +538,16 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader" class="md-nav__link">
+  <a href="#sc_utility.sc_csv_reader.CSVReader" class="md-nav__link">
     <span class="md-ellipsis">
-      ExcelReader
+      CSVReader
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.__init__" class="md-nav__link">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -547,45 +556,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.extract_data" class="md-nav__link">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.merge_data_sets" class="md-nav__link">
     <span class="md-ellipsis">
-      extract_data
+      merge_data_sets
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.extract_from_range" class="md-nav__link">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.read_csv" class="md-nav__link">
     <span class="md-ellipsis">
-      extract_from_range
+      read_csv
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.extract_from_sheet" class="md-nav__link">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.sort_csv_data" class="md-nav__link">
     <span class="md-ellipsis">
-      extract_from_sheet
+      sort_csv_data
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.extract_from_table" class="md-nav__link">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.trim_csv_data" class="md-nav__link">
     <span class="md-ellipsis">
-      extract_from_table
+      trim_csv_data
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_excel_reader.ExcelReader.load_excel_workbook" class="md-nav__link">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.update_csv_file" class="md-nav__link">
     <span class="md-ellipsis">
-      load_excel_workbook
+      update_csv_file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_csv_reader.CSVReader.write_csv" class="md-nav__link">
+    <span class="md-ellipsis">
+      write_csv
     </span>
   </a>
   
@@ -607,20 +625,63 @@
 
 
 
-<h1 id="excel-reader">Excel Reader</h1>
+<h1 id="csv-reader">CSV Reader</h1>
+<p>CSVReader class for extracting data from CSV and updating files. </p>
+<p>The <strong>header_config</strong> argument to __init__() is a list of dict objects that defines the expected structure of the CSV file. Each dict object in the list should have the following keys:</p>
+<ul>
+<li><strong>name</strong>: The name of the column.</li>
+<li><strong>type</strong>: The type of the column, which can be 'str', 'int', 'float', or 'date'.</li>
+<li><strong>format</strong> (optional): A string that defines the format for date or float types (e.g., "%Y-%m-%d" for date or ".2f" for float).</li>
+<li><strong>match</strong> (optional): A boolean indicating if this column should be used for matching records in the merge_data_sets() function.</li>
+<li><strong>sort</strong> (optional): An integer indicating the sort order of the column.</li>
+<li><strong>minimum</strong> (optional): A date or int that defines a minimum value for filtering by date.</li>
+</ul>
+<p>For example, consider this CSV file:</p>
+<pre><code>Symbol,Date,Name,Currency,Price
+ACM0006AU,2025-04-28,AB Managed Volatility Equities,AUD,1.82
+CSA0038AU,2025-04-28,Bentham Global Income,AUD,1.00
+ETL0018AU,2025-04-28,PIMCO Global Bond Wholesale,AUD,0.90
+</code></pre>
+<p>The header configuration might look liek this:</p>
+<pre><code>header_config = [
+    {
+        "name": "Symbol",
+        "type": "str",
+        "match": True,
+        "sort": 2,
+    },
+    {
+        "name": "Date",
+        "type": "date",
+        "format": "%Y-%m-%d",
+        "match": True,
+        "sort": 1,
+        "minimum": None,
+    },
+    {
+        "name": "Name",
+        "type": "str",
+    },
+    {
+        "name": "Currency",
+        "type": "str",
+    },
+    {
+        "name": "Price",
+        "type": "float",
+        "format": ".2f",
+    },
+]
+</code></pre>
 
 
 <div class="doc doc-object doc-class">
 
 
 
-<a id="sc_utility.sc_excel_reader.ExcelReader"></a>
+<a id="sc_utility.sc_csv_reader.CSVReader"></a>
     <div class="doc doc-contents first">
 
-
-        <p>A class to read and extract data from Excel files (.xlsx, .xlsm, .xlsb).</p>
-<p>This class provides methods to load workbooks, extract data from sheets,
-tables, and named ranges, with robust error handling.</p>
 
 
 
@@ -644,15 +705,15 @@ tables, and named ranges, with robust error handling.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="sc_utility.sc_excel_reader.ExcelReader.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></code>
+<h2 id="sc_utility.sc_csv_reader.CSVReader.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">header_config</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
 
     <div class="doc doc-contents ">
 
-        <p>Initializes the ExcelReader with the path to the Excel file.</p>
+        <p>Initialize the CSVReader with the file path.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -671,15 +732,31 @@ tables, and named ranges, with robust error handling.</p>
                 <code>file_path</code>
             </td>
             <td>
-                  <code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Path to the Excel file, specified as a Path object or string.</p>
+                <p>The path to the CSV file. If the file does not exist, it won't be created.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>header_config</code>
+            </td>
+            <td>
+                  <code><span title="Optional">Optional</span>(<span title="list">list</span>[<span title="dict">dict</span>])</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The header configuration for the CSV file.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -697,11 +774,21 @@ tables, and named ranges, with robust error handling.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If header_config is not structured correctly.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                   <code><span title="ImportError">ImportError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the file does not exist, is not a valid Excel file, or if the openpyxl library cannot be imported.</p>
+                <p>If the file not exists but doesn't have a valid extension.</p>
               </div>
             </td>
           </tr>
@@ -716,19 +803,15 @@ tables, and named ranges, with robust error handling.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="sc_utility.sc_excel_reader.ExcelReader.extract_data" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">extract_data</span><span class="p">(</span><span class="n">source_name</span><span class="p">,</span> <span class="n">source_type</span><span class="p">)</span></code>
+<h2 id="sc_utility.sc_csv_reader.CSVReader.merge_data_sets" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">merge_data_sets</span><span class="p">(</span><span class="n">primary_list</span><span class="p">,</span> <span class="n">append_list</span><span class="p">)</span></code>
 
 </h2>
 
 
     <div class="doc doc-contents ">
 
-        <p>Extracts data from an Excel file based on the source type and name.</p>
-<p>Expected the specified source type to be either:
-- An entire worksheet with the header in the first row (sheet)
-- A named range (range)
-- An Excel table (table)</p>
+        <p>Merges two lists of dictionaries based on header configuration match fields and sorts the result.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -744,14 +827,14 @@ tables, and named ranges, with robust error handling.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>source_name</code>
+                <code>primary_list</code>
             </td>
             <td>
-                  <code><span title="str">str</span></code>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Name of the sheet, table, or range to extract.</p>
+                <p>The primary list of dictionaries.</p>
               </div>
             </td>
             <td>
@@ -760,14 +843,14 @@ tables, and named ranges, with robust error handling.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>source_type</code>
+                <code>append_list</code>
             </td>
             <td>
-                  <code><span title="str">str</span></code>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Type of source ('sheet', 'table', or 'range').</p>
+                <p>The list of dictionaries to append or override.</p>
               </div>
             </td>
             <td>
@@ -789,11 +872,86 @@ tables, and named ranges, with robust error handling.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the dictionaries in the lists do not have the same structure.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>list[dict]: The merged and sorted list of dictionaries.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="sc_utility.sc_csv_reader.CSVReader.read_csv" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">read_csv</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Read the CSV file and return its content.</p>
+<p>If the file does not exist, return None. If the file has a header but no data, returns an empty list.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
                   <code><span title="ImportError">ImportError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the source type is invalid or if there are issues extracting data.</p>
+                <p>If the CSV file is empty or has no header.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A value read from the CSV file cannot be converted to the expected type as defined in header_config.</p>
               </div>
             </td>
           </tr>
@@ -816,7 +974,7 @@ tables, and named ranges, with robust error handling.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Data extracted as a dictionary.</p>
+                <p>A list of rows from the CSV file or None if the file does not exist.</p>
               </div>
             </td>
           </tr>
@@ -831,15 +989,15 @@ tables, and named ranges, with robust error handling.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="sc_utility.sc_excel_reader.ExcelReader.extract_from_range" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">extract_from_range</span><span class="p">(</span><span class="n">range_name</span><span class="p">)</span></code>
+<h2 id="sc_utility.sc_csv_reader.CSVReader.sort_csv_data" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">sort_csv_data</span><span class="p">(</span><span class="n">csv_data</span><span class="p">)</span></code>
 
 </h2>
 
 
     <div class="doc doc-contents ">
 
-        <p>Extracts a table from an Excel file and returns it as a DataFrame.</p>
+        <p>Sort the CSV data based on the header configuration.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -855,14 +1013,14 @@ tables, and named ranges, with robust error handling.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>range_name</code>
+                <code>csv_data</code>
             </td>
             <td>
-                  <code><span title="str">str</span></code>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Name of the range to extract.</p>
+                <p>The data read from the CSV file.</p>
               </div>
             </td>
             <td>
@@ -873,7 +1031,7 @@ tables, and named ranges, with robust error handling.</p>
     </table>
 
 
-<p><span class="doc-section-title">Raises:</span></p>
+    <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
@@ -884,34 +1042,11 @@ tables, and named ranges, with robust error handling.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ImportError">ImportError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the table cannot be loaded or if there are issues with the file.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>data</code></td>            <td>
                   <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list containing the range data.</p>
+                <p>list[dict]: The sorted data.</p>
               </div>
             </td>
           </tr>
@@ -926,15 +1061,15 @@ tables, and named ranges, with robust error handling.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="sc_utility.sc_excel_reader.ExcelReader.extract_from_sheet" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">extract_from_sheet</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span></code>
+<h2 id="sc_utility.sc_csv_reader.CSVReader.trim_csv_data" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">trim_csv_data</span><span class="p">(</span><span class="n">csv_data</span><span class="p">)</span></code>
 
 </h2>
 
 
     <div class="doc doc-contents ">
 
-        <p>Extracts a sheet from an Excel file and returns it as a DataFrame.</p>
+        <p>Trim the CSV data based on the header configuration.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -950,14 +1085,14 @@ tables, and named ranges, with robust error handling.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>sheet_name</code>
+                <code>csv_data</code>
             </td>
             <td>
-                  <code><span title="str">str</span></code>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Name of the sheet to extract.</p>
+                <p>The data read from the CSV file.</p>
               </div>
             </td>
             <td>
@@ -968,7 +1103,7 @@ tables, and named ranges, with robust error handling.</p>
     </table>
 
 
-<p><span class="doc-section-title">Raises:</span></p>
+    <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
@@ -979,34 +1114,11 @@ tables, and named ranges, with robust error handling.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ImportError">ImportError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the sheet cannot be loaded or if there are issues with the file.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>data</code></td>            <td>
                   <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list containing the sheet data.</p>
+                <p>list[dict]: The trimmed data.</p>
               </div>
             </td>
           </tr>
@@ -1021,15 +1133,16 @@ tables, and named ranges, with robust error handling.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="sc_utility.sc_excel_reader.ExcelReader.extract_from_table" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">extract_from_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span></code>
+<h2 id="sc_utility.sc_csv_reader.CSVReader.update_csv_file" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">update_csv_file</span><span class="p">(</span><span class="n">new_data</span><span class="p">,</span> <span class="n">new_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
 
     <div class="doc doc-contents ">
 
-        <p>Extracts a table from an Excel file and returns it as a DataFrame.</p>
+        <p>Appends or merges the new_data into an existing CSV file. If the file does not exist, it will be created.</p>
+<p>This function will also sort and trim the combined data according to the header configuration.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1045,20 +1158,36 @@ tables, and named ranges, with robust error handling.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>table_name</code>
+                <code>new_data</code>
             </td>
             <td>
-                  <code><span title="str">str</span></code>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Name of the table to extract.</p>
+                <p>The new data to append or merge.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>new_filename</code>
+            </td>
+            <td>
+                  <code><span title="Optional">Optional</span>(<span title="pathlib.Path">Path</span> | <span title="str">str</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If provided, the data will be written to this file instead of the original file.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -1074,11 +1203,11 @@ tables, and named ranges, with robust error handling.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ImportError">ImportError</span></code>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the table cannot be loaded or if there are issues with the file.</p>
+                <p>If there is a problem processign the data.</p>
               </div>
             </td>
           </tr>
@@ -1096,12 +1225,12 @@ tables, and named ranges, with robust error handling.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>data</code></td>            <td>
-                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
+<td><code>bool</code></td>            <td>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list containing the table data.</p>
+                <p>True if the data was written successfully, False otherwise.</p>
               </div>
             </td>
           </tr>
@@ -1116,15 +1245,24 @@ tables, and named ranges, with robust error handling.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="sc_utility.sc_excel_reader.ExcelReader.load_excel_workbook" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">load_excel_workbook</span><span class="p">(</span><span class="n">data_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<h2 id="sc_utility.sc_csv_reader.CSVReader.write_csv" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">write_csv</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">new_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
 
     <div class="doc doc-contents ">
 
-        <p>Load an Excel workbook with robust error handling.</p>
+        <p>Write data to the CSV file.</p>
+<ol>
+<li>If the file does not exist, it will be created.</li>
+<li>If the file exists, it will be overwritten.</li>
+<li>The header will be written based on the header_config.</li>
+<li>The data will be written in the order of the header_config.</li>
+<li>If a header in the data does not exist in the header_config, it will be ignored.</li>
+<li>If a header in the header_config does not exist in the data, throw an exception.</li>
+<li>Date fields are formatted according to the format specified in header_config.</li>
+</ol>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1140,34 +1278,34 @@ tables, and named ranges, with robust error handling.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>data_only</code>
+                <code>data</code>
             </td>
             <td>
-                  <code><span title="Optional">Optional</span>[<span title="bool">bool</span>]</code>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to return cell values (not formulas).</p>
+                <p>The data to write to the CSV file.</p>
               </div>
             </td>
             <td>
-                  <code>True</code>
+                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>read_only</code>
+                <code>new_filename</code>
             </td>
             <td>
-                  <code><span title="Optional">Optional</span>[<span title="bool">bool</span>]</code>
+                  <code><span title="Optional">Optional</span>(<span title="pathlib.Path">Path</span> | <span title="str">str</span>)</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Use openpyxl's read-only mode for large files.</p>
+                <p>If provided, the data will be written to this file instead of the original file.</p>
               </div>
             </td>
             <td>
-                  <code>False</code>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -1185,11 +1323,11 @@ tables, and named ranges, with robust error handling.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ImportError">ImportError</span></code>
+                  <code><span title="ValueError">ValueError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the file cannot be loaded due to various reasons (e.g., file not found, permission denied, invalid format).</p>
+                <p>If the data is empty or if a header in header_config is not found in the data.</p>
               </div>
             </td>
           </tr>
@@ -1201,18 +1339,18 @@ tables, and named ranges, with robust error handling.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>object</code></td>            <td>
-                  <code><span title="workbook">workbook</span></code>
+            <td>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Workbook object or None if loading fails.</p>
+                <p>True if the data was written successfully, False otherwise.</p>
               </div>
             </td>
           </tr>

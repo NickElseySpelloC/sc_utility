@@ -13,13 +13,13 @@ class DateHelper:
     """
 
     @staticmethod
-    def format_date(date_obj: date, date_format: str | None = "%Y-%m-%d") -> str:
+    def format_date(date_obj: date, date_format: str = "%Y-%m-%d") -> str | None:
         """
         Format a date object to a string.
 
         Args:
             date_obj (date): The date object to format.
-            date_format (Optional[str], optional): The format string to use for formatting the date.
+            date_format (str, optional): The format string to use for formatting the date.
 
         Returns:
             date_str (str): The formatted date string, or None if date_obj is None.
@@ -29,7 +29,7 @@ class DateHelper:
         return date_obj.strftime(date_format)
 
     @staticmethod
-    def parse_date(date_str: str, date_format: str | None = "%Y-%m-%d") -> date:
+    def parse_date(date_str: str, date_format: str = "%Y-%m-%d") -> date | None:
         """
         Parse a date string to a date object.
 
@@ -47,7 +47,7 @@ class DateHelper:
         return dt.date()
 
     @staticmethod
-    def days_between(start_date: date, end_date: date) -> int:
+    def days_between(start_date: date, end_date: date) -> int | None:
         """
         Calculate the number of days between two date objects.
 
@@ -63,7 +63,7 @@ class DateHelper:
         return (end_date - start_date).days
 
     @staticmethod
-    def add_days(start_date: date, days: int) -> date:
+    def add_days(start_date: date, days: int) -> date | None:
         """
         Add days to a date object.
 
@@ -80,7 +80,7 @@ class DateHelper:
         return start_date + timedelta(days=days)
 
     @staticmethod
-    def is_valid_date(date_str: str, date_format: str | None = "%Y-%m-%d") -> bool:
+    def is_valid_date(date_str: str, date_format: str = "%Y-%m-%d") -> bool:
         """
         Check if a date string is valid according to the specified format.
 
@@ -122,7 +122,7 @@ class DateHelper:
             result (date): Today's date offset by the specified number of days.
         """
         date_today = DateHelper.today()
-        return DateHelper.add_days(date_today, days)
+        return DateHelper.add_days(date_today, days)  # type: ignore[call-arg]
 
     @staticmethod
     def today_str(date_format: str | None = "%Y-%m-%d") -> str:
@@ -136,10 +136,10 @@ class DateHelper:
             result (str): Today's date as a formatted string, using the specified date format.
         """
         date_today = DateHelper.today()
-        return DateHelper.format_date(date_today, date_format)
+        return DateHelper.format_date(date_today, date_format)  # type: ignore[call-arg]
 
     @staticmethod
-    def get_file_date(file_path: str | Path) -> date:
+    def get_file_date(file_path: str | Path) -> date | None:
         """
         Get the last modified date of a file.
 

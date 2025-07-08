@@ -3,13 +3,66 @@
 import platform
 import pprint
 import sys
+from datetime import date
 
 from example_config_schemas import ConfigSchema
 
-from sc_utility import DateHelper, ExcelReader, SCConfigManager, SCLogger
+from sc_utility import CSVReader, DateHelper, ExcelReader, SCConfigManager, SCLogger
 
 CONFIG_FILE = "examples/example_config.yaml"
 EXCEL_FILE = "examples/example_excel.xlsx"
+CSV_FILE = "examples/example_csv.csv"
+
+
+def update_csv():
+    header_config = [
+        {
+            "name": "Symbol",
+            "type": "str",
+            "match": True,
+            "sort": 2,
+        },
+        {
+            "name": "Date",
+            "type": "date",
+            "format": "%Y-%m-%d",
+            "match": True,
+            "sort": 1,
+            "minimum": None,
+        },
+        {
+            "name": "Name",
+            "type": "str",
+        },
+        {
+            "name": "Currency",
+            "type": "str",
+        },
+        {
+            "name": "Price",
+            "type": "float",
+            "format": ".2f",
+        },
+    ]
+
+    extra_data = [
+        {
+            "Symbol": "AAPL",
+            "Date": date(2023, 10, 1),
+            "Name": "Apple Inc.",
+            "Currency": "USD",
+            "Price": 150.00,
+        },
+        ]
+
+    # Create an instance of the CSVReader class
+    try:
+        csv_reader = CSVReader(CSV_FILE, header_config)
+    except (ImportError, TypeError, ValueError) as e:
+        print(e, file=sys.stderr)
+        return
+
+    csv_reader.update_csv_file(extra_data)
 
 
 def main():
@@ -70,6 +123,9 @@ def main():
     else:
         print("Table data extracted successfully:\n")
         pprint.pprint(table_data)
+
+    # Update a CSV file
+    update_csv()
 
     # See if we have a fatal error from a previous run
     if logger.get_fatal_error():

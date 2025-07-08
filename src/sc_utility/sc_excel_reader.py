@@ -75,7 +75,7 @@ class ExcelReader:
 
         raise ImportError(msg)   # Raise an error with the message if loading fails
 
-    def extract_data(self, source_name: str, source_type: str) -> dict:
+    def extract_data(self, source_name: str, source_type: str) -> list[dict]:
         """
         Extracts data from an Excel file based on the source type and name.
 
@@ -92,7 +92,7 @@ class ExcelReader:
             ImportError: If the source type is invalid or if there are issues extracting data.
 
         Returns:
-            data (dict): Data extracted as a dictionary.
+            data (list[dict]): Data extracted as a dictionary.
         """
         if source_type == "sheet":
             return self.extract_from_sheet(source_name)
@@ -104,7 +104,7 @@ class ExcelReader:
         msg = f"Invalid source type '{source_type}'. Must be 'sheet', 'table', or 'range'."
         raise ImportError(msg)
 
-    def extract_from_sheet(self, sheet_name: str) -> dict:
+    def extract_from_sheet(self, sheet_name: str) -> list[dict]:
         """
         Extracts a sheet from an Excel file and returns it as a DataFrame.
 
@@ -115,7 +115,7 @@ class ExcelReader:
             ImportError: If the sheet cannot be loaded or if there are issues with the file.
 
         Returns:
-            data (DataFrame): A DataFrame containing the sheet data.
+            data (list[dict]): A list containing the sheet data.
         """
         try:
             table_df = pd.read_excel(self.file_path, sheet_name=sheet_name)
@@ -136,7 +136,7 @@ class ExcelReader:
         # If we reach here, it means the import failed
         raise ImportError(msg)
 
-    def extract_from_table(self, table_name: str) -> dict:
+    def extract_from_table(self, table_name: str) -> list[dict]:
         """
         Extracts a table from an Excel file and returns it as a DataFrame.
 
@@ -147,7 +147,7 @@ class ExcelReader:
             ImportError: If the table cannot be loaded or if there are issues with the file.
 
         Returns:
-            data (DataFrame): A DataFrame containing the table data.
+            data (list[dict]): A list containing the table data.
         """
         # load_excel_workbook() will raise an ImportError if there's an issue. Let this be caught by the caller.
         wb = self.load_excel_workbook(data_only=True, read_only=False)
@@ -167,10 +167,15 @@ class ExcelReader:
             msg = f"Table '{table_name}' not found in any worksheet of the Excel file {self.file_path}."
             raise ImportError(msg)
 
+        if min_col is None or max_col is None or max_row is None or min_row is None:
+            msg = f"Invalid table range boundaries for table '{table_name}' in file {self.file_path}."
+            raise ImportError(msg)
+
         try:
             # Generate usecols as Excel letters (e.g., 'B', 'C', ..., 'F')
             usecols = [get_column_letter(col) for col in range(min_col, max_col + 1)]
-            nrows = max_row - min_row + 1  # Include all rows in the table
+            # Include all rows in the table
+            nrows = max_row - min_row + 1  # type: ignore[assignment]
 
             # Read the specific table range using pandas
             table_df = pd.read_excel(
@@ -183,10 +188,10 @@ class ExcelReader:
             )
 
             # Strip whitespace from column names
-            table_df.columns = table_df.iloc[0].map(str).str.strip()
+            table_df.columns = table_df.iloc[0].map(str).str.strip()  # type: ignore[attr-defined]
 
             # Define the first row as the header
-            table_df = table_df[1:].reset_index(drop=True)
+            table_df = table_df[1:].reset_index(drop=True)  # type: ignore[attr-defined]
 
             # Extract to dictionary
             table_data = table_df.to_dict(orient="records")
@@ -197,7 +202,7 @@ class ExcelReader:
         else:
             return table_data
 
-    def extract_from_range(self, range_name: str) -> dict:
+    def extract_from_range(self, range_name: str) -> list[dict]:
         """
         Extracts a table from an Excel file and returns it as a DataFrame.
 
@@ -208,7 +213,7 @@ class ExcelReader:
             ImportError: If the table cannot be loaded or if there are issues with the file.
 
         Returns:
-            data (DataFrame): A DataFrame containing the range data.
+            data (list[dict]): A list containing the range data.
         """
         # load_excel_workbook() will raise an ImportError if there's an issue. Let this be caught by the caller.
         wb = self.load_excel_workbook(data_only=True, read_only=True)
@@ -231,10 +236,15 @@ class ExcelReader:
             msg = f"Range '{range_name}' not found in any worksheet of the Excel file {self.file_path}."
             raise ImportError(msg)
 
+        if min_col is None or max_col is None or max_row is None or min_row is None:
+            msg = f"Invalid table range boundaries for range '{range_name}' in file {self.file_path}."
+            raise ImportError(msg)
+
         try:
             # Generate usecols as Excel letters (e.g., 'B', 'C', ..., 'F')
             usecols = [get_column_letter(col) for col in range(min_col, max_col + 1)]
-            nrows = max_row - min_row + 1  # Include all rows in the table
+            # Include all rows in the table
+            nrows = max_row - min_row + 1    # type: ignore[assignment]
 
             # Read the specific table range using pandas
             table_df = pd.read_excel(
@@ -247,7 +257,7 @@ class ExcelReader:
             )
 
             # Strip whitespace from column names
-            table_df.columns = table_df.iloc[0].map(str).str.strip()
+            table_df.columns = table_df.iloc[0].map(str).str.strip()  # type: ignore[attr-defined]
 
             # Define the first row as the header
             table_df = table_df[1:].reset_index(drop=True)
@@ -260,3 +270,5 @@ class ExcelReader:
             raise ImportError(msg) from e
         else:
             return table_data
+
+

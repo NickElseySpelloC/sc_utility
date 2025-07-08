@@ -12,11 +12,13 @@ plugins:
           options:
             docstring_style: google  # or numpy, sphinx
             show_source: false
+            heading_level: 2
 
 nav:
   - Home: index.md
   - Getting Started: guide.md
   - API Reference:
+      - CSVReader: reference/csvreader.md
       - DateHelper: reference/datehelper.md
       - ExcelReader: reference/excelreader.md
       - SCConfigManager: reference/configmanager.md

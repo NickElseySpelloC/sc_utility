@@ -67,7 +67,7 @@ class SCLogger:
         # Make a note of the app directory
         self.app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
 
-        if self.file_logging_enabled:
+        if self.file_logging_enabled and self.logfile_name is not None:
             # Determine the file path for the log file
             current_dir = Path.cwd()
 
@@ -110,7 +110,7 @@ class SCLogger:
         if not self.file_logging_enabled:
             return
 
-        if self.logfile_path.exists() and self.max_lines > 0:
+        if self.logfile_path.exists() and self.max_lines is not None and self.max_lines > 0:
             # Monitoring log file exists - truncate excess lines if needed.
             with self.logfile_path.open(encoding="utf-8") as file:
                 lines = file.readlines()
@@ -138,8 +138,10 @@ class SCLogger:
             exception_msg = f"log_message(): Invalid verbosity passed, must be one of {list(self.verbosity_levels.keys())}."
             raise ValueError(exception_msg)
 
-        logfile_level = self.verbosity_levels.get(self.file_verbosity, 0)
-        console_level = self.verbosity_levels.get(self.console_verbosity, 0)
+        file_verbosity = self.file_verbosity if self.file_verbosity is not None else "none"
+        console_verbosity = self.console_verbosity if self.console_verbosity is not None else "none"
+        logfile_level = self.verbosity_levels.get(file_verbosity, 0)
+        console_level = self.verbosity_levels.get(console_verbosity, 0)
         message_level = self.verbosity_levels.get(verbosity, 0)
 
         process_str = ""
@@ -234,13 +236,16 @@ class SCLogger:
             path_obj = Path(possible_path)
 
         # Check if it's absolute, or contains a path separator, or has a file extension
-        return (
-            path_obj.is_absolute() or
-            "/" in path_str or "\\" in path_str or
-            (path_obj.suffix.lower() is not None and path_obj.suffix.lower())
-        )
+        if path_obj.is_absolute():
+            return True
 
-    def select_file_location(self, file_name: str) -> Path:
+        if "/" in path_str or "\\" in path_str:
+            return True
+
+        # Check if the path has a file extension
+        return bool(path_obj.suffix and path_obj.suffix.lower() is not None)
+
+    def select_file_location(self, file_name: str | Path) -> Path | None:
         """
         Selects the file location for the given file name.
 
@@ -275,7 +280,7 @@ class SCLogger:
             file_path = app_dir / file_name
         return file_path
 
-    def send_email(self, subject: str, body: str, test_mode: bool = False) -> bool:  # noqa: FBT001, FBT002, PLR0912
+    def send_email(self, subject: str, body: str | Path, test_mode: bool = False) -> bool:  # noqa: FBT001, FBT002, PLR0912, PLR0915
         """
         Sends an email using the SMTP server previously specified in register_email_settings().
 
@@ -283,9 +288,9 @@ class SCLogger:
             subject (str): The subject of the email.
             body (str): The body of the email. This argument can be one of 4 things:
                 1. A string containing the HTML body of the email
-                2. A string containing the path to an HTML file to read the body from
+                2. A string or Path containing the path to an HTML file to read the body from
                 3. A string containing the text body of the email
-                4. A string containing the path to an text file to read the body from
+                4. A string or Path containing the path to an text file to read the body from
             test_mode (bool, optional): If True, the email will not be sent, but a message will be logged indicating that the email would have been sent. Defaults to False.
 
         Returns:
@@ -330,8 +335,8 @@ class SCLogger:
         if payload_path is None:
             # If fall through to here, then the body was not a file path or the file did not exist
             # Assume that the body is a string containing the content
-            payload = body  # Default to the body as text content
-            if body.startswith(("<html", "<!DOCTYPE html")):
+            payload = str(body)  # Default to the body as text content
+            if payload.startswith(("<html", "<!DOCTYPE html")):
                 payload_type = "html"
             else:
                 payload_type = "plain"
@@ -339,6 +344,13 @@ class SCLogger:
         # Load the Gmail SMTP server configuration
         sender_email = self.email_settings.get("SMTPUsername")
         send_to = self.email_settings.get("SendEmailsTo")
+        smtp_server = self.email_settings.get("SMTPServer")
+        smtp_port = self.email_settings.get("SMTPPort", 587)
+        smtp_password = self.email_settings.get("SMTPPassword")
+
+        if not sender_email or not send_to or not smtp_server or not smtp_port or not smtp_password:
+            self.log_fatal_error("send_email(): Email settings are incomplete. 'SMTPUsername', 'SendEmailsTo', 'SMTPServer' and 'SMTPPassword' must be provided.")
+            return False
 
         try:
             # Create the email
@@ -346,18 +358,18 @@ class SCLogger:
             msg["From"] = sender_email
             msg["To"] = send_to
             if self.email_settings.get("SubjectPrefix", None) is not None:
-                msg["Subject"] = self.email_settings.get("SubjectPrefix") + subject
+                msg["Subject"] = self.email_settings.get("SubjectPrefix", "") + subject
             else:
                 msg["Subject"] = subject
 
             # Attach the payload as either plain text or HTML
-            part = MIMEText(payload, payload_type)
+            part = MIMEText(payload, payload_type)  # type: ignore[arg-type]
             msg.attach(part)
 
             # Connect to the Gmail SMTP server
-            with smtplib.SMTP(self.email_settings.get("SMTPServer"), self.email_settings.get("SMTPPort", 587)) as server:
+            with smtplib.SMTP(smtp_server, smtp_port) as server:
                 server.starttls()  # Upgrade the connection to secure
-                server.login(sender_email, self.email_settings.get("SMTPPassword"))  # Log in using App Password
+                server.login(sender_email, smtp_password)  # Log in using App Password
                 if test_mode:
                     self.log_message(f"Test mode: Email with subject '{msg['Subject']}' would be sent to {send_to}.", "summary")
                 else:

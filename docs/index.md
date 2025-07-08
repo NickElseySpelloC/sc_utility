@@ -7,6 +7,7 @@ This utility library provides some basic utility functions for:
 - SCLogging: Sending email in plain text or HTML format
 - DateHelper: Date helper functions
 - ExcelReader: Reading data from Excel worksheets, ranges and tables
+- CSVReader: Reading data from CSV files and writing to CSV files
 
 To get started, see the [Getting Started](guide.md/) page.
 

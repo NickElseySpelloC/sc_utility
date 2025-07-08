@@ -4,6 +4,7 @@ Management of a YAML log file.
 """
 
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 import yaml
@@ -76,8 +77,8 @@ class SCConfigManager:
                 if self.validation_schema is not None:
                     v = Validator()
 
-                    if not v.validate(self._config, self.validation_schema):
-                        msg = f"Validation error for config file {self.config_path}: {v.errors}"
+                    if not v.validate(self._config, self.validation_schema):  # type: ignore[call-arg]
+                        msg = f"Validation error for config file {self.config_path}: {v.errors}"  # type: ignore[call-arg]
                         raise RuntimeError(msg)
 
         self.config_last_modified = self.config_path.stat().st_mtime
@@ -130,15 +131,15 @@ class SCConfigManager:
             file_path = app_dir / file_name
         return file_path
 
-    def register_logger(self, logger_function: callable) -> None:
+    def register_logger(self, logger_function: Callable) -> None:
         """Registers a logger function to be used for logging messages.
 
         Args:
-            logger_function (callable): The function to use for logging messages.
+            logger_function (Callable): The function to use for logging messages.
         """
         self.logger_function = logger_function
 
-    def check_for_placeholders(self, placeholders: dict) -> bool:
+    def check_for_placeholders(self, placeholders: dict | None) -> bool:
         """Recursively scan self._config for any instances of a key found in placeholders.
 
         If the keys and values match (including nested), return True.
@@ -210,7 +211,7 @@ class SCConfigManager:
         }
         return logger_settings
 
-    def get_email_settings(self, config_section: str | None = "Email") -> dict:
+    def get_email_settings(self, config_section: str | None = "Email") -> dict | None:
         """Returns the email settings from the config file.
 
         Args:
