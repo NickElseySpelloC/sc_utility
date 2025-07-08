@@ -1062,14 +1062,14 @@ ETL0018AU,2025-04-28,PIMCO Global Bond Wholesale,AUD,0.90
 
 
 <h2 id="sc_utility.sc_csv_reader.CSVReader.trim_csv_data" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">trim_csv_data</span><span class="p">(</span><span class="n">csv_data</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">trim_csv_data</span><span class="p">(</span><span class="n">csv_data</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
 
     <div class="doc doc-contents ">
 
-        <p>Trim the CSV data based on the header configuration.</p>
+        <p>Trim the CSV data based on the header configuration and optionally the max_lines arg.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1097,6 +1097,23 @@ ETL0018AU,2025-04-28,PIMCO Global Bond Wholesale,AUD,0.90
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_lines</code>
+            </td>
+            <td>
+                  <code><span title="Optional">Optional</span>(<span title="int">int</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If provided, the maximum number of lines to return from csv_data.
+If this is &gt;0 then it will return the first max_lines lines, if &lt;0 then it will return all but the last abs(max_lines) lines. If None, no trimming is done.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -1225,12 +1242,12 @@ ETL0018AU,2025-04-28,PIMCO Global Bond Wholesale,AUD,0.90
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>bool</code></td>            <td>
-                  <code><span title="bool">bool</span></code>
+<td><code>merged_data</code></td>            <td>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True if the data was written successfully, False otherwise.</p>
+                <p>The merged and sorted data after appending or merging the new_data.</p>
               </div>
             </td>
           </tr>

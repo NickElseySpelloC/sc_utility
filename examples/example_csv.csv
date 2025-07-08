@@ -1,4 +1,5 @@
 Symbol,Date,Name,Currency,Price
+AAPL,2023-10-01,Apple Inc.,USD,150.00
 ACM0006AU,2025-04-28,AB Managed Volatility Equities,AUD,1.82
 CSA0038AU,2025-04-28,Bentham Global Income,AUD,1.00
 ETL0018AU,2025-04-28,PIMCO Global Bond Wholesale,AUD,0.90
@@ -34,4 +35,4 @@ HOW0098AU,2025-04-30,Ardea Real Outcome Fund,AUD,0.87
 IOF0145AU,2025-04-30,Janus Henderson Tactical Income,AUD,1.06
 PER0048AU,2025-04-30,Perpetual Smaller Companies,AUD,1.17
 PLA0004AU,2025-04-30,Platinum Asia,AUD,2.44
-RFA0025AU,2025-04-30,Pendal Horizon Sustainable Australian Shares,AUD,1.06
+RFA0025AU,2025-04-30,Somethng Else,AUD,100.00

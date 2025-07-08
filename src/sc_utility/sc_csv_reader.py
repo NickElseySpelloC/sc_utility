@@ -1,7 +1,7 @@
 """CSVReader class for extracting data from CSV files."""
 import csv
 import operator
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 from sc_utility.sc_date_helper import DateHelper
@@ -49,8 +49,8 @@ class CSVReader:
             If header_config has been supplied, validate it:
             1. Make sure it's a list of dictionaries.
             2. Ensure each header is a dictionary with 'name' and 'type' keys.
-            3. 'type' can be 'str', 'int', 'float', or 'date'.
-            4. If 'date', it can have an optional 'format' key.
+            3. 'type' can be 'str', 'int', 'float', 'date' or 'datetime'.
+            4. If 'date' or 'datetime', it can have an optional 'format' key.
             5. The only allowed attributes in the header dictionaries are 'name', 'type', 'format', 'match' and 'sort'
 
         Returns:
@@ -63,6 +63,7 @@ class CSVReader:
             return "header_config must be a list of dictionaries."
 
         allowed_keys = {"name", "type", "format", "match", "sort", "minimum"}
+        allowed_types = {"str", "int", "float", "date", "datetime"}
         for header in self.header_config:
             if not isinstance(header, dict):
                 return "Each header in header_config must be a dictionary."
@@ -71,10 +72,8 @@ class CSVReader:
                 return f"Invalid keys in header configuration. Allowed keys are: {', '.join(allowed_keys)}."
             if "name" not in header or "type" not in header:
                 return "Each header must have 'name' and 'type' keys."
-            if header["type"] not in {"str", "int", "float", "date"}:
-                return f"Invalid type '{header['type']}' in header configuration."
-            if header["type"] == "date" and "format" in header and not isinstance(header["format"], str):
-                return "If 'format' is provided, it must be a string."
+            if header["type"] not in allowed_types:
+                return f"Invalid type '{header['type']}' in header configuration. Allowed types are: {', '.join(allowed_types)}."
 
         # If 'format' is provided, it must be a string
         for header in self.header_config:
@@ -92,12 +91,12 @@ class CSVReader:
                 return "If 'match' is provided, it must be a boolean."
 
         # If 'minimum' is provided, it must be a date or an int or None
-        # and the type must be Date
+        # and the type must be Date or Datetime
         for header in self.header_config:
             if "minimum" in header and not (isinstance(header["minimum"], (int, date)) or header["minimum"] is None):
                 return "If 'minimum' is provided, it must be a date, and int or None."
-            if "minimum" in header and header["type"] != "date":
-                return "If 'minimum' is provided, the type must be 'date'."
+            if "minimum" in header and header["type"] != "date" and header["type"] != "datetime":
+                return "If 'minimum' is provided, the type must be 'date' or 'datetime'."
 
         return ""
 
@@ -169,6 +168,11 @@ class CSVReader:
                                     # Convert date strings to datetime objects
                                     date_format = config.get("format", "%Y-%m-%d")
                                     row_dict[header] = DateHelper.parse_date(row[i], date_format)
+                                elif config["type"] == "datetime":
+                                    # Convert datetime strings to datetime objects
+                                    datetime_format = config.get("format", "%Y-%m-%d %H:%M:%S")
+                                    # local_tz = datetime.now().astimezone().tzinfo
+                                    row_dict[header] = datetime.strptime(row[i], datetime_format)   # .replace(tzinfo=local_tz)  # noqa: DTZ007
                                 elif config["type"] == "float":
                                     # Convert float strings to float and round if specified
                                     row_dict[header] = float(row[i])
@@ -283,11 +287,13 @@ class CSVReader:
 
         return merged
 
-    def trim_csv_data(self, csv_data: list[dict]) -> list[dict]:
-        """Trim the CSV data based on the header configuration.
+    def trim_csv_data(self, csv_data: list[dict], max_lines: int | None = None) -> list[dict]:
+        """Trim the CSV data based on the header configuration and optionally the max_lines arg.
 
         Args:
             csv_data (list[dict]): The data read from the CSV file.
+            max_lines (Optional(int), optional): If provided, the maximum number of lines to return from csv_data.
+                If this is >0 then it will return the first max_lines lines, if <0 then it will return all but the last abs(max_lines) lines. If None, no trimming is done.
 
         Returns:
             list[dict]: The trimmed data.
@@ -301,12 +307,12 @@ class CSVReader:
             if "minimum" in header
         ]
 
-        # If no minimum headers, return original data
-        if not minimum_headers:
+        # If no minimum headers and no max_lines, return original data
+        if not minimum_headers and max_lines is None:
             return csv_data
 
+        # Trim based on header configuration
         trimmed_data = csv_data
-
         for header in minimum_headers:
             field_name = header["name"]
             minimum_value = header["minimum"]
@@ -325,6 +331,13 @@ class CSVReader:
                 row for row in trimmed_data
                 if field_name in row and isinstance(row[field_name], date) and row[field_name] >= cutoff_date
             ]
+
+        # If max_lines is specified, trim the data to that many lines
+        if max_lines is not None and max_lines != 0:
+            if max_lines > 0:
+                trimmed_data = trimmed_data[:max_lines]
+            else:  # max_lines < 0
+                trimmed_data = trimmed_data[max_lines:]
 
         return trimmed_data
 
@@ -386,6 +399,9 @@ class CSVReader:
                 if header["type"] == "date" and isinstance(value, date):
                     date_format = header.get("format", "%Y-%m-%d")
                     formatted_row[field_name] = value.strftime(date_format)
+                elif header["type"] == "datetime" and isinstance(value, datetime):
+                    datetime_format = header.get("format", "%Y-%m-%d %H:%M:%S")
+                    formatted_row[field_name] = value.strftime(datetime_format)
                 elif header["type"] == "float" and "format" in header:
                     formatted_row[field_name] = format(value, header["format"])
                 else:
@@ -401,7 +417,7 @@ class CSVReader:
 
         return True
 
-    def update_csv_file(self, new_data: list[dict], new_filename: Path | str | None = None) -> bool:
+    def update_csv_file(self, new_data: list[dict], new_filename: Path | str | None = None) -> list[dict]:
         """Appends or merges the new_data into an existing CSV file. If the file does not exist, it will be created.
 
         This function will also sort and trim the combined data according to the header configuration.
@@ -414,7 +430,7 @@ class CSVReader:
             RuntimeError: If there is a problem processign the data.
 
         Returns:
-            bool: True if the data was written successfully, False otherwise.
+            merged_data (list[dict]): The merged and sorted data after appending or merging the new_data.
         """
         # Read the existing CSV data
         try:
@@ -437,4 +453,4 @@ class CSVReader:
 
         # Save the modified CSV data
         self.write_csv(merged_data, new_filename)
-        return True
+        return merged_data
