@@ -1,9 +1,9 @@
 """Example code using the sc_utility libraries. Should not be included in the distrbution."""
 
+import datetime as dt
 import platform
 import pprint
 import sys
-from datetime import date
 
 from example_config_schemas import ConfigSchema
 
@@ -48,7 +48,7 @@ def update_csv():
     extra_data = [
         {
             "Symbol": "AAPL",
-            "Date": date(2023, 10, 1),
+            "Date": dt.date(2023, 10, 1),
             "Name": "Apple Inc.",
             "Currency": "USD",
             "Price": 150.00,

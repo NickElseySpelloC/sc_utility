@@ -1,7 +1,7 @@
 """CSVReader class for extracting data from CSV files."""
 import csv
+import datetime as dt
 import operator
-from datetime import date, datetime
 from pathlib import Path
 
 from sc_utility.sc_date_helper import DateHelper
@@ -93,7 +93,7 @@ class CSVReader:
         # If 'minimum' is provided, it must be a date or an int or None
         # and the type must be Date or Datetime
         for header in self.header_config:
-            if "minimum" in header and not (isinstance(header["minimum"], (int, date)) or header["minimum"] is None):
+            if "minimum" in header and not (isinstance(header["minimum"], (int, dt.date)) or header["minimum"] is None):
                 return "If 'minimum' is provided, it must be a date, and int or None."
             if "minimum" in header and header["type"] != "date" and header["type"] != "datetime":
                 return "If 'minimum' is provided, the type must be 'date' or 'datetime'."
@@ -172,7 +172,7 @@ class CSVReader:
                                     # Convert datetime strings to datetime objects
                                     datetime_format = config.get("format", "%Y-%m-%d %H:%M:%S")
                                     # local_tz = datetime.now().astimezone().tzinfo
-                                    row_dict[header] = datetime.strptime(row[i], datetime_format)   # .replace(tzinfo=local_tz)  # noqa: DTZ007
+                                    row_dict[header] = dt.datetime.strptime(row[i], datetime_format)   # .replace(tzinfo=local_tz)  # noqa: DTZ007
                                 elif config["type"] == "float":
                                     # Convert float strings to float and round if specified
                                     row_dict[header] = float(row[i])
@@ -318,7 +318,7 @@ class CSVReader:
             minimum_value = header["minimum"]
 
             # Calculate the cutoff date
-            if isinstance(minimum_value, date):
+            if isinstance(minimum_value, dt.date):
                 cutoff_date = minimum_value
             elif isinstance(minimum_value, int):
                 # Calculate date that is minimum_value days before today
@@ -329,7 +329,7 @@ class CSVReader:
             # Filter out records with dates prior to cutoff_date
             trimmed_data = [
                 row for row in trimmed_data
-                if field_name in row and isinstance(row[field_name], date) and row[field_name] >= cutoff_date
+                if field_name in row and isinstance(row[field_name], dt.date) and row[field_name] >= cutoff_date
             ]
 
         # If max_lines is specified, trim the data to that many lines
@@ -396,10 +396,10 @@ class CSVReader:
                 value = row[field_name]
 
                 # Format according to header config
-                if header["type"] == "date" and isinstance(value, date):
+                if header["type"] == "date" and isinstance(value, dt.date):
                     date_format = header.get("format", "%Y-%m-%d")
                     formatted_row[field_name] = value.strftime(date_format)
-                elif header["type"] == "datetime" and isinstance(value, datetime):
+                elif header["type"] == "datetime" and isinstance(value, dt.datetime):
                     datetime_format = header.get("format", "%Y-%m-%d %H:%M:%S")
                     formatted_row[field_name] = value.strftime(datetime_format)
                 elif header["type"] == "float" and "format" in header:
