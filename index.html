@@ -12,7 +12,7 @@
       
       
       
-        <link rel="next" href="guide/">
+        <link rel="next" href="guide/getting_started/">
       
       
       <link rel="icon" href="assets/images/favicon.png">
@@ -227,9 +227,20 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="guide/" class="md-nav__link">
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -238,7 +249,88 @@
   </span>
   
 
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Using the Library
+    
+  </span>
+  
+
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/shelly_control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Shelly Smart Switches
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/shelly_models_list/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Shelly Models Library
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -396,6 +488,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reference/shelly_control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ShellyControl
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -440,14 +555,14 @@
 <h1 id="welcome">Welcome</h1>
 <p>This utility library provides some basic utility functions for:</p>
 <ul>
-<li>SCConfigManager: Reading from and validating YAML style config files</li>
-<li>SCLogging: Logging messages to the console and a log file</li>
-<li>SCLogging: Sending email in plain text or HTML format</li>
-<li>DateHelper: Date helper functions</li>
-<li>ExcelReader: Reading data from Excel worksheets, ranges and tables</li>
-<li>CSVReader: Reading data from CSV files and writing to CSV files</li>
+<li><a href="reference/configmanager/">SCConfigManager</a>: Reading from and validating YAML style config files</li>
+<li><a href="reference/logging/">SCLogging</a>: Logging messages to the console and a log file and sending email in plain text or HTML format</li>
+<li><a href="reference/datehelper/">DateHelper</a>: Date and datetime helper functions</li>
+<li><a href="reference/excelreader/">ExcelReader</a>: Reading data from Excel worksheets, ranges and tables</li>
+<li><a href="reference/csvreader/">CSVReader</a>: Reading data from and and writing to CSV files</li>
+<li><a href="reference/shelly_control/">ShellyControl</a>: Controlling Shelly smart switches and energy meters</li>
 </ul>
-<p>To get started, see the <a href="guide/">Getting Started</a> page.</p>
+<p>To get started, see the <a href="guide/getting_started/">Getting Started</a> page.</p>
 <p>Use the <strong>API Reference</strong> navigation to view the API methods for each class.</p>
 
 
