@@ -3,12 +3,13 @@
 Management of a YAML log file.
 """
 
-import sys
 from collections.abc import Callable
 from pathlib import Path
 
 import yaml
 from cerberus import Validator
+
+from sc_utility.sc_common import SCCommon
 
 
 class SCConfigManager:
@@ -34,11 +35,11 @@ class SCConfigManager:
         self.validation_schema = validation_schema
         self.placeholders = placeholders
 
-        # Make a note of the app directory
-        self.app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
-
         # Determine the file path for the log file
-        self.config_path = self.select_file_location(self.config_file)
+        self.config_path = SCCommon.select_file_location(self.config_file)
+        if self.config_path is None:
+            msg = f"Cannot find config file {self.config_file}. Please check the path."
+            raise RuntimeError(msg)
 
         # If the config file doesn't exist and we have a default config, write that to file
         if not self.config_path.exists():
@@ -61,6 +62,9 @@ class SCConfigManager:
         Returns:
             result (bool): True if the configuration was loaded successfully, otherwise False.
         """
+        if not self.config_path:
+            return False
+
         with Path(self.config_path).open(encoding="utf-8") as file:
             try:
                 self._config = yaml.safe_load(file)
@@ -91,6 +95,9 @@ class SCConfigManager:
             result (bool): True if the configuration has changed, False otherwise.
         """
         # get the last modified time of the config file
+        if not self.config_path:
+            return False
+
         last_modified = self.config_path.stat().st_mtime
 
         if self.config_last_modified is None or last_modified > self.config_last_modified:
@@ -100,36 +107,6 @@ class SCConfigManager:
             return True
 
         return False
-
-    def select_file_location(self, file_name: str) -> Path:
-        """Selects the file location for the given file name.
-
-        Args:
-            file_name (str): The name of the file to locate. Can be just a file name, or a relative or absolute path.
-
-        Returns:
-            file_path (Path): The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.
-        """
-        # Check to see if file_name is a full path or just a file name
-        file_path = Path(file_name)
-
-        # Check if file_name is an absolute path, return this even if it does not exist
-        if file_path.is_absolute():
-            return file_path
-
-        # Check if file_name contains any parent directories (i.e., is a relative path)
-        # If so, return this even if it does not exist
-        if file_path.parent != Path("."):  # noqa: PTH201
-            # It's a relative path
-            return (Path.cwd() / file_path).resolve()
-
-        # Otherwise, assume it's just a file name and look for it in the current directory and the script directory
-        current_dir = Path.cwd()
-        app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
-        file_path = current_dir / file_name
-        if not file_path.exists():
-            file_path = app_dir / file_name
-        return file_path
 
     def register_logger(self, logger_function: Callable) -> None:
         """Registers a logger function to be used for logging messages.
@@ -239,3 +216,18 @@ class SCConfigManager:
             return email_settings
 
         return None
+
+    def get_shelly_settings(self, config_section: str | None = "ShellyDevices") -> list[dict]:
+        """Returns the the settings for one or more Shelly Smart Switches.
+
+        Args:
+            config_section (Optional[str], optional): The section in the config file where settings are stored.
+
+        Returns:
+            settings (list[dict]): A list of dict objects, each one represeting a device. Returns an empty list if no devices are configured or the section does not exist.
+        """
+        devices = self.get(config_section, default=None)
+        if devices is None:
+            return []
+
+        return devices  # type: ignore[assignment]

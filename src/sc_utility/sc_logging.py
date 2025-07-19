@@ -5,8 +5,6 @@ Provides general purpose logging functions.
 """
 
 import inspect
-import os
-import platform
 import smtplib
 import sys
 import traceback
@@ -14,6 +12,8 @@ from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
+
+from sc_utility.sc_common import SCCommon
 
 
 class SCLogger:
@@ -55,9 +55,6 @@ class SCLogger:
             "all": 6,
         }
 
-        # Platform specific settings
-        self.os_name = self.get_os()
-
         # Use the register_email_settings method to set up email settings
         self.email_settings = None
 
@@ -80,23 +77,6 @@ class SCLogger:
 
         # Setup the path to the fatal error tracking file
         self.fatal_error_file_path = self.app_dir / f"{self.app_dir.name}_fatal_error.txt"
-
-        # Save process ID
-        self.process_id = os.getpid()
-
-    def get_os(self) -> str:  # noqa: PLR6301
-        """Returns the name of the operating system.
-
-        Returns:
-            os_string (str): The name of the operating system in lowercase.
-        """
-        # Get the platform name and convert it to lowercase
-        platform_name = platform.system().lower()
-
-        if platform_name == "darwin":
-            platform_name = "macos"
-
-        return platform_name
 
     def _initialise_monitoring_logfile(self) -> None:
         """Initialise the monitoring log file. If it exists, truncate it to the max number of lines."""
@@ -146,7 +126,7 @@ class SCLogger:
 
         process_str = ""
         if self.log_process_id:
-            process_str = f" Proc {self.process_id}"
+            process_str = f" Proc {SCCommon.get_process_id()}"
 
         # Deal with console message first
         if console_level >= message_level and console_level > 0:
@@ -207,79 +187,6 @@ class SCLogger:
         # Store the email settings in the config object
         self.email_settings = email_settings
 
-    def is_probable_path(self, possible_path: str | Path) -> bool:
-        """
-        Checks if the given string or Path object is likely to be a file path.
-
-        This method checks if the string is an absolute path, contains a path separator, or has a file extension.
-
-        Args:
-            possible_path (str): The string to check.
-
-        Returns:
-            result (bool): True if the string is likely a file path, False otherwise.
-        """
-        max_path = 260 if self.os_name == "windows" else os.pathconf("/", "PC_PATH_MAX")
-
-        path_obj = None
-        if isinstance(possible_path, Path):
-            path_str = str(possible_path)
-            path_obj = possible_path
-        else:
-            path_str = possible_path
-
-        if len(path_str) > max_path:
-            # If the path is longer than the maximum allowed path length, it cannot be a valid path
-            return False
-
-        if path_obj is None:
-            path_obj = Path(possible_path)
-
-        # Check if it's absolute, or contains a path separator, or has a file extension
-        if path_obj.is_absolute():
-            return True
-
-        if "/" in path_str or "\\" in path_str:
-            return True
-
-        # Check if the path has a file extension
-        return bool(path_obj.suffix and path_obj.suffix.lower() is not None)
-
-    def select_file_location(self, file_name: str | Path) -> Path | None:
-        """
-        Selects the file location for the given file name.
-
-        Args:
-            file_name (str): The name of the file to locate. Can be just a file name, or a relative or absolute path.
-
-        Returns:
-            location (Path): The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.
-        """
-        # Look at the file_name and see if it looks like a path
-        if not self.is_probable_path(file_name):
-            return None
-
-        # Check to see if file_name is a full path or just a file name
-        file_path = Path(file_name)
-
-        # Check if file_name is an absolute path, return this even if it does not exist
-        if file_path.is_absolute():
-            return file_path
-
-        # Check if file_name contains any parent directories (i.e., is a relative path)
-        # If so, return this even if it does not exist
-        if file_path.parent != Path("."):  # noqa: PTH201
-            # It's a relative path
-            return (Path.cwd() / file_path).resolve()
-
-        # Otherwise, assume it's just a file name and look for it in the current directory and the script directory
-        current_dir = Path.cwd()
-        app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
-        file_path = current_dir / file_name
-        if not file_path.exists():
-            file_path = app_dir / file_name
-        return file_path
-
     def send_email(self, subject: str, body: str | Path, test_mode: bool = False) -> bool:  # noqa: FBT001, FBT002, PLR0912, PLR0915
         """
         Sends an email using the SMTP server previously specified in register_email_settings().
@@ -306,7 +213,7 @@ class SCLogger:
 
         # See if the body string is something that looks like a file path
         try:
-            payload_path = self.select_file_location(body)
+            payload_path = SCCommon.select_file_location(str(body))
         except OSError:
             # Nothing to do here
             payload_path = None
@@ -459,12 +366,3 @@ class SCLogger:
         """
         with Path(self.fatal_error_file_path).open("w", encoding="utf-8") as file:
             file.write(message)
-
-    def get_process_id(self) -> int:
-        """
-        Returns the process ID of the current process.
-
-        Returns:
-            process_id (int): The process ID of the current process.
-        """
-        return self.process_id

@@ -6,6 +6,7 @@ theme:
 
 plugins:
   - search
+  - include-markdown
   - mkdocstrings:
       handlers:
         python:
@@ -16,10 +17,14 @@ plugins:
 
 nav:
   - Home: index.md
-  - Getting Started: guide.md
+  - Getting Started: 
+      - Using the Library: guide/getting_started.md
+      - Shelly Smart Switches: guide/shelly_control.md
+      - Shelly Models Library: guide/shelly_models_list.md
   - API Reference:
       - CSVReader: reference/csvreader.md
       - DateHelper: reference/datehelper.md
       - ExcelReader: reference/excelreader.md
       - SCConfigManager: reference/configmanager.md
       - SCLogging: reference/logging.md
+      - ShellyControl: reference/shelly_control.md
