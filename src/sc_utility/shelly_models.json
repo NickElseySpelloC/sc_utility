@@ -1,0 +1,377 @@
+[
+  {
+    "model": "ShellyEM",
+    "name": "Shelly EM",
+    "url": "https://www.shelly.com/products/shelly-em-50a-clamp-1",
+    "generation": 1,
+    "protocol": "REST",
+    "inputs": 0,
+    "outputs": 1,
+    "meters": 2,
+    "meters_seperate": true,
+    "temperature_monitoring": false
+  },
+  {
+    "model": "Shelly2",
+    "name": "Shelly 2",
+    "url": "https://shelly-api-docs.shelly.cloud/gen1/#shelly2-overview",
+    "generation": 1,
+    "protocol": "REST",
+    "inputs": 2,
+    "outputs": 2,
+    "meters": 1,
+    "meters_seperate": true,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "Shelly2.5",
+    "name": "Shelly 2.5",
+    "url": "https://kb.shelly.cloud/knowledge-base/shelly-2-5",
+    "generation": 1,
+    "protocol": "REST",
+    "inputs": 2,
+    "outputs": 2,
+    "meters": 2,
+    "meters_seperate": true,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "Shelly3EM",
+    "name": "Shelly 3 EM",
+    "url": "https://kb.shelly.cloud/knowledge-base/shelly-3em",
+    "generation": 1,
+    "protocol": "REST",
+    "inputs": 0,
+    "outputs": 0,
+    "meters": 3,
+    "meters_seperate": true,
+    "temperature_monitoring": false
+  },
+
+
+
+
+{
+    "model": "ShellyPlus1PM",
+    "name": "Shelly Plus 1 PM",
+    "url": "https://www.shelly.com/products/shelly-plus-1pm",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 1,
+    "outputs": 1,
+    "meters": 1,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "ShellyPro1",
+    "name": "Shelly Pro 1",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen2/ShellyPro1",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 1,
+    "meters": 0,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "ShellyPro1PM",
+    "name": "Shelly Pro 1PM",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen2/ShellyPro1PM",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 1,
+    "meters": 2,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "ShellyPlus2PM",
+    "name": "Shelly Plus 2PM",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen2/ShellyPlus2PM",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 2,
+    "meters": 2,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "ShellyPro2",
+    "name": "Shelly Pro 2",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen2/ShellyPro2",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 2,
+    "meters": 0,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "ShellyPro2PM",
+    "name": "Shelly Pro 2PM",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen2/ShellyPro2PM",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 2,
+    "meters": 2,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+
+
+
+
+
+  {
+    "model": "Shelly1G3",
+    "name": "Shelly 1 Gen3",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen3/Shelly1G3",
+    "generation": 3,
+    "protocol": "RPC",
+    "inputs": 1,
+    "outputs": 1,
+    "meters": 0,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "Shelly1PMG3",
+    "name": "Shelly 1PM Gen3",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen3/Shelly1PMG3",
+    "generation": 3,
+    "protocol": "RPC",
+    "inputs": 1,
+    "outputs": 1,
+    "meters": 1,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },  
+  {
+    "model": "ShellyP1",
+    "name": "Shelly Pro 1",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen2/ShellyPro1",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 1,
+    "meters": 0,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "ShellyP1PM",
+    "name": "Shelly Pro 1PM",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen2/ShellyPro1PM",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 1,
+    "meters": 1,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "ShellyP2",
+    "name": "Shelly Pro 2",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen2/ShellyPro2",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 2,
+    "meters": 0,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "ShellyP2PM",
+    "name": "Shelly Pro 2PM",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen2/ShellyPro1PM",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 2,
+    "meters": 2,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "ShellyP3",
+    "name": "Shelly Pro 3",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen2/ShellyPro3",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 3,
+    "outputs": 3,
+    "meters": 0,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "ShellyP4PM",
+    "name": "Shelly Pro 4PM",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen2/ShellyPro4PM",
+    "generation": 2,
+    "protocol": "RPC",
+    "inputs": 4,
+    "outputs": 4,
+    "meters": 4,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  
+
+
+
+  {
+    "model": "Shelly1MiniG3",
+    "name": "Shelly 1 Mini Gen3",
+    "url": "https://www.shelly.com/products/shelly-1-mini-gen3",
+    "generation": 3,
+    "protocol": "RPC",
+    "inputs": 1,
+    "outputs": 1,
+    "meters": 0,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "Shelly1PMMiniG3",
+    "name": "Shelly 1PM Mini Gen3",
+    "url": "https://www.shelly.com/products/shelly-1pm-mini-gen3",
+    "generation": 3,
+    "protocol": "RPC",
+    "inputs": 1,
+    "outputs": 1,
+    "meters": 1,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "Shelly1LG3",
+    "name": "Shelly 1L Gen3",
+    "url": "https://www.shelly.com/products/shelly-1l-gen3",
+    "generation": 3,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 1,
+    "meters": 0,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "Shelly2LG3",
+    "name": "Shelly 2L Gen3",
+    "url": "https://www.shelly.com/products/shelly-2l-gen3",
+    "generation": 3,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 2,
+    "meters": 0,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "Shelly2PMG3",
+    "name": "Shelly 2PM Gen3",
+    "url": "https://www.shelly.com/products/shelly-2pm-gen3",
+    "generation": 3,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 2,
+    "meters": 2,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+{
+    "model": "ShellyEMG3",
+    "name": "Shelly EM Gen3",
+    "url": "https://shelly-api-docs.shelly.cloud/gen2/Devices/Gen3/ShellyEMG3",
+    "generation": 3,
+    "protocol": "RPC",
+    "inputs": 0,
+    "outputs": 1,
+    "meters": 2,
+    "meters_seperate": true,
+    "temperature_monitoring": true
+  },  
+
+
+  {
+    "model": "ShellyEMMiniG4",
+    "name": "Shelly EM Mini Gen4",
+    "url": "https://www.shelly.com/products/shelly-em-mini-gen4",
+    "generation": 4,
+    "protocol": "RPC",
+    "inputs": 0,
+    "outputs": 0,
+    "meters": 1,
+    "meters_seperate": true,
+    "temperature_monitoring": false
+  },
+  {
+    "model": "Shelly1G4",
+    "name": "Shelly 1 Gen4",
+    "url": "https://www.shelly.com/products/shelly-1-gen4",
+    "generation": 4,
+    "protocol": "RPC",
+    "inputs": 1,
+    "outputs": 1,
+    "meters": 0,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },
+  {
+    "model": "Shelly1PMG4",
+    "name": "Shelly 1PM Gen4",
+    "url": "https://www.shelly.com/products/shelly-1pm-gen4",
+    "generation": 4,
+    "protocol": "RPC",
+    "inputs": 1,
+    "outputs": 1,
+    "meters": 1,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },  
+  {
+    "model": "Shelly1MiniG4",
+    "name": "Shelly 1 Mini Gen4",
+    "url": "https://www.shelly.com/products/shelly-1-mini-gen4",
+    "generation": 4,
+    "protocol": "RPC",
+    "inputs": 1,
+    "outputs": 1,
+    "meters": 0,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },  
+  {
+    "model": "Shelly1PMMiniG4",
+    "name": "Shelly 1PM Mini Gen4",
+    "url": "https://www.shelly.com/products/shelly-1pm-mini-gen4",
+    "generation": 4,
+    "protocol": "RPC",
+    "inputs": 1,
+    "outputs": 1,
+    "meters": 1,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  },  
+  {
+    "model": "Shelly2PMG4",
+    "name": "Shelly 2PM Gen4",
+    "url": "https://www.shelly.com/products/shelly-2pm-gen4",
+    "generation": 4,
+    "protocol": "RPC",
+    "inputs": 2,
+    "outputs": 2,
+    "meters": 2,
+    "meters_seperate": false,
+    "temperature_monitoring": true
+  }
+ ]
