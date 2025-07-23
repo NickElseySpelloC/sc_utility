@@ -1,3 +1,4 @@
+"""ShellyControl class for controlling Shelly Smart Switch devices."""
 import json
 import time
 from importlib import resources
@@ -482,28 +483,28 @@ class ShellyControl:
         Returns:
             result (bool): True if the device is online, False otherwise. If all devices are checked, returns True if all device are online.
         """
+        found_offline_device = False
         try:
             selected_device = None
             if device_identity is not None:
                 selected_device = self.get_device(device_identity)
 
-            result = False
             for index, device in enumerate(self.devices):
                 if device["Simulate"] or not self.ping_allowed:
                     device["Online"] = True
-                    result = True
 
                 elif selected_device is None or selected_device["Index"] == index:
                     device_online = SCCommon.ping_host(device["Hostname"], self.response_timeout)
                     device["Online"] = device_online
-                    if device_online:
-                        result = True
+                    if not device_online:
+                        found_offline_device = True
 
                     self.logger.log_message(f"Shelly device {device['Label']} is {'online' if device_online else 'offline'}", "debug")
 
         except RuntimeError as e:
             raise RuntimeError(e) from e
-        return result
+
+        return not found_offline_device
 
     def print_device_status(self, device_identity: int | str | None = None) -> str:
         """Prints the status of a device or all devices.

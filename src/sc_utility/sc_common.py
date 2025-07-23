@@ -92,11 +92,6 @@ class SCCommon:
             error_msg = f"Invalid IP address: {ip_address}"
             raise RuntimeError(error_msg)
 
-        # Only allow numeric IP addresses to prevent command injection
-        if not all(part.isdigit() and 0 <= int(part) <= 255 for part in ip_address.split(".")):
-            error_msg = f"Untrusted input for IP address: {ip_address}"
-            raise RuntimeError(error_msg)
-
         command = ["ping", param, "1", "-W", str(timeout), ip_address]
 
         try:
