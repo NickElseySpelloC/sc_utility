@@ -438,7 +438,7 @@ class CSVReader:
         except (ImportError, TypeError, ValueError) as e:
             raise RuntimeError(e) from e
 
-        if current_data is not None:
+        if current_data:
             # Merge / append the extra data
             try:
                 merged_data = self.merge_data_sets(current_data, new_data)
@@ -450,6 +450,9 @@ class CSVReader:
 
             # Trim the CSV data
             merged_data = self.trim_csv_data(merged_data)
+        else:
+            # If no current data, just use the new_data
+            merged_data = new_data
 
         # Save the modified CSV data
         self.write_csv(merged_data, new_filename)
