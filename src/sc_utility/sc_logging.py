@@ -6,6 +6,7 @@ Provides general purpose logging functions.
 
 import inspect
 import smtplib
+import ssl
 import sys
 import traceback
 from datetime import datetime
@@ -187,7 +188,7 @@ class SCLogger:
         # Store the email settings in the config object
         self.email_settings = email_settings
 
-    def send_email(self, subject: str, body: str | Path, test_mode: bool = False) -> bool:  # noqa: FBT001, FBT002, PLR0912, PLR0915
+    def send_email(self, subject: str, body: str | Path, test_mode: bool = False) -> bool:  # noqa: FBT001, FBT002, PLR0911, PLR0912, PLR0915
         """
         Sends an email using the SMTP server previously specified in register_email_settings().
 
@@ -274,7 +275,7 @@ class SCLogger:
             msg.attach(part)
 
             # Connect to the Gmail SMTP server
-            with smtplib.SMTP(smtp_server, smtp_port) as server:
+            with smtplib.SMTP(host=smtp_server, port=smtp_port, timeout=10) as server:
                 server.starttls()  # Upgrade the connection to secure
                 server.login(sender_email, smtp_password)  # Log in using App Password
                 if test_mode:
@@ -282,10 +283,27 @@ class SCLogger:
                 else:
                     server.sendmail(sender_email, send_to, msg.as_string())  # Send the email
 
-        except RuntimeError as e:
-            self.log_fatal_error(f"send_email(): Failed to send email with subject {msg['Subject']}: {e}")
+        except TimeoutError as e:
+            self.log_message(f"send_email(): Timeout sending email: {e}", "error")
             return False
-
+        except smtplib.SMTPAuthenticationError as e:
+            self.log_message(f"send_email(): Authentication failed: {e}", "error")
+            return False
+        except smtplib.SMTPRecipientsRefused as e:
+            self.log_message(f"send_email(): Recipients refused: {e}", "error")
+            return False
+        except smtplib.SMTPSenderRefused as e:
+            self.log_message(f"send_email(): Sender refused: {e}", "error")
+            return False
+        except (smtplib.SMTPException, ssl.SSLError) as e:
+            self.log_message(f"send_email(): SMTP/SSL error: {e}", "error")
+            return False
+        except (OSError, ConnectionRefusedError, smtplib.SMTPServerDisconnected) as e:
+            self.log_message(f"send_email(): Network error sending email: {e}", "error")
+            return False
+        except Exception as e:  # noqa: BLE001
+            self.log_message(f"send_email(): Unexpected error: {e}", "error")
+            return False
         else:
             return True  # Email sent successfully
 
