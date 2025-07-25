@@ -8,6 +8,7 @@ import subprocess  # noqa: S404
 import sys
 from pathlib import Path
 
+import httpx
 import validators
 
 
@@ -104,6 +105,34 @@ class SCCommon:
         else:
             # Return True if the ping was successful (exit code 0)
             return response_code == 0
+
+    @staticmethod
+    def check_internet_connection(urls=None, timeout: int = 3) -> bool:
+        """Checks if the system has an active internet connection by trying to open a connection to common websites.
+
+        Args:
+            urls (list[str], optional): A list of URLs to check for internet connectivity. Defaults to common DNS servers and websites.
+            timeout (int): The timeout in seconds for each request.
+
+        Returns:
+            result(bool): True if the system is connected to the internet, False otherwise.
+        """
+        if urls is None:
+            urls = [
+                "https://1.1.1.1",         # Cloudflare DNS
+                "https://8.8.8.8",         # Google DNS
+                "https://www.google.com",
+                "https://www.cloudflare.com"
+            ]
+
+        for url in urls:
+            try:
+                response = httpx.get(url, timeout=timeout, follow_redirects=True)
+                if response.status_code < 400:
+                    return True
+            except httpx.RequestError:  # noqa: PERF203
+                continue
+        return False
 
     @staticmethod
     def get_os() -> str:
