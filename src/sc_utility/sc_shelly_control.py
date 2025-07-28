@@ -170,6 +170,13 @@ class ShellyControl:
             file_name += ".json"  # Add the .json extension
             new_device["SimulationFile"] = SCCommon.select_file_location(file_name)
 
+        # Add any additional custom key / value pairs defined in component_config that don't already exist in new_component
+        new_device["customkeylist"] = []  # Initialize custom key list
+        for key, value in device_config.items():
+            if key not in new_device:
+                new_device[key] = value
+                new_device["customkeylist"].append(key)  # Track custom keys
+
         # Finally, add the device to the list of devices
         self.devices.append(new_device)
 
@@ -184,7 +191,7 @@ class ShellyControl:
         # Finished
         self.logger.log_message(f"Added Shelly device {new_device['ClientName']}.", "debug")
 
-    def _add_device_components(self, device_index: int, component_type: str, component_config: list[dict] | None) -> None:
+    def _add_device_components(self, device_index: int, component_type: str, component_config: list[dict] | None) -> None:  # noqa: PLR0912
         """Adds components (inputs, outputs, or meters) to an existing device.
 
         Args:
@@ -262,6 +269,14 @@ class ShellyControl:
                 new_component["State"] = False
                 new_component["OnOutput"] = not device["MetersSeperate"]
 
+            # Add any additional custom key / value pairs defined in component_config that don't already exist in new_component
+            new_component["customkeylist"] = []  # Initialize custom key list
+            if component_config:
+                for key, value in component_config[component_idx].items():
+                    if key not in new_component:
+                        new_component[key] = value
+                        new_component["customkeylist"].append(key)  # Track custom keys
+
             # Validate that the name is unique
             for existing_component in storage_list:
                 if existing_component["Name"] == new_component["Name"]:
@@ -311,6 +326,7 @@ class ShellyControl:
             "ComponentIndex": None,
             "ID": None,
             "Name": None,
+            "customkeylist": [],  # Initialize custom key list
         }
 
         # Add extra attributes based on the component type
@@ -353,6 +369,7 @@ class ShellyControl:
         - Online: Is the device online?^
         - MacAddress: The MAC address of the device, if available.^
         - Temperature: The current temperature of the device, if available.^
+        - customkeylist: A list of any custom keys that have been added to the device attributes.
         - Uptime: The uptime of the device in seconds, if available.^
         - RestartRequired: Whether the device requires a restart to apply changes, if available.^
 
@@ -406,6 +423,7 @@ class ShellyControl:
             "Temperature": None,
             "Uptime": None,
             "RestartRequired": None,
+            "customkeylist": [],  # Initialize custom key list for any custom attributes
             "TotalPower": 0.0,  # Total power consumption across all outputs
             "TotalEnergy": 0.0,  # Total energy consumption across all meters
         }
@@ -506,7 +524,7 @@ class ShellyControl:
 
         return not found_offline_device
 
-    def print_device_status(self, device_identity: int | str | None = None) -> str:
+    def print_device_status(self, device_identity: int | str | None = None) -> str:  # noqa: PLR0912, PLR0915
         """Prints the status of a device or all devices.
 
         Args:
@@ -520,7 +538,7 @@ class ShellyControl:
         """
         device_index = None
         return_str = ""
-        try:
+        try:  # noqa: PLR1702
             if device_identity is not None:
                 selected_device = self.get_device(device_identity)
                 device_index = selected_device["Index"]
@@ -533,21 +551,53 @@ class ShellyControl:
                     return_str += f"  Hostname: {device['Hostname']}:{device['Port']}\n"
                     return_str += f"  Generation: {device['Generation']}\n"
                     return_str += f"  Protocol: {device['Protocol']}\n"
+
+                    # Print custom device attributes
+                    for custom_key in device.get("customkeylist", []):
+                        return_str += f"  {custom_key}: {device[custom_key]}\n"
+
                     return_str += f"  Number of Inputs: {device['Inputs']}\n"
-                    # Iterate through the inputs, outputs, and meters for this device
+                    # Iterate through the inputs for this device
                     for device_input in self.inputs:
                         if device_input["DeviceIndex"] == index:
-                            return_str += f"    - Index: {device_input['ComponentIndex']}, ID: {device_input['ID']}, Name: {device_input['Name']}, State: {device_input['State']}\n"
+                            return_str += f"    - Index: {device_input['ComponentIndex']}, ID: {device_input['ID']}, Name: {device_input['Name']}, State: {device_input['State']}"
+
+                            # Print custom input attributes
+                            custom_attrs = []
+                            for custom_key in device_input.get("customkeylist", []):
+                                custom_attrs.append(f"{custom_key}: {device_input[custom_key]}")
+                            if custom_attrs:
+                                return_str += f", {', '.join(custom_attrs)}"
+                            return_str += "\n"
+
                     return_str += f"  Number of Output Relays: {device['Outputs']}\n"
                     # Iterate through the outputs for this device
                     for device_output in self.outputs:
                         if device_output["DeviceIndex"] == index:
-                            return_str += f"    - Index: {device_output['ComponentIndex']}, ID: {device_output['ID']}, Name: {device_output['Name']}, Has Metering: {device_output['HasMeter']}, State: {device_output['State']}, Temp.: {device_output['Temperature']}\n"
+                            return_str += f"    - Index: {device_output['ComponentIndex']}, ID: {device_output['ID']}, Name: {device_output['Name']}, Has Metering: {device_output['HasMeter']}, State: {device_output['State']}, Temp.: {device_output['Temperature']}"
+
+                            # Print custom output attributes
+                            custom_attrs = []
+                            for custom_key in device_output.get("customkeylist", []):
+                                custom_attrs.append(f"{custom_key}: {device_output[custom_key]}")
+                            if custom_attrs:
+                                return_str += f", {', '.join(custom_attrs)}"
+                            return_str += "\n"
+
                     return_str += f"  Number of Meters: {device['Meters']}\n"
                     # Iterate through the meters for this device
                     for device_meter in self.meters:
                         if device_meter["DeviceIndex"] == index:
-                            return_str += f"    - Index: {device_meter['ComponentIndex']}, ID: {device_meter['ID']}, Name: {device_meter['Name']}, On Output: {device_meter['OnOutput']}, Power: {device_meter['PowerFactor']}, Power: {device_meter['PowerFactor']}, Voltage: {device_meter['Voltage']}, Current: {device_meter['Current']}, Energy: {device_meter['Energy']}\n"
+                            return_str += f"    - Index: {device_meter['ComponentIndex']}, ID: {device_meter['ID']}, Name: {device_meter['Name']}, On Output: {device_meter['OnOutput']}, Power: {device_meter['Power']}, Voltage: {device_meter['Voltage']}, Current: {device_meter['Current']}, Power Factor: {device_meter['PowerFactor']}, Energy: {device_meter['Energy']}"
+
+                            # Print custom meter attributes
+                            custom_attrs = []
+                            for custom_key in device_meter.get("customkeylist", []):
+                                custom_attrs.append(f"{custom_key}: {device_meter[custom_key]}")
+                            if custom_attrs:
+                                return_str += f", {', '.join(custom_attrs)}"
+                            return_str += "\n"
+
                     return_str += f"  Meters Separate: {device['MetersSeperate']}\n"
                     return_str += f"  Temperature Monitoring: {device['TemperatureMonitoring']}\n"
                     return_str += f"  Online: {device['Online']}\n"

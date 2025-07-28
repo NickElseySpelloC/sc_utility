@@ -22,47 +22,49 @@ To initialise an instance of the ShellyControl class, you need to pass it:
 
 Here's an example of a section of yaml file configuration for 3 Shelly devices
 
-    ShellyDevices:
-      ResponseTimeout: 5
-      RetryCount: 1
-      RetryDelay: 2
-      PingAllowed: True
-      Devices:
-        - Name: Downstairs Lights
-          Model: Shelly2PMG3
-          Hostname: 192.168.1.23
-          ID: 100
-          Inputs:
-            - ID: 101
-              Name: "Living Room Switch"
-            - ID: 102
-              Name: "Kitchen Switch"
-          Outputs:
-            - ID: 111
-              Name: "Living Room Relay"
-            - ID: 112
-              Name: "Kitchen Relay"
-        - Name: Outside Lights
-          Model: Shelly2PMG3
-          Hostname: 192.168.1.25
-          ID: 200
-          Inputs:
-            - ID: 201
-              Name: "Patio Switch"
-            - ID: 202
-              Name: "Car Port Switch"
-          Outputs:
-            - ID: 211
-              Name: "Patio Relay"
-            - ID: 212
-              Name: "Car Port Relay"
-        - Name: Testing
-          Model: ShellyPlus1PM
-          Simulate: True
-          Outputs:
-            - Name: "Test Switch"
-          Meters:
-            - Name: "Test Meter"
+```yaml
+ShellyDevices:
+  ResponseTimeout: 5
+  RetryCount: 1
+  RetryDelay: 2
+  PingAllowed: True
+  Devices:
+    - Name: Downstairs Lights
+      Model: Shelly2PMG3
+      Hostname: 192.168.1.23
+      ID: 100
+      Inputs:
+        - ID: 101
+          Name: "Living Room Switch"
+        - ID: 102
+          Name: "Kitchen Switch"
+      Outputs:
+        - ID: 111
+          Name: "Living Room Relay"
+        - ID: 112
+          Name: "Kitchen Relay"
+    - Name: Outside Lights
+      Model: Shelly2PMG3
+      Hostname: 192.168.1.25
+      ID: 200
+      Inputs:
+        - ID: 201
+          Name: "Patio Switch"
+        - ID: 202
+          Name: "Car Port Switch"
+      Outputs:
+        - ID: 211
+          Name: "Patio Relay"
+        - ID: 212
+          Name: "Car Port Relay"
+    - Name: Testing
+      Model: ShellyPlus1PM
+      Simulate: True
+      Outputs:
+        - Name: "Test Switch"
+      Meters:
+        - Name: "Test Meter"
+```
 
 The entries are used as follows:
 
@@ -87,9 +89,47 @@ The Devices key in the configuration block supports the following keys :
 | Outputs | A list of dict defining the outputs (if any) for this device. This section is optional but if defined, the number of entries must match the number of outputs supported by this model. For each output, define a Name and/or an ID. |
 | Meters | A list of dict defining the meters (if any) for this device. Note that depending on the devices, the actual meters might be part of the output or seperate energy meters (EM1 API calls). Either way, in this class meters are reported seperately from outputs. This section is optional but if defined, the number of entries must match the number of meters supported by this model. For each meter, define a Name and/or an ID. |
 
-Note:
+Notes:
 
 - Either a Device Name or a Device ID must be supplied.
+
+# Custom Attrbutes 
+
+You can add custom key/values to Devices, Inputs, Outputs and Meters if needed. For example you could add a group name to each output switch:![alt](
+
+```yaml
+ShellyDevices:
+  ...
+  Devices:
+    - Name: Downstairs Lights
+      Model: Shelly2PMG3
+      Hostname: 192.168.1.23
+      ID: 100
+      Inputs:
+        - Name: "Living Room Switch"
+        - Name: "Kitchen Switch"
+      Outputs:
+        - Name: "Living Room Relay"
+          Group: Inside
+        - Name: "Kitchen Relay"
+          Group: Inside
+    - Name: Outside Lights
+      Model: Shelly2PMG3
+      Hostname: 192.168.1.25
+      ID: 200
+      Inputs:
+        - Name: "Patio Switch"
+          Group: Outside
+        - Name: "Car Port Switch"
+          Group: Outside
+      Outputs:
+        - Name: "Patio Relay"
+        - Name: "Car Port Relay"
+    - Name: Testing
+      ...
+```
+
+These custom attrbutes will be printed by the print_device_status() function and available from the get_**() functions.
 
 ## Future Features 
 

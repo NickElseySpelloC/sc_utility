@@ -18,26 +18,26 @@ The library uses a YAML file for configuration. An example config file (*config.
 
 Here's the example file - the library expects to find the Files and Email sections in the file:
 
-    # Just an example section to show how to set up a section
-    AmberAPI:
-        APIKey: somerandomkey342
-        BaseUrl: https://api.amber.com.au/v1
-        Timeout: 15
-    
-    Files:
-        LogfileName: logfile.log
-        LogfileMaxLines: 500
-        LogfileVerbosity: detailed
-        ConsoleVerbosity: detailed
+```yaml
+AmberAPI:
+    APIKey: somerandomkey342
+    BaseUrl: https://api.amber.com.au/v1
+    Timeout: 15
 
-    Email:
-        EnableEmail: True
-        SMTPServer: smtp.gmail.com
-        SMTPPort: 587
-        SMTPUsername: me@gmail.com
-        SMTPPassword: <Your SMTP password>
-        SubjectPrefix: "[Bob Portfolio]: "
+Files:
+    LogfileName: logfile.log
+    LogfileMaxLines: 500
+    LogfileVerbosity: detailed
+    ConsoleVerbosity: detailed
 
+Email:
+    EnableEmail: True
+    SMTPServer: smtp.gmail.com
+    SMTPPort: 587
+    SMTPUsername: me@gmail.com
+    SMTPPassword: <Your SMTP password>
+    SubjectPrefix: "[Bob Portfolio]: "
+```
 
 ## Configuration Parameters
 

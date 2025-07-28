@@ -567,8 +567,7 @@
 <h1 id="configuration-file">Configuration File</h1>
 <p>The library uses a YAML file for configuration. An example config file (<em>config.yaml.example</em>) is <a href="https://github.com/NickElseySpelloC/sc_utility">available on Github</a>. Copy this to <em>[your_app_name].yaml</em> before using the library. </p>
 <p>Here's the example file - the library expects to find the Files and Email sections in the file:</p>
-<pre><code># Just an example section to show how to set up a section
-AmberAPI:
+<pre><code class="language-yaml">AmberAPI:
     APIKey: somerandomkey342
     BaseUrl: https://api.amber.com.au/v1
     Timeout: 15
@@ -585,7 +584,7 @@ Email:
     SMTPPort: 587
     SMTPUsername: me@gmail.com
     SMTPPassword: &lt;Your SMTP password&gt;
-    SubjectPrefix: "[Bob Portfolio]: "
+    SubjectPrefix: &quot;[Bob Portfolio]: &quot;
 </code></pre>
 <h2 id="configuration-parameters">Configuration Parameters</h2>
 <h3 id="section-files">Section: Files</h3>
