@@ -341,24 +341,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#future-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      Future Features
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sample-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      Sample code
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -616,24 +598,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#future-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      Future Features
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sample-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      Sample code
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -669,7 +633,7 @@
 <li>A dict object containing the configuraton of the Shell devices that you want to manage. This information is normally stored in a YAML configuration file and can be read from that file using <a href="../../reference/configmanager/">SCConfigManager.get_shelly_settings()</a></li>
 </ol>
 <p>Here's an example of a section of yaml file configuration for 3 Shelly devices</p>
-<pre><code>ShellyDevices:
+<pre><code class="language-yaml">ShellyDevices:
   ResponseTimeout: 5
   RetryCount: 1
   RetryDelay: 2
@@ -681,35 +645,35 @@
       ID: 100
       Inputs:
         - ID: 101
-          Name: "Living Room Switch"
+          Name: &quot;Living Room Switch&quot;
         - ID: 102
-          Name: "Kitchen Switch"
+          Name: &quot;Kitchen Switch&quot;
       Outputs:
         - ID: 111
-          Name: "Living Room Relay"
+          Name: &quot;Living Room Relay&quot;
         - ID: 112
-          Name: "Kitchen Relay"
+          Name: &quot;Kitchen Relay&quot;
     - Name: Outside Lights
       Model: Shelly2PMG3
       Hostname: 192.168.1.25
       ID: 200
       Inputs:
         - ID: 201
-          Name: "Patio Switch"
+          Name: &quot;Patio Switch&quot;
         - ID: 202
-          Name: "Car Port Switch"
+          Name: &quot;Car Port Switch&quot;
       Outputs:
         - ID: 211
-          Name: "Patio Relay"
+          Name: &quot;Patio Relay&quot;
         - ID: 212
-          Name: "Car Port Relay"
+          Name: &quot;Car Port Relay&quot;
     - Name: Testing
       Model: ShellyPlus1PM
       Simulate: True
       Outputs:
-        - Name: "Test Switch"
+        - Name: &quot;Test Switch&quot;
       Meters:
-        - Name: "Test Meter"
+        - Name: &quot;Test Meter&quot;
 </code></pre>
 <p>The entries are used as follows:</p>
 <table>
@@ -785,10 +749,43 @@
 </tr>
 </tbody>
 </table>
-<p>Note:</p>
+<p>Notes:</p>
 <ul>
 <li>Either a Device Name or a Device ID must be supplied.</li>
 </ul>
+<h1 id="custom-attrbutes">Custom Attrbutes</h1>
+<p>You can add custom key/values to Devices, Inputs, Outputs and Meters if needed. For example you could add a group name to each output switch:![alt](</p>
+<pre><code class="language-yaml">ShellyDevices:
+  ...
+  Devices:
+    - Name: Downstairs Lights
+      Model: Shelly2PMG3
+      Hostname: 192.168.1.23
+      ID: 100
+      Inputs:
+        - Name: &quot;Living Room Switch&quot;
+        - Name: &quot;Kitchen Switch&quot;
+      Outputs:
+        - Name: &quot;Living Room Relay&quot;
+          Group: Inside
+        - Name: &quot;Kitchen Relay&quot;
+          Group: Inside
+    - Name: Outside Lights
+      Model: Shelly2PMG3
+      Hostname: 192.168.1.25
+      ID: 200
+      Inputs:
+        - Name: &quot;Patio Switch&quot;
+          Group: Outside
+        - Name: &quot;Car Port Switch&quot;
+          Group: Outside
+      Outputs:
+        - Name: &quot;Patio Relay&quot;
+        - Name: &quot;Car Port Relay&quot;
+    - Name: Testing
+      ...
+</code></pre>
+<p>These custom attrbutes will be printed by the print_device_status() function and available from the get_**() functions.</p>
 <h2 id="future-features">Future Features</h2>
 <p>Some of the things this library might support in the future:</p>
 <ul>
