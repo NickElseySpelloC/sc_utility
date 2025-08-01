@@ -767,7 +767,7 @@ tables, and named ranges, with robust error handling.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initializes the ExcelReader with the path to the Excel file.</p>
+        <p>Initialize the ExcelReader with the path to the Excel file.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -786,7 +786,7 @@ tables, and named ranges, with robust error handling.</p>
                 <code>file_path</code>
             </td>
             <td>
-                  <code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -816,7 +816,7 @@ tables, and named ranges, with robust error handling.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the file does not exist, is not a valid Excel file, or if the openpyxl library cannot be imported.</p>
+                <p>If the file does not exist, is not a valid Excel file.</p>
               </div>
             </td>
           </tr>
@@ -839,7 +839,7 @@ tables, and named ranges, with robust error handling.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Extracts data from an Excel file based on the source type and name.</p>
+        <p>Extract data from an Excel file based on the source type and name.</p>
 <p>Expected the specified source type to be either:
 - An entire worksheet with the header in the first row (sheet)
 - A named range (range)
@@ -893,6 +893,29 @@ tables, and named ranges, with robust error handling.</p>
     </table>
 
 
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Data extracted as a list of dictionaries.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
 <p><span class="doc-section-title">Raises:</span></p>
     <table>
       <thead>
@@ -916,29 +939,6 @@ tables, and named ranges, with robust error handling.</p>
     </table>
 
 
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>data</code></td>            <td>
-                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Data extracted as a dictionary.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
     </div>
 
 </div>
@@ -954,7 +954,7 @@ tables, and named ranges, with robust error handling.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Extracts a table from an Excel file and returns it as a DataFrame.</p>
+        <p>Extract a named range from an Excel file and return it as a list of dictionaries.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -988,6 +988,29 @@ tables, and named ranges, with robust error handling.</p>
     </table>
 
 
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list containing the range data as dictionaries.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
 <p><span class="doc-section-title">Raises:</span></p>
     <table>
       <thead>
@@ -1003,30 +1026,7 @@ tables, and named ranges, with robust error handling.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the table cannot be loaded or if there are issues with the file.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>data</code></td>            <td>
-                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A list containing the range data.</p>
+                <p>If the range cannot be loaded or if there are issues with the file.</p>
               </div>
             </td>
           </tr>
@@ -1049,7 +1049,7 @@ tables, and named ranges, with robust error handling.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Extracts a sheet from an Excel file and returns it as a DataFrame.</p>
+        <p>Extract a sheet from an Excel file and return it as a list of dictionaries.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1083,6 +1083,29 @@ tables, and named ranges, with robust error handling.</p>
     </table>
 
 
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list containing the sheet data as dictionaries.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
 <p><span class="doc-section-title">Raises:</span></p>
     <table>
       <thead>
@@ -1106,29 +1129,6 @@ tables, and named ranges, with robust error handling.</p>
     </table>
 
 
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>data</code></td>            <td>
-                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A list containing the sheet data.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
     </div>
 
 </div>
@@ -1144,7 +1144,7 @@ tables, and named ranges, with robust error handling.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Extracts a table from an Excel file and returns it as a DataFrame.</p>
+        <p>Extract a table from an Excel file and return it as a list of dictionaries.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1178,6 +1178,29 @@ tables, and named ranges, with robust error handling.</p>
     </table>
 
 
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list containing the table data as dictionaries.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
 <p><span class="doc-section-title">Raises:</span></p>
     <table>
       <thead>
@@ -1201,29 +1224,6 @@ tables, and named ranges, with robust error handling.</p>
     </table>
 
 
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>data</code></td>            <td>
-                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A list containing the table data.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
     </div>
 
 </div>
@@ -1232,7 +1232,7 @@ tables, and named ranges, with robust error handling.</p>
 
 
 <h2 id="sc_utility.sc_excel_reader.ExcelReader.load_excel_workbook" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">load_excel_workbook</span><span class="p">(</span><span class="n">data_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">load_excel_workbook</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">data_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1258,7 +1258,7 @@ tables, and named ranges, with robust error handling.</p>
                 <code>data_only</code>
             </td>
             <td>
-                  <code><span title="Optional">Optional</span>[<span title="bool">bool</span>]</code>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1274,7 +1274,7 @@ tables, and named ranges, with robust error handling.</p>
                 <code>read_only</code>
             </td>
             <td>
-                  <code><span title="Optional">Optional</span>[<span title="bool">bool</span>]</code>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1283,6 +1283,29 @@ tables, and named ranges, with robust error handling.</p>
             </td>
             <td>
                   <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>workbook</code></td>            <td>
+                  <code><span title="openpyxl.workbook.Workbook">Workbook</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Workbook object.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -1304,30 +1327,7 @@ tables, and named ranges, with robust error handling.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the file cannot be loaded due to various reasons (e.g., file not found, permission denied, invalid format).</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>object</code></td>            <td>
-                  <code><span title="workbook">workbook</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Workbook object or None if loading fails.</p>
+                <p>If the file cannot be loaded due to various reasons.</p>
               </div>
             </td>
           </tr>
