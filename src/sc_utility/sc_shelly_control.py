@@ -960,6 +960,22 @@ class ShellyControl:
 
         return True
 
+    def refresh_all_device_statuses(self) -> None:
+        """Refreshes the status of all Shelly devices.
+
+        This function iterates through all devices and updates their status by calling get_device_status.
+        It also calculates the total power and energy consumption for each device.
+
+        Raises:
+            RuntimeError: If there is an error getting the status of any device.
+        """
+        for device in self.devices:
+            try:
+                self.get_device_status(device)
+            except RuntimeError as e:
+                self.logger.log_message(f"Error refreshing status for device {device['Label']}: {e}", "error")
+                raise RuntimeError(e) from e
+
     def _calculate_device_totals(self, device: dict) -> None:
         """Calculates the total power and energy consumption for a device.
 
