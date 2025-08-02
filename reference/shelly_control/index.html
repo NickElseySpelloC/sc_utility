@@ -626,6 +626,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.refresh_all_device_statuses" class="md-nav__link">
+    <span class="md-ellipsis">
+      refresh_all_device_statuses
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -753,6 +762,15 @@
   <a href="#sc_utility.sc_shelly_control.ShellyControl.print_model_library" class="md-nav__link">
     <span class="md-ellipsis">
       print_model_library
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.refresh_all_device_statuses" class="md-nav__link">
+    <span class="md-ellipsis">
+      refresh_all_device_statuses
     </span>
   </a>
   
@@ -1716,6 +1734,49 @@
             <td>
               <div class="doc-md-description">
                 <p>A string representation of the Shelly model library.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="sc_utility.sc_shelly_control.ShellyControl.refresh_all_device_statuses" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">refresh_all_device_statuses</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Refreshes the status of all Shelly devices.</p>
+<p>This function iterates through all devices and updates their status by calling get_device_status.
+It also calculates the total power and energy consumption for each device.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If there is an error getting the status of any device.</p>
               </div>
             </td>
           </tr>
