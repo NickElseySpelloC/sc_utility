@@ -132,7 +132,7 @@ class SCConfigManager:
         """  # noqa: DOC502
         def recursive_check(config_section, placeholder_section):
             for key, placeholder_value in placeholder_section.items():
-                if key in config_section:
+                if key and key in config_section:
                     config_value = config_section[key]
                     if isinstance(placeholder_value, dict) and isinstance(config_value, dict):
                         if recursive_check(config_value, placeholder_value):
