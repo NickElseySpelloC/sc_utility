@@ -428,7 +428,7 @@ class ShellyControl:
             "TotalEnergy": 0.0,  # Total energy consumption across all meters
         }
         # Do some basic validation of the device attributes
-        if not device["MetersSeperate"] and device["Meters"] != device["Outputs"]:
+        if not device["MetersSeperate"] and device["Meters"] > 0 and device["Meters"] != device["Outputs"]:
             error_msg = f"Device {device['ClientName']} (ID: {device['ID']}) has a mismatch between the number of outputs ({device['Outputs']}) and meters ({device['Meters']}) when meters are not separate. Please check the configuration."
             raise RuntimeError(error_msg)
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sc_utility"
-version = "2.1.2"
+version = "2.1.3"
 description = "Shared utilities for logging and configuration management"
 authors = [{ name = "Nick Elsey", email = "nick@spelloconsulting.com" }]
 readme = "README.md"
