@@ -1216,7 +1216,7 @@ class ShellyControl:
             # HERE - change to included keys only
 
             # Update alloed device attributes
-            device_included_keys = {"Online", "MACAddress", "Uptime", "RestartRequired"}
+            device_included_keys = {"MACAddress", "Uptime", "RestartRequired"}
             for key, value in device_info.items():
                 if key in device_included_keys and key in device:
                     device[key] = value
