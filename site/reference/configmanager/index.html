@@ -932,7 +932,7 @@
 
 
 <h2 id="sc_utility.sc_config_mgr.SCConfigManager.check_for_config_changes" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">check_for_config_changes</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">check_for_config_changes</span><span class="p">(</span><span class="n">last_check</span><span class="p">)</span></code>
 
 </h2>
 
@@ -940,6 +940,37 @@
     <div class="doc doc-contents ">
 
         <p>Check if the configuration file has changed. If it has, reload the configuration.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>last_check</code>
+            </td>
+            <td>
+                  <code><span title="datetime.datetime">datetime</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The last time the config was checked.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -953,11 +984,11 @@
       <tbody>
           <tr class="doc-section-item">
 <td><code>result</code></td>            <td>
-                  <code><span title="bool">bool</span></code>
+                  <code><span title="datetime.datetime">datetime</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True if the configuration has changed, False otherwise.</p>
+                <p>The new last modified time if the config has changed and was reloaded, None otherwise.</p>
               </div>
             </td>
           </tr>

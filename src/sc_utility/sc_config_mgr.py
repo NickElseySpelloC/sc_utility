@@ -2,7 +2,7 @@
 
 Management of a YAML log file.
 """
-
+import datetime as dt
 from collections.abc import Callable
 from pathlib import Path
 
@@ -30,7 +30,6 @@ class SCConfigManager:
         """
         self._config = {}    # Intialise the actual config object
         self.config_file = config_file
-        self.config_last_modified = None  # Last modified time of the config file
         self.logger_function = None  # Placeholder for a logger function
         self.validation_schema = validation_schema
         self.placeholders = placeholders
@@ -85,28 +84,32 @@ class SCConfigManager:
                         msg = f"Validation error for config file {self.config_path}: {v.errors}"  # type: ignore[call-arg]
                         raise RuntimeError(msg)
 
-        self.config_last_modified = self.config_path.stat().st_mtime
         return True
 
-    def check_for_config_changes(self) -> bool:
+    def check_for_config_changes(self, last_check: dt.datetime) -> dt.datetime | None:
         """Check if the configuration file has changed. If it has, reload the configuration.
 
+        Args:
+            last_check (dt.datetime): The last time the config was checked.
+
         Returns:
-            result (bool): True if the configuration has changed, False otherwise.
+            result (dt.datetime | None): The new last modified time if the config has changed and was reloaded, None otherwise.
         """
         # get the last modified time of the config file
+        local_tz = dt.datetime.now().astimezone().tzinfo
         if not self.config_path:
-            return False
+            return None
 
         last_modified = self.config_path.stat().st_mtime
+        # Convert last_modified to a datetime object
+        last_modified_dt = dt.datetime.fromtimestamp(last_modified, tz=local_tz)
 
-        if self.config_last_modified is None or last_modified > self.config_last_modified:
+        if last_check is None or last_modified_dt > last_check:
             # The config file has changed, reload it
             self.load_config()
-            self.config_last_modified = last_modified
-            return True
+            return last_modified_dt
 
-        return False
+        return None
 
     def register_logger(self, logger_function: Callable) -> None:
         """Registers a logger function to be used for logging messages.
