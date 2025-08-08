@@ -27,6 +27,7 @@ AmberAPI:
 Files:
     LogfileName: logfile.log
     LogfileMaxLines: 500
+    LogProcessID: False
     LogfileVerbosity: detailed
     ConsoleVerbosity: detailed
 

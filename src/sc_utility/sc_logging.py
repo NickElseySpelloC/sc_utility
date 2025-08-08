@@ -20,7 +20,12 @@ from sc_utility.sc_common import SCCommon
 class SCLogger:
     """A class to handle logging messages with different verbosity levels."""
 
-    def __init__(self, logger_settings: dict | None = None, logfile_name: str | None = None, file_verbosity: str | None = "detailed", console_verbosity: str | None = "summary", max_lines: int | None = 10000):
+    def __init__(self, logger_settings: dict | None = None, 
+                 logfile_name: str | None = None, 
+                 file_verbosity: str | None = "detailed", 
+                 console_verbosity: str | None = "summary", 
+                 max_lines: int | None = 10000,
+                 log_process_id: bool | None = False):
         """
         Initializes the logger with configuration settings.
 
@@ -32,6 +37,7 @@ class SCLogger:
             file_verbosity (Optional[str], optional): Verbosity level for file logging
             console_verbosity  (Optional[str], optional): Verbosity level for console logging
             max_lines  (Optional[int], optional): Maximum number of lines to keep in the log file
+            log_process_id (Optional[bool], optional): If True, include the process ID in log messages. Defaults to False.
         """
         if logger_settings is not None:
             self.logfile_name = logger_settings["logfile_name"]
@@ -44,6 +50,7 @@ class SCLogger:
             self.file_verbosity = file_verbosity
             self.console_verbosity = console_verbosity
             self.max_lines = max_lines
+            self.log_process_id = log_process_id
             self.log_process_id = False
 
         self.verbosity_levels = {
@@ -127,16 +134,16 @@ class SCLogger:
 
         process_str = ""
         if self.log_process_id:
-            process_str = f" Proc {SCCommon.get_process_id()}"
+            process_str = f"[Proc {SCCommon.get_process_id()}] "
 
         # Deal with console message first
         if console_level >= message_level and console_level > 0:
             if verbosity == "error":
-                print("ERROR: " + message, file=sys.stderr)
+                print(f"ERROR: {process_str}{message}", file=sys.stderr)
             elif verbosity == "warning":
-                print("WARNING: " + message)
+                print(f"WARNING: {process_str}{message}")
             else:
-                print(message)
+                print(f"{process_str}{message}")
 
         # Now write to the log file if needed
         if self.file_logging_enabled:
@@ -148,7 +155,7 @@ class SCLogger:
                     else:
                         # Use the local timezone for the log timestamp
                         local_tz = datetime.now().astimezone().tzinfo
-                        file.write(f"{datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S')}{process_str}{error_str}: {message}\n")
+                        file.write(f"{datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S')}{error_str}: {process_str}{message}\n")
 
     def register_email_settings(self, email_settings: dict | None) -> None:
         """
