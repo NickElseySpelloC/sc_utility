@@ -552,6 +552,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_logging.SCLogger.initialise_settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      initialise_settings
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_logging.SCLogger.log_fatal_error" class="md-nav__link">
     <span class="md-ellipsis">
       log_fatal_error
@@ -701,6 +710,15 @@
   <a href="#sc_utility.sc_logging.SCLogger.get_fatal_error" class="md-nav__link">
     <span class="md-ellipsis">
       get_fatal_error
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_logging.SCLogger.initialise_settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      initialise_settings
     </span>
   </a>
   
@@ -991,6 +1009,136 @@
     <div class="doc doc-contents ">
 
         <p>Returns True if a fatal error was previously reported, false otherwise.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="sc_utility.sc_logging.SCLogger.initialise_settings" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">initialise_settings</span><span class="p">(</span><span class="n">logger_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logfile_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_verbosity</span><span class="o">=</span><span class="s1">&#39;detailed&#39;</span><span class="p">,</span> <span class="n">console_verbosity</span><span class="o">=</span><span class="s1">&#39;summary&#39;</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">log_process_id</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Set / reset the logger configuration settings.</p>
+<p>If logger_settings are provided, it will override the individual parameters.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>logger_settings</code>
+            </td>
+            <td>
+                  <code><span title="Optional">Optional</span>[<span title="dict">dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary containing logger settings. If provided, it should include the same keys as the individual parameters below:</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>logfile_name</code>
+            </td>
+            <td>
+                  <code><span title="Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the log file. If None, no file logging will be done.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_verbosity</code>
+            </td>
+            <td>
+                  <code><span title="Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Verbosity level for file logging</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;detailed&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>console_verbosity</code>
+            </td>
+            <td>
+                  <code> (Optional[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Verbosity level for console logging</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;summary&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_lines</code>
+            </td>
+            <td>
+                  <code> (Optional[int]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of lines to keep in the log file</p>
+              </div>
+            </td>
+            <td>
+                  <code>10000</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>log_process_id</code>
+            </td>
+            <td>
+                  <code><span title="Optional">Optional</span>[<span title="bool">bool</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, include the process ID in log messages. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>

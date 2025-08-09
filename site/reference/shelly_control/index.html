@@ -600,6 +600,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.initialize_settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      initialize_settings
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_shelly_control.ShellyControl.is_device_online" class="md-nav__link">
     <span class="md-ellipsis">
       is_device_online
@@ -735,6 +744,15 @@
   <a href="#sc_utility.sc_shelly_control.ShellyControl.get_device_status" class="md-nav__link">
     <span class="md-ellipsis">
       get_device_status
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.initialize_settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      initialize_settings
     </span>
   </a>
   
@@ -1455,6 +1473,94 @@
             <td>
               <div class="doc-md-description">
                 <p>True if the device is online, False otherwise.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="sc_utility.sc_shelly_control.ShellyControl.initialize_settings" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">initialize_settings</span><span class="p">(</span><span class="n">device_settings</span><span class="p">,</span> <span class="n">refresh_status</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initializes the Shelly devices using the provided settings.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>device_settings</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary containing the device settings.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>refresh_status</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to refresh the status of the devices.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the device settings are invalid or incomplete.</p>
               </div>
             </td>
           </tr>

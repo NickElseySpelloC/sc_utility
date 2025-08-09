@@ -220,7 +220,7 @@ class SCConfigManager:
 
         return None
 
-    def get_shelly_settings(self, config_section: str | None = "ShellyDevices") -> list[dict]:
+    def get_shelly_settings(self, config_section: str | None = "ShellyDevices") -> dict:
         """Returns the the settings for one or more Shelly Smart Switches.
 
         Args:
@@ -231,6 +231,6 @@ class SCConfigManager:
         """
         devices = self.get(config_section, default=None)
         if devices is None:
-            return []
+            return {}
 
         return devices  # type: ignore[assignment]

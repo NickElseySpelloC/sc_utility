@@ -20,14 +20,67 @@ from sc_utility.sc_common import SCCommon
 class SCLogger:
     """A class to handle logging messages with different verbosity levels."""
 
-    def __init__(self, logger_settings: dict | None = None, 
-                 logfile_name: str | None = None, 
-                 file_verbosity: str | None = "detailed", 
-                 console_verbosity: str | None = "summary", 
+    def __init__(self, logger_settings: dict | None = None,
+                 logfile_name: str | None = None,
+                 file_verbosity: str | None = "detailed",
+                 console_verbosity: str | None = "summary",
                  max_lines: int | None = 10000,
-                 log_process_id: bool | None = False):
+                 log_process_id: bool | None = False):  # noqa: FBT001, FBT002
         """
         Initializes the logger with configuration settings.
+
+        If logger_settings are provided, it will override the individual parameters.
+
+        Args:
+            logger_settings (Optional[dict], optional): A dictionary containing logger settings. If provided, it should include the same keys as the individual parameters below:
+            logfile_name (Optional[str], optional): The name of the log file. If None, no file logging will be done.
+            file_verbosity (Optional[str], optional): Verbosity level for file logging
+            console_verbosity  (Optional[str], optional): Verbosity level for console logging
+            max_lines  (Optional[int], optional): Maximum number of lines to keep in the log file
+            log_process_id (Optional[bool], optional): If True, include the process ID in log messages. Defaults to False.
+        """
+        # Make a note of the app directory
+        self.app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
+
+        # Setup the path to the fatal error tracking file
+        self.fatal_error_file_path = self.app_dir / f"{self.app_dir.name}_fatal_error.txt"
+
+        # Use the register_email_settings method to set up email settings
+        self.email_settings = None
+
+        self.verbosity_levels = {
+            "none": 0,
+            "error": 1,
+            "warning": 2,
+            "summary": 3,
+            "detailed": 4,
+            "debug": 5,
+            "all": 6,
+        }
+        # Attributes set in the initialise_logger method
+        self.logfile_name = None
+        self.logfile_path = None
+        self.file_verbosity = "summary"
+        self.console_verbosity = "summary"
+        self.max_lines = 1000
+        self.log_process_id = False
+        self.file_logging_enabled = False
+
+        self.initialise_settings(logger_settings=logger_settings,
+                 logfile_name=logfile_name,
+                 file_verbosity=file_verbosity,
+                 console_verbosity=console_verbosity,
+                 max_lines=max_lines,
+                 log_process_id=log_process_id)
+
+    def initialise_settings(self, logger_settings: dict | None = None,
+                 logfile_name: str | None = None,
+                 file_verbosity: str | None = "detailed",
+                 console_verbosity: str | None = "summary",
+                 max_lines: int | None = 10000,
+                 log_process_id: bool | None = False):  # noqa: FBT001, FBT002
+        """
+        Set / reset the logger configuration settings.
 
         If logger_settings are provided, it will override the individual parameters.
 
@@ -51,26 +104,9 @@ class SCLogger:
             self.console_verbosity = console_verbosity
             self.max_lines = max_lines
             self.log_process_id = log_process_id
-            self.log_process_id = False
-
-        self.verbosity_levels = {
-            "none": 0,
-            "error": 1,
-            "warning": 2,
-            "summary": 3,
-            "detailed": 4,
-            "debug": 5,
-            "all": 6,
-        }
-
-        # Use the register_email_settings method to set up email settings
-        self.email_settings = None
 
         # See if logfile writing is required
         self.file_logging_enabled = self.logfile_name is not None
-
-        # Make a note of the app directory
-        self.app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
 
         if self.file_logging_enabled and self.logfile_name is not None:
             # Determine the file path for the log file
@@ -82,9 +118,6 @@ class SCLogger:
 
             # Truncate the log file if it exists
             self._initialise_monitoring_logfile()
-
-        # Setup the path to the fatal error tracking file
-        self.fatal_error_file_path = self.app_dir / f"{self.app_dir.name}_fatal_error.txt"
 
     def _initialise_monitoring_logfile(self) -> None:
         """Initialise the monitoring log file. If it exists, truncate it to the max number of lines."""
@@ -98,6 +131,7 @@ class SCLogger:
         if not self.file_logging_enabled:
             return
 
+        assert self.logfile_path is not None, "Log file path must be set before trimming the log file."
         if self.logfile_path.exists() and self.max_lines is not None and self.max_lines > 0:
             # Monitoring log file exists - truncate excess lines if needed.
             with self.logfile_path.open(encoding="utf-8") as file:
@@ -147,6 +181,7 @@ class SCLogger:
 
         # Now write to the log file if needed
         if self.file_logging_enabled:
+            assert self.logfile_path is not None, "Log file path must be set before trimming the log file."
             error_str = " ERROR" if verbosity == "error" else " WARNING" if verbosity == "warning" else ""
             if logfile_level >= message_level and logfile_level > 0:
                 with self.logfile_path.open("a", encoding="utf-8") as file:

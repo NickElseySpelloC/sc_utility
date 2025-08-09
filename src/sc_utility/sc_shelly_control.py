@@ -7,6 +7,7 @@ from pathlib import Path
 import requests
 
 from sc_utility.sc_common import SCCommon
+from sc_utility.sc_logging import SCLogger
 
 SHELLY_MODEL_FILE = "shelly_models.json"
 
@@ -14,7 +15,7 @@ SHELLY_MODEL_FILE = "shelly_models.json"
 class ShellyControl:
     """Control interface for Shelly Smart Switch devices."""
 
-    def __init__(self, logger, device_settings: dict):
+    def __init__(self, logger: SCLogger, device_settings: dict):
         """Initializes the ShellySwitch object.
 
         Args:
@@ -39,20 +40,8 @@ class ShellyControl:
         except RuntimeError as e:
             raise RuntimeError(e) from e
 
-        # If switch_settings is provided, add switches from the configuration. Allow exception to be raised if the configuration is invalid.
-        if device_settings:
-            try:
-                self._add_devices_from_config(device_settings)
-            except RuntimeError as e:
-                raise RuntimeError(e) from e
-
-        # See if the devices are online
-        self.is_device_online()
-
-        # Get current status of all devices and switches
-
-        # Finished
-        self.logger.log_message("ShellyControl initialized successfully.", "detailed")
+        # Now initialize the device settings
+        self.initialize_settings(device_settings)
 
     def _import_models(self) -> bool:
         """Imports the Shelly models from the shelly_models.json file.
@@ -77,6 +66,33 @@ class ShellyControl:
         else:
             self.logger.log_message(f"Imported Shelly models data from {model_file}.", "debug")
             return True
+
+    def initialize_settings(self, device_settings: dict, refresh_status: bool | None = False):  # noqa: FBT001, FBT002
+        """Initializes the Shelly devices using the provided settings.
+
+        Args:
+            device_settings (dict): A dictionary containing the device settings.
+            refresh_status (bool | None): Whether to refresh the status of the devices.
+
+        Raises:
+            RuntimeError: If the device settings are invalid or incomplete.
+        """
+        # If switch_settings is provided, add switches from the configuration. Allow exception to be raised if the configuration is invalid.
+        if device_settings:
+            try:
+                self._add_devices_from_config(device_settings)
+            except RuntimeError as e:
+                raise RuntimeError(e) from e
+
+        # See if the devices are online
+        self.is_device_online()
+
+        # If requested, refresh the status of the devices
+        if refresh_status:
+            self.refresh_all_device_statuses()
+
+        # Finished
+        self.logger.log_message("ShellyControl initialized successfully.", "detailed")
 
     def _add_devices_from_config(self, settings: dict) -> None:
         """Adds one or more Shelly devices from the provided configuration dictionary.
