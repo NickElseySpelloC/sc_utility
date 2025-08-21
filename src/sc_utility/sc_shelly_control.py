@@ -197,9 +197,9 @@ class ShellyControl:
         self.devices.append(new_device)
 
         # Add inputs, outputs, and meters for this device
-        self._add_device_components(device_index, "inputs", device_config.get("Inputs"))
-        self._add_device_components(device_index, "outputs", device_config.get("Outputs"))
-        self._add_device_components(device_index, "meters", device_config.get("Meters"))
+        self._add_device_components(device_index, "input", device_config.get("Inputs"))
+        self._add_device_components(device_index, "output", device_config.get("Outputs"))
+        self._add_device_components(device_index, "meter", device_config.get("Meters"))
 
         # If in simuation mode, create the simulation file if it does not exist. Read the contents of the file if it does exist.
         self._import_device_information_from_json(new_device, create_if_no_file=True)
@@ -208,11 +208,11 @@ class ShellyControl:
         self.logger.log_message(f"Added Shelly device {new_device['ClientName']}.", "debug")
 
     def _add_device_components(self, device_index: int, component_type: str, component_config: list[dict] | None) -> None:  # noqa: PLR0912
-        """Adds components (inputs, outputs, or meters) to an existing device.
+        """Adds components (input, outputs, or meters) to an existing device.
 
         Args:
             device_index (int): The index of the device to which the component will be added.
-            component_type (str): The type of component to add ('inputs', 'outputs', or 'meters').
+            component_type (str): The type of component to add ('input', 'outputs', or 'meters').
             component_config (list[dict] | None): A list of the configured components for one device.
 
         Raises:
@@ -223,7 +223,7 @@ class ShellyControl:
             raise RuntimeError(error_msg)
 
         # Validate component type
-        valid_types = {"inputs", "outputs", "meters"}
+        valid_types = {"input", "output", "meter"}
         if component_type not in valid_types:
             error_msg = f"Invalid component type '{component_type}'. Must be one of: {', '.join(valid_types)}."
             raise RuntimeError(error_msg)
@@ -233,17 +233,17 @@ class ShellyControl:
 
         # Set up component-specific configurations
         component_types_list = {
-            "inputs": {
+            "input": {
                 "count_key": "Inputs",
                 "storage_list": self.inputs,
                 "name_prefix": "Input",
             },
-            "outputs": {
+            "output": {
                 "count_key": "Outputs",
                 "storage_list": self.outputs,
                 "name_prefix": "Output",
             },
-            "meters": {
+            "meter": {
                 "count_key": "Meters",
                 "storage_list": self.meters,
                 "name_prefix": "Meter",
@@ -276,12 +276,12 @@ class ShellyControl:
 
             # Set extra attributes
             new_component["ComponentIndex"] = component_idx
-            if component_type == "inputs":
+            if component_type == "input":
                 new_component["State"] = False
-            elif component_type == "outputs":
+            elif component_type == "output":
                 new_component["State"] = False
                 new_component["HasMeter"] = not device["MetersSeperate"]
-            elif component_type == "meters":
+            elif component_type == "meter":
                 new_component["State"] = False
                 new_component["OnOutput"] = not device["MetersSeperate"]
 
@@ -318,7 +318,7 @@ class ShellyControl:
 
         Args:
             device_index (int): The index of the device to which the component will be added.
-            component_type (str): The type of component to create ('inputs', 'outputs', or 'meters').
+            component_type (str): The type of component to create ('input', 'outputs', or 'meters').
 
         Raises:
             RuntimeError: If the component type is invalid or if the device index is out of range.
@@ -331,28 +331,33 @@ class ShellyControl:
                 - Additional attributes based on the component type.
         """
         # Validate component type
-        valid_types = {"inputs", "outputs", "meters"}
+        valid_types = {"input", "output", "meter"}
         if component_type not in valid_types:
             error_msg = f"Invalid component type '{component_type}'. Must be one of: {', '.join(valid_types)}."
             raise RuntimeError(error_msg)
 
+        # Get the device from the list
+        device = self.devices[device_index]
+
         # Create a new component dictionary and populate it with the basic information
         new_component = {
             "DeviceIndex": device_index,
+            "DeviceID": device["ID"],
             "ComponentIndex": None,
+            "ObjectType": component_type,
             "ID": None,
             "Name": None,
             "customkeylist": [],  # Initialize custom key list
         }
 
         # Add extra attributes based on the component type
-        if component_type == "inputs":
+        if component_type == "input":
             new_component["State"] = False
-        elif component_type == "outputs":
+        elif component_type == "output":
             new_component["HasMeter"] = not self.devices[device_index]["MetersSeperate"]
             new_component["State"] = False
             new_component["Temperature"] = None
-        elif component_type == "meters":
+        elif component_type == "meter":
             new_component["OnOutput"] = not self.devices[device_index]["MetersSeperate"]
             new_component["Power"] = None
             new_component["Voltage"] = None
@@ -368,6 +373,7 @@ class ShellyControl:
         - Model: The model tag, used to look up the device characteristics in the shelly_models.json file~
         - ClientName: Client provided name for the device~
         - ID: Client provided numeric ID for the device, or auto numbered if not provided~
+        - ObjectType: Will always be 'device'
         - Simulate: Whether to simulate the device or not, default is False~
         - SimulationFile: The file to use for simulation. None if not in simulation mode.
         - ModelName: The vendor's model name**
@@ -419,6 +425,7 @@ class ShellyControl:
             "Model": device_model,
             "ClientName": None,
             "ID": None,
+            "ObjectType": "device",
             "Simulate": False,  # Default to False if not specified
             "SimulationFile": None,  # This will be set later if in simulation mode
             "ModelName": model_dict.get("name", "Unknown Model Name"),
@@ -452,10 +459,16 @@ class ShellyControl:
         return device
 
     def get_device(self, device_identity: dict | int | str) -> dict:
-        """Returns the device index for a given device ID or name.
+        """Returns the device index for a given device ID or name. 
+        
+        For device_identity you can pass:
+        - A device object (dict) to retrieve it directly.
+        - The device ID (int) to look it up by ID.
+        - The device name (str) to look it up by name.
+        - A component object (dict), which will return the parent device.
 
         Args:
-            device_identity (dict | int | str): If a dict, just returns this, otherwise looks up the ID (int) or name (str) of the device to retrieve.
+            device_identity (dict | int | str): The identifier for the device.
 
         Raises:
             RuntimeError: If the device is not found in the list of devices.
@@ -464,7 +477,10 @@ class ShellyControl:
             device (dict): The device object if found.
         """
         if isinstance(device_identity, dict):
-            return device_identity  # If a dict is passed, return it directly
+            if device_identity.get("ObjectType") == 'device':
+                return device_identity  # If a dict is passed, return it directly
+            else:
+                return self.get_device(device_identity["DeviceID"])  # If a component dict is passed, return the parent device
         for device in self.devices:
             if device["ID"] == device_identity or device["ClientName"] == device_identity:
                 return device
@@ -509,7 +525,7 @@ class ShellyControl:
         Returns the result and updates the device's online status. If we are in simulation mode, always returns True.
 
         Args:
-            device_identity (Optional (dict | int | str | None), optional): The actual device object or ID or name of the device to check. If None, checks all device.
+            device_identity (Optional (dict | int | str | None), optional): The actual device object, device component object, device ID or device name of the device to check. If None, checks all device.
 
         Raises:
             RuntimeError: If the device is not found in the list of devices.

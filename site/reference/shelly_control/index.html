@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
       
       
 
@@ -1073,7 +1073,12 @@
 
     <div class="doc doc-contents ">
 
-        <p>Returns the device index for a given device ID or name.</p>
+        <p>Returns the device index for a given device ID or name. </p>
+<p>For device_identity you can pass:
+- A device object (dict) to retrieve it directly.
+- The device ID (int) to look it up by ID.
+- The device name (str) to look it up by name.
+- A component object (dict), which will return the parent device.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1096,7 +1101,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If a dict, just returns this, otherwise looks up the ID (int) or name (str) of the device to retrieve.</p>
+                <p>The identifier for the device.</p>
               </div>
             </td>
             <td>
@@ -1607,7 +1612,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The actual device object or ID or name of the device to check. If None, checks all device.</p>
+                <p>The actual device object, device component object, device ID or device name of the device to check. If None, checks all device.</p>
               </div>
             </td>
             <td>
@@ -1952,7 +1957,7 @@ It also calculates the total power and energy consumption for each device.</p>
       <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      <script src="../../assets/javascripts/bundle.50899def.min.js"></script>
       
     
   </body>
