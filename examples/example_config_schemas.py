@@ -76,6 +76,44 @@ class ConfigSchema:
                     "RetryCount": {"type": "number", "required": False, "nullable": True, "min": 0, "max": 10},
                     "RetryDelay": {"type": "number", "required": False, "nullable": True, "min": 1, "max": 10},
                     "PingAllowed": {"type": "boolean", "required": False, "nullable": True},
+                    "WebhooksEnabled": {"type": "boolean", "required": False, "nullable": True},
+                    "WebhookHost": {"type": "string", "required": False, "nullable": True},
+                    "WebhookPort": {"type": "number", "required": False, "nullable": True},
+                    "WebhookPath": {"type": "string", "required": False, "nullable": True},
+                    "DefaultWebhooks": {
+                        "type": "dict",
+                        "required": False,
+                        "nullable": True,
+                        "schema": {
+                            "Inputs": {
+                                "type": "list",
+                                "required": False,
+                                "nullable": True,
+                                "schema": {
+                                    "type": "string",
+                                    "required": True,
+                                },
+                            },
+                            "Outputs": {
+                                "type": "list",
+                                "required": False,
+                                "nullable": True,
+                                "schema": {
+                                    "type": "string",
+                                    "required": True,
+                                },
+                            },
+                            "Meters": {
+                                "type": "list",
+                                "required": False,
+                                "nullable": True,
+                                "schema": {
+                                    "type": "string",
+                                    "required": True,
+                                },
+                            },
+                        },
+                    },
                     "Devices": {
                         "type": "list",
                         "required": True,
@@ -89,6 +127,7 @@ class ConfigSchema:
                                 "Port": {"type": "number", "required": False, "nullable": True},
                                 "ID": {"type": "number", "required": False, "nullable": True},
                                 "Simulate": {"type": "boolean", "required": False, "nullable": True},
+                                "Colour": {"type": "string", "required": False, "nullable": True},
                                 "Inputs": {
                                     "type": "list",
                                     "required": False,
@@ -98,6 +137,7 @@ class ConfigSchema:
                                         "schema": {
                                             "Name": {"type": "string", "required": False, "nullable": True},
                                             "ID": {"type": "number", "required": False, "nullable": True},
+                                            "Webhooks": {"type": "boolean", "required": False, "nullable": True},
                                         },
                                     },
                                 },
@@ -109,7 +149,9 @@ class ConfigSchema:
                                         "type": "dict",
                                         "schema": {
                                             "Name": {"type": "string", "required": False, "nullable": True},
+                                            "Group": {"type": "string", "required": False, "nullable": True},
                                             "ID": {"type": "number", "required": False, "nullable": True},
+                                            "Webhooks": {"type": "boolean", "required": False, "nullable": True},
                                         },
                                     },
                                 },

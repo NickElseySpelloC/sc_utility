@@ -10,5 +10,6 @@ from .sc_date_helper import DateHelper
 from .sc_excel_reader import ExcelReader
 from .sc_logging import SCLogger
 from .sc_shelly_control import ShellyControl
+from .webhook_server import _ShellyWebhookHandler
 
-__all__ = ["CSVReader", "DateHelper", "ExcelReader", "SCCommon", "SCConfigManager", "SCLogger", "ShellyControl"]
+__all__ = ["CSVReader", "DateHelper", "ExcelReader", "SCCommon", "SCConfigManager", "SCLogger", "ShellyControl", "_ShellyWebhookHandler"]

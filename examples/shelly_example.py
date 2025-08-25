@@ -2,6 +2,7 @@
 
 import platform
 import sys
+import threading
 
 from example_config_schemas import ConfigSchema
 
@@ -10,8 +11,13 @@ from sc_utility import SCConfigManager, SCLogger, ShellyControl
 CONFIG_FILE = "examples/example_config.yaml"
 
 
-def main():
+def main():  # noqa: PLR0914, PLR0915
     """Main function to run the example code."""
+    loop_delay = 5
+    loop_count = 0
+    max_loops = 20
+    wake_event = threading.Event()
+
     print(f"Hello from sc-utility running on {platform.system()}")
 
     # Get our default schema, validation schema, and placeholders
@@ -44,7 +50,7 @@ def main():
 
     # Initialize the SC_ShellyControl class
     try:
-        shelly_control = ShellyControl(logger, shelly_settings)  # type: ignore[arg-type]
+        shelly_control = ShellyControl(logger, shelly_settings, wake_event)  # type: ignore[arg-type]
     except RuntimeError as e:
         print(f"Shelly control initialization error: {e}", file=sys.stderr)
         return
@@ -71,6 +77,34 @@ def main():
     current_state = output["State"]
     result, did_change = shelly_control.change_output(output_identity, not current_state)
     print(f"Output {output_identity} changed: {did_change}, Result: {result}")
+
+    # Loop and listed for webhook events
+    while loop_count < max_loops:  # noqa: PLR1702
+        print(f"Starting loop {loop_count + 1}/{max_loops}")
+
+        # Do application stuff here
+
+        # Wait for a webhook event or timeout
+        wake_event.wait(timeout=loop_delay)
+        if wake_event.is_set():
+            try:
+                # We were woken by a webhook call
+                event = shelly_control.pull_webhook_event()
+                if event:
+                    print(f"Received webhook event: {event.get('Event')}")
+                    if event.get("Event") in {"input.toggle_on", "input.toggle_off"}:
+                        # An input was toggled on/off, change the corresponding output
+                        output_identity = event.get("Component")
+                        if not output_identity:
+                            print(f"Unable to get component object for event: {event}", file=sys.stderr)
+                            continue
+                        new_state = event.get("Event") == "input.toggle_on"
+                        result, did_change = shelly_control.change_output(output_identity, new_state)
+                        print(f"Output {output_identity} changed: {did_change}, Result: {result}")
+            except (AttributeError, RuntimeError) as e:
+                print(f"Error processing webhook event: {e}", file=sys.stderr)
+            wake_event.clear()
+        loop_count += 1
 
 
 if __name__ == "__main__":
