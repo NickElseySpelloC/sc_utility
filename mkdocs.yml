@@ -21,6 +21,7 @@ nav:
       - Using the Library: guide/getting_started.md
       - Shelly Smart Switches: guide/shelly_control.md
       - Shelly Models Library: guide/shelly_models_list.md
+      - Shelly Control Object Reference: guide/shelly_control_objects.md
   - API Reference:
       - CSVReader: reference/csvreader.md
       - DateHelper: reference/datehelper.md

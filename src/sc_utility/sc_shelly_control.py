@@ -1,26 +1,34 @@
 """ShellyControl class for controlling Shelly Smart Switch devices."""
 import json
+import threading
 import time
+from http.server import ThreadingHTTPServer
 from importlib import resources
 from pathlib import Path
 
 import requests
 
 from sc_utility.sc_common import SCCommon
+from sc_utility.sc_date_helper import DateHelper
 from sc_utility.sc_logging import SCLogger
+from sc_utility.webhook_server import _ShellyWebhookHandler
 
 SHELLY_MODEL_FILE = "shelly_models.json"
+DEFAULT_WEBHOOK_HOST = "0.0.0.0"  # noqa: S104
+DEFAULT_WEBHOOK_PORT = 8787
+DEFAULT_WEBHOOK_PATH = "/shelly/webhook"
 
 
 class ShellyControl:
     """Control interface for Shelly Smart Switch devices."""
 
-    def __init__(self, logger: SCLogger, device_settings: dict):
+    def __init__(self, logger: SCLogger, device_settings: dict, app_wake_event: threading.Event | None = None):
         """Initializes the ShellySwitch object.
 
         Args:
             logger (SCLogger): The logger instance to use for logging messages.
             device_settings (dict): A dictionary containing the device, as returned by SCConfigManager.get_shelly_settings().
+            app_wake_event (threading.Event | None): An optional event to wake the application when a webhook is received.
 
         Raises:
             RuntimeError: If the switch_settings configuration is invalid or incomplete or the model file cannot be found.
@@ -29,6 +37,14 @@ class ShellyControl:
         self.response_timeout = 5   # Number of seconds to wait for a response from the switch
         self.retry_count = 1        # Number of times to retry a request
         self.retry_delay = 2        # Number of seconds to wait between retries
+
+        self.webhook_enabled = False
+        self.webhook_host = DEFAULT_WEBHOOK_HOST
+        self.webhook_port = DEFAULT_WEBHOOK_PORT
+        self.webhook_path = DEFAULT_WEBHOOK_PATH
+        self.app_wake_event = app_wake_event
+        self.webhook_event_queue = []
+
         self.devices = []           # List to hold multiple Shelly devices
         self.inputs = []            # List to hold multiple switch inputs, each one associated with a Shelly device
         self.outputs = []           # List to hold multiple relay outputs, each one associated with a Shelly device
@@ -42,6 +58,9 @@ class ShellyControl:
 
         # Now initialize the device settings
         self.initialize_settings(device_settings)
+
+        # Start the webhook server if needed
+        self._start_webhook_server()
 
     def _import_models(self) -> bool:
         """Imports the Shelly models from the shelly_models.json file.
@@ -67,7 +86,7 @@ class ShellyControl:
             self.logger.log_message(f"Imported Shelly models data from {model_file}.", "debug")
             return True
 
-    def initialize_settings(self, device_settings: dict, refresh_status: bool | None = False):  # noqa: FBT001, FBT002
+    def initialize_settings(self, device_settings: dict, refresh_status: bool | None = True):  # noqa: FBT001, FBT002
         """Initializes the Shelly devices using the provided settings.
 
         Args:
@@ -91,8 +110,391 @@ class ShellyControl:
         if refresh_status:
             self.refresh_all_device_statuses()
 
+        # Get the supported webhooks for each device if it's online
+        self._set_supported_webhooks()
+
+        # Install all the webhooks
+        self._install_webhooks()
+
         # Finished
         self.logger.log_message("ShellyControl initialized successfully.", "detailed")
+
+    def _set_supported_webhooks(self, selected_device: dict | None = None) -> None:
+        """Set the SupportedWebhooks attrbute for each device using the Webhook.ListSupported API call.
+
+        Args:
+            selected_device (dict | None): The device to set supported webhooks for, or None to set for all devices.
+
+        Raises:
+            RuntimeError: If the Webhook.ListSupported API call fails.
+        """
+        for device in self.devices:
+            if selected_device and device["Index"] != selected_device["Index"]:
+                continue
+
+            # Skip if device generation 1 (REST)
+            if device.get("Protocol") != "RPC":
+                continue
+
+            # Skip if device is in simulation mode
+            if device.get("Simulate", False):
+                self.logger.log_message(f"Device {device.get('Name')} is in simulation mode, skipping determining supported webhooks.", "debug")
+                continue
+
+            # Skip if device is offline
+            if not device.get("Online", False):
+                self.logger.log_message(f"Device {device.get('Name')} is offline, unable to determine supported webhooks.", "warning")
+                device["WebhookInstallPending"] = True
+                continue
+
+            try:
+                # Now do a Webhook.ListSupported call and make sure our webhooks are supported
+                payload = {
+                    "id": 0,
+                    "method": "Webhook.ListSupported"
+                }
+                result, result_data = self._rpc_request(device, payload)
+                if not result:
+                    self.logger.log_message(f"Failed to list supported webhooks for device {device.get('Name')}: {result_data}", "error")
+                    continue
+            except TimeoutError as e:
+                error_msg = f"Timeout error listing supported webhooks for device {device.get('Name')}: {e}"
+                self.logger.log_message(error_msg, "error")
+                raise RuntimeError(error_msg) from e
+            except RuntimeError as e:
+                error_msg = f"Error installing listing supported webhooks for device {device.get('Name')}: {e}"
+                self.logger.log_message(error_msg, "error")
+                raise RuntimeError(error_msg) from e
+            else:
+                types_dict = result_data.get("types", {})
+                device["SupportedWebhooks"] = [
+                    {"name": k, **({"attrs": v["attrs"]} if "attrs" in v else {})}
+                    for k, v in types_dict.items()
+                ]
+
+    def _install_webhooks(self, selected_device: dict | None = None):
+        """Install all the default webhooks for each device.
+
+        Args:
+            selected_device (dict | None): The device to install webhooks for, or None to install for all devices.
+
+        Raises:
+            RuntimeError: If the webhook installation fails.
+        """
+        # If webhooks are disabled, return
+        if not self.webhook_enabled:
+            return
+
+        for device in self.devices:
+            if selected_device and device["Index"] != selected_device["Index"]:
+                continue
+
+            # If there are no supported webhooks, skip installation. This will also happen if the device is in simulation mode or offline.
+            if not device["SupportedWebhooks"]:
+                continue
+
+            # Skip if device is offline
+            if not device.get("Online", False):
+                self.logger.log_message(f"Device {device.get('Name')} is offline, unable to install webhooks.", "warning")
+                device["WebhookInstallPending"] = True
+                continue
+
+            # Clear all existing webhooks for this device
+            payload = {
+                "id": 0,
+                "method": "Webhook.DeleteAll"
+            }
+            result, result_data = self._rpc_request(device, payload)
+            if not result:
+                self.logger.log_message(f"Failed to delete existing web hooks for device {device.get('Name')}: {result_data}", "error")
+                continue
+
+            # Now itterate through the inputs and outputs for each device and see which components have the Webhooks attribute set
+            for component in self.inputs + self.outputs + self.meters:
+                if component["DeviceIndex"] != device["Index"]:
+                    continue
+
+                # If the component does not have the Webhooks attribute, skip it
+                if "Webhooks" not in component or not component["Webhooks"]:
+                    continue
+
+                # Get the list of default or configured events for this type of component
+                configured_events = self._get_default_webhook_events_for_component(component)
+
+                # Install each of these events
+                for event in configured_events:
+                    try:
+                        self.install_webhook(event, component)
+                    except RuntimeError as e:
+                        error_msg = f"Error installing webhook for event {event} on component {component.get('Name')} of device {device.get('Name')}: {e}"
+                        self.logger.log_message(error_msg, "error")
+                        raise RuntimeError(error_msg) from e
+
+    def _get_default_webhook_events_for_component(self, component: dict) -> list[str]:
+        """Get the default or configure webhook events for a specific component.
+
+        Args:
+            component (dict): The component to get webhook events for.
+
+        Returns:
+            list[str]: A list of webhook events for the component.
+        """
+        component_type = component.get("ObjectType")
+        if component_type not in {"input", "output", "meter"}:
+            return []
+
+        if component_type == "input":
+            configured_events = self.default_webhook_events.get("Inputs", [])
+            if configured_events:
+                return configured_events
+            return ["input.toggle_on", "input.toggle_off"]
+        if component_type == "output":
+            configured_events = self.default_webhook_events.get("Outputs", [])
+            if configured_events:
+                return configured_events
+            return ["switch.on", "switch.off"]
+        if component_type == "meter":
+            configured_events = self.default_webhook_events.get("Meters", [])
+            if configured_events:
+                return configured_events
+            return []
+        return []
+
+    def install_webhook(self, event: str, component: dict, url: str | None = None, additional_payload: dict | None = None) -> None:  # noqa: PLR0912
+        """Install a webhook for the specified device and component.
+
+        The function is used internally to install input and/or output webhooks that will be handled by the ShellyControl webhook
+        handler server, but it can also be used to install additional webhooks that point to your own enpoint. If you use this
+        function for custom webhooks, make sure your device supports the webhook event.
+
+        The SupportedWebhooks attrbute of the device object lists the webhook events that each device supports (if any). See this page for documentation:
+        https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Webhook#webhookcreate
+
+        You must have set the ShellyDevices: WebhooksEnabled configuration parameter to True for this function to install a webhook.
+
+        The following arguments will automatically be added to the url string if not already provided:
+          Event: The event type that triggered the webhook
+          DeviceID: The ID attribute of the device that this webhook came from.
+          ObjectType: The type of the component that this webhook came from. One of "input", "output", "meter"
+          ComponentID: The ID attribute of the component that this webhook came from.
+        For example:
+           http://192.16.81.23:8787/shelly/webhook?Event=input.toggle_on&DeviceID=1&ObjectType=input&ComponentID=2
+
+        Args:
+            event (str): The event type to install the webhook for. This is case sensitive and must match the event type supported by the device
+                         and componnent. For example "input.toggle_on". A RunTime error will be thrown is the event type is not supported.
+            component (dict): The component object for the device component that you want to install the webhook on.
+            url (str | None): The URL to send the webhook to. If None, the URL will be constructed using the webhook host, port, and path.
+            additional_payload (dict | None): Additional key/value pairs to include in the webhook payload, for example active_between.
+
+        Raises:
+            RuntimeError: If the webhook installation fails.
+        """
+        # Get the device object
+        device = self.get_device(component)
+
+        # Look at the name keys in the device["SupportedWebhooks"] list of dicts and return if not found
+        if not any(webhook.get("name") == event for webhook in device.get("SupportedWebhooks", [])):
+            error_msg = f"Event {event} is not supported for component {component.get('Name')}"
+            raise RuntimeError(error_msg)
+
+        # Skip if device is offline
+        if not device.get("Online", False):
+            self.logger.log_message(f"Device {device.get('Name')} is offline, unable to install webhook {event}.", "warning")
+            device["WebhookInstallPending"] = True
+            return
+
+        # Formulate the payload URL
+        if url is None:
+            payload_url = f"http://{self.webhook_host}:{self.webhook_port}{self.webhook_path}?Event={event}&DeviceID={device.get('ID')}&ObjectType={component.get('ObjectType')}&ComponentID={component.get('ID')}"
+        else:
+            payload_url = url
+            # Now add the Event, DeviceIndex and ComponentIndex if not already present in the passed url
+
+            def add_arg(url, arg):
+                # If there are no URL arguments, start with '?', else use '&'
+                if "?" not in url:
+                    return url + "?" + arg
+                return url + "&" + arg
+
+            if "Event" not in url:
+                payload_url = add_arg(payload_url, f"Event={event}")
+            if "DeviceID" not in url:
+                payload_url = add_arg(payload_url, f"DeviceID={device.get('ID')}")
+            if "ObjectType" not in url:
+                payload_url = add_arg(payload_url, f"ObjectType={component.get('ObjectType')}")
+            if "ComponentID" not in url:
+                payload_url = add_arg(payload_url, f"ComponentID={component.get('ID')}")
+
+            # Now add any additional payload parameters
+            if additional_payload:
+                for key, value in additional_payload.items():
+                    payload_url = add_arg(payload_url, f"{key}={value}")
+
+        # Install the webhook
+        try:
+            error_msg = None
+            payload = {
+                "id": 0,
+                "method": "Webhook.Create",
+                "params": {
+                    "cid": component.get("ComponentIndex"),
+                    "enable": True,
+                    "event": event,
+                    "name": f"{component.get('Name')}: {event}",
+                    "urls": [str(payload_url)]
+                }
+            }
+            result, result_data = self._rpc_request(device, payload)
+            if result:
+                self.logger.log_message(f"Installed {event} webhook rev {result_data.get('rev')} for on component {component.get('Name')}", "debug")
+            else:
+                error_msg = f"Failed to create {event} webhook for component {component.get('Name')}: {result_data}"
+                self.logger.log_message(error_msg, "error")
+                # We will raise a RunTime error below
+
+        except TimeoutError as e:
+            error_msg = f"Timeout error installing web hooks for device {device.get('Name')}: {e}"
+            self.logger.log_message(error_msg, "error")
+            raise RuntimeError(error_msg) from e
+        except RuntimeError as e:
+            error_msg = f"Error installing web hooks for device {device.get('Name')}: {e}"
+            self.logger.log_message(error_msg, "error")
+            raise RuntimeError(error_msg) from e
+        else:
+            if error_msg:
+                raise RuntimeError(error_msg)
+            # Finally record what webhooks we have installed
+            self._list_installed_webhooks(device)
+
+    def _list_installed_webhooks(self, selected_device: dict | None = None) -> None:
+        """List all installed webhooks for each device.
+
+        Args:
+            selected_device (dict | None): The device to list webhooks for. If None, list webhooks for all devices.
+
+        Raises:
+            RuntimeError: If the webhook enumeration fails.
+        """
+        # If the device doesn't support webhooks, no point in checkig to see what's installed
+        for device in self.devices:
+            if not device["SupportedWebhooks"]:
+                continue
+
+            if selected_device is not None and device != selected_device:
+                continue
+
+            try:
+                payload = {
+                    "id": 0,
+                    "method": "Webhook.List"
+                }
+                result, result_data = self._rpc_request(device, payload)
+                if not result:
+                    self.logger.log_message(f"Failed to enumerate installed webhooks for device {device.get('Name')}: {result_data}", "error")
+                    continue
+            except TimeoutError as e:
+                self.logger.log_message(f"Timeout error enumerating installed webhooks for device {device.get('Name')}: {e}", "error")
+            except RuntimeError as e:
+                error_msg = f"Error enumerating installed webhooks for device {device.get('Name')}: {e}"
+                self.logger.log_message(error_msg, "error")
+                raise RuntimeError(error_msg) from e
+            else:
+                device["InstalledWebhooks"] = result_data.get("hooks", [])
+
+    def _start_webhook_server(self) -> ThreadingHTTPServer | None:
+        """Start the webhook server in a background thread.
+
+        Args:
+            app_wake_event: A reference to the client application's wake event. This will be set when a webhook is received.
+
+        Raises:
+            RuntimeError: If the webhook server fails to start.
+
+        Returns:
+            ThreadingHTTPServer instance running the webhook server.
+        """
+        # If webhooks are disabled, return
+        if not self.webhook_enabled:
+            self.logger.log_message("Webhook server is disabled. Webhook server will not be started.", "debug")
+            return None
+
+        # If we are about to start the server, the self.app_wake_event must be valid
+        if self.app_wake_event is None:
+            error_msg = "app_wake_event is not set. Webhook server cannot be started."
+            self.logger.log_message(error_msg, "error")
+            raise RuntimeError(error_msg)
+
+        try:
+            server = ThreadingHTTPServer((self.webhook_host, self.webhook_port), _ShellyWebhookHandler)  # pyright: ignore[reportArgumentType]
+            server.app_wake_event = self.app_wake_event  # type: ignore[attr-defined]
+            server.controller = self  # type: ignore[attr-defined]
+            server.webhook_path = self.webhook_path  # type: ignore[attr-defined]
+            server.logger = self.logger  # type: ignore[attr-defined]
+
+            t = threading.Thread(target=server.serve_forever, daemon=True, name="ShellyWebhookServer")
+            t.start()
+        except (RuntimeError, OSError, TypeError) as e:
+            error_msg = f"Failed to start webhook server: {e}"
+            self.logger.log_message(error_msg, "error")
+            raise RuntimeError(error_msg) from e
+        else:
+            self.logger.log_message(f"Webhook server started on http://{self.webhook_host}:{self.webhook_port}{self.webhook_path}", "debug")
+            return server
+
+    def _push_webhook_event(self, args: dict) -> None:
+        """Adds a webhook event to the queue for later processing. Used by the Wehhook listener.
+
+        Args:
+            args (dict): The arguments for the webhook event.
+        """
+        self.logger.log_message(f"Webhook event received: {args}", "debug")
+
+        # Create a new event entry
+        event_entry = {
+            "timestamp": DateHelper.now(),
+        }
+        # Add each of the args, flattening single-element lists
+        for k, v in args.items():
+            if isinstance(v, list) and len(v) == 1:
+                event_entry[k] = v[0]
+            else:
+                event_entry[k] = v  # pyright: ignore[reportArgumentType]
+
+        # If the DeviceID is present, replace it with the actual device object
+        if event_entry.get("DeviceID") is not None:
+            device_id = int(event_entry.get("DeviceID"))  # pyright: ignore[reportArgumentType]
+            device = self.get_device(device_id)
+            if device is not None:
+                event_entry.pop("DeviceID", None)
+                event_entry["Device"] = device  # pyright: ignore[reportArgumentType]
+
+        # If the ComponentID is present, replace it with the actual component object
+        if event_entry.get("ObjectType") is not None and event_entry.get("ComponentID") is not None and event_entry.get("Device") is not None:
+            # We need to figure out what type of component this is
+            device = event_entry.get("Device")
+            component_id = int(event_entry.get("ComponentID"))  # pyright: ignore[reportArgumentType]
+            component_type = event_entry.get("ObjectType")
+            component = self.get_device_component(component_type=component_type, component_identity=component_id)  # pyright: ignore[reportArgumentType]
+            if component is not None:
+                event_entry.pop("ObjectType", None)
+                event_entry.pop("ComponentID", None)
+                event_entry["Component"] = component  # pyright: ignore[reportArgumentType]
+
+        self.webhook_event_queue.append(event_entry)
+
+    def pull_webhook_event(self) -> dict | None:
+        """Pulls a webhook event from the queue.
+
+        Use this if your app has been interrupted by a webhook event (your app_wake_event was set).
+        This will return the earliest webhook event that was received and remove it from the queue.
+
+        Returns:
+            dict | None: The next webhook event from the queue, or None if the queue is empty.
+        """
+        if self.webhook_event_queue:
+            return self.webhook_event_queue.pop(0)
+        return None
 
     def _add_devices_from_config(self, settings: dict) -> None:
         """Adds one or more Shelly devices from the provided configuration dictionary.
@@ -110,6 +512,13 @@ class ShellyControl:
         self.retry_count = settings.get("RetryCount", self.retry_count)  # Number of times to retry a request
         self.retry_delay = settings.get("RetryDelay", self.retry_delay)  # Number of seconds to wait between retries
         self.ping_allowed = settings.get("PingAllowed", True)  # Whether to allow pinging the devices
+
+        # Now the webhook settings
+        self.webhook_enabled = settings.get("WebhooksEnabled", False)
+        self.webhook_host = settings.get("WebhookHost", "0.0.0.0")  # noqa: S104
+        self.webhook_port = settings.get("WebhookPort", 8787)
+        self.webhook_path = settings.get("WebhookPath", "/shelly/webhook")
+        self.default_webhook_events = settings.get("DefaultWebhooks", {})
 
         # Clear any existing devices, inputs, outputs, and meters
         self.devices.clear()
@@ -207,7 +616,74 @@ class ShellyControl:
         # Finished
         self.logger.log_message(f"Added Shelly device {new_device['ClientName']}.", "debug")
 
-    def _add_device_components(self, device_index: int, component_type: str, component_config: list[dict] | None) -> None:  # noqa: PLR0912
+    def _get_device_attributes(self, device_model: str) -> dict:
+        """Creates a devie attrbutes object and populates the basic information on its model.
+
+        See the shelly_control_objects.md file for the list of device attrbutes.
+
+        Args:
+            device_model (str): The model of the device.
+
+        Raises:
+            RuntimeError: If the model file is not loaded or the device model is not found in the models dictionary.
+
+        Returns:
+            dict: A dictionary containing the characteristics of the device, or None if the model is not supported.
+        """
+        # First lookup the model in the models dictionary - find the list item where "model" matches the device_model
+        if not self.models:
+            error_msg = f"Shelly model file {SHELLY_MODEL_FILE} not loaded. Cannot get device attributes."
+            raise RuntimeError(error_msg)
+        if not any(model_dict.get("model") == device_model for model_dict in self.models):
+            error_msg = f"Device model {device_model} not found in the {SHELLY_MODEL_FILE} model file. Returning empty device attributes."
+            raise RuntimeError(error_msg)
+        # Find the model dictionary
+        model_dict = next((model for model in self.models if model.get("model") == device_model), None)
+        if model_dict is None:
+            error_msg = f"Device model {device_model} not found in the {SHELLY_MODEL_FILE} model file. Returning empty device attributes."
+            raise RuntimeError(error_msg)
+        device = {
+            "Index": len(self.devices),  # This will be set when the device is added to the devices list
+            "Model": device_model,
+            "ClientName": None,
+            "ID": None,
+            "ObjectType": "device",
+            "Simulate": False,  # Default to False if not specified
+            "SimulationFile": None,  # This will be set later if in simulation mode
+            "ModelName": model_dict.get("name", "Unknown Model Name"),
+            "Label": None,
+            "URL": model_dict.get("url", None),
+            "Hostname": None,
+            "Port": 80,  # Default port is 80
+            "Generation": model_dict.get("generation", 3),
+            "Protocol": model_dict.get("protocol", "RPC"),
+            "Inputs": model_dict.get("inputs", 1),
+            "Outputs": model_dict.get("outputs", 1),
+            "Meters": model_dict.get("meters", 0),
+            "MetersSeperate": model_dict.get("meters_seperate", False),
+            "TemperatureMonitoring": model_dict.get("temperature_monitoring", True),
+            # The folowing will be set later when checking the switch status
+            "Online": False,
+            "MacAddress": None,
+            "Temperature": None,
+            "Uptime": None,
+            "RestartRequired": None,
+            "WebhookInstallPending": False,  # Set to True if device(s) need webhook installation because were offline at startup
+            "SupportedWebhooks": [],
+            "InstalledWebhooks": [],
+            "customkeylist": [],  # Initialize custom key list for any custom attributes
+            "TotalPower": 0.0,  # Total power consumption across all outputs
+            "TotalEnergy": 0.0,  # Total energy consumption across all meters
+        }
+        # Do some basic validation of the device attributes
+        if not device["MetersSeperate"] and device["Meters"] > 0 and device["Meters"] != device["Outputs"]:
+            error_msg = f"Device {device['ClientName']} (ID: {device['ID']}) has a mismatch between the number of outputs ({device['Outputs']}) and meters ({device['Meters']}) when meters are not separate. Please check the configuration."
+            raise RuntimeError(error_msg)
+
+        self.logger.log_message(f"Retrieved Shelly model {device_model} ({device['ModelName']}) from models file.", "debug")
+        return device
+
+    def _add_device_components(self, device_index: int, component_type: str, component_config: list[dict] | None) -> None:  # noqa: PLR0912, PLR0915
         """Adds components (input, outputs, or meters) to an existing device.
 
         Args:
@@ -269,10 +745,12 @@ class ShellyControl:
                 new_component["DeviceIndex"] = device_index
                 new_component["ID"] = len(storage_list) + 1
                 new_component["Name"] = f"{component_type_config['name_prefix']} {len(storage_list) + 1}"
+                new_component["Webhooks"] = False
             else:
                 new_component["DeviceIndex"] = device_index
                 new_component["ID"] = component_config[component_idx].get("ID", len(storage_list) + 1)
                 new_component["Name"] = component_config[component_idx].get("Name", f"{component_type_config['name_prefix']} {len(storage_list) + 1}")
+                new_component["Webhooks"] = component_config[component_idx].get("Webhooks", False)
 
             # Set extra attributes
             new_component["ComponentIndex"] = component_idx
@@ -347,6 +825,7 @@ class ShellyControl:
             "ObjectType": component_type,
             "ID": None,
             "Name": None,
+            "Webhooks": False,
             "customkeylist": [],  # Initialize custom key list
         }
 
@@ -366,101 +845,9 @@ class ShellyControl:
             new_component["Energy"] = None
         return new_component
 
-    def _get_device_attributes(self, device_model: str) -> dict:
-        """Creates a devie attrbutes object and populates the basic information on its model.
-
-        - Index: The index of the device in the devices list.
-        - Model: The model tag, used to look up the device characteristics in the shelly_models.json file~
-        - ClientName: Client provided name for the device~
-        - ID: Client provided numeric ID for the device, or auto numbered if not provided~
-        - ObjectType: Will always be 'device'
-        - Simulate: Whether to simulate the device or not, default is False~
-        - SimulationFile: The file to use for simulation. None if not in simulation mode.
-        - ModelName: The vendor's model name**
-        - Label: Combination of the ClientName and ID used in logging messages
-        - URL: URL to the vendor's product page**
-        - Hostname: The DNS hostname or IP address of the device~
-        - Port: The port number to use for communication with the device, default is 80~
-        - Generation: Numeric value representing which generation this device is.**
-        - Protocol: Which API protocol is used to communicate with the device: REST or RPC**
-        - Inputs: Number of switch inputs supported by the device, if any**
-        - Outputs: Number of relay outputs supported by the device, if any**
-        - Meters: Number of energy meters supported by the device, if any**
-        - MetersSeperate: Are the energy meters separate from the relay outputs?**
-        - TemperatureMonitoring: Is temperature monitoring supported by the device?**
-        - Online: Is the device online?^
-        - MacAddress: The MAC address of the device, if available.^
-        - Temperature: The current temperature of the device, if available.^
-        - customkeylist: A list of any custom keys that have been added to the device attributes.
-        - Uptime: The uptime of the device in seconds, if available.^
-        - RestartRequired: Whether the device requires a restart to apply changes, if available.^
-
-        **These attributes are retrieved from the shelly_models.json file.
-        ~These attributes are provided by the client in the configuration file.
-        ^This attribute is set later when checking the switch status.
-
-        Args:
-            device_model (str): The model of the device.
-
-        Raises:
-            RuntimeError: If the model file is not loaded or the device model is not found in the models dictionary.
-
-        Returns:
-            dict: A dictionary containing the characteristics of the device, or None if the model is not supported.
-        """
-        # First lookup the model in the models dictionary - find the list item where "model" matches the device_model
-        if not self.models:
-            error_msg = f"Shelly model file {SHELLY_MODEL_FILE} not loaded. Cannot get device attributes."
-            raise RuntimeError(error_msg)
-        if not any(model_dict.get("model") == device_model for model_dict in self.models):
-            error_msg = f"Device model {device_model} not found in the {SHELLY_MODEL_FILE} model file. Returning empty device attributes."
-            raise RuntimeError(error_msg)
-        # Find the model dictionary
-        model_dict = next((model for model in self.models if model.get("model") == device_model), None)
-        if model_dict is None:
-            error_msg = f"Device model {device_model} not found in the {SHELLY_MODEL_FILE} model file. Returning empty device attributes."
-            raise RuntimeError(error_msg)
-        device = {
-            "Index": len(self.devices),  # This will be set when the device is added to the devices list
-            "Model": device_model,
-            "ClientName": None,
-            "ID": None,
-            "ObjectType": "device",
-            "Simulate": False,  # Default to False if not specified
-            "SimulationFile": None,  # This will be set later if in simulation mode
-            "ModelName": model_dict.get("name", "Unknown Model Name"),
-            "Label": None,
-            "URL": model_dict.get("url", None),
-            "Hostname": None,
-            "Port": 80,  # Default port is 80
-            "Generation": model_dict.get("generation", 3),
-            "Protocol": model_dict.get("protocol", "RPC"),
-            "Inputs": model_dict.get("inputs", 1),
-            "Outputs": model_dict.get("outputs", 1),
-            "Meters": model_dict.get("meters", 0),
-            "MetersSeperate": model_dict.get("meters_seperate", False),
-            "TemperatureMonitoring": model_dict.get("temperature_monitoring", True),
-            # The folowing will be set later when checking the switch status
-            "Online": False,
-            "MacAddress": None,
-            "Temperature": None,
-            "Uptime": None,
-            "RestartRequired": None,
-            "customkeylist": [],  # Initialize custom key list for any custom attributes
-            "TotalPower": 0.0,  # Total power consumption across all outputs
-            "TotalEnergy": 0.0,  # Total energy consumption across all meters
-        }
-        # Do some basic validation of the device attributes
-        if not device["MetersSeperate"] and device["Meters"] > 0 and device["Meters"] != device["Outputs"]:
-            error_msg = f"Device {device['ClientName']} (ID: {device['ID']}) has a mismatch between the number of outputs ({device['Outputs']}) and meters ({device['Meters']}) when meters are not separate. Please check the configuration."
-            raise RuntimeError(error_msg)
-
-        self.logger.log_message(f"Retrieved Shelly model {device_model} ({device['ModelName']}) from models file.", "debug")
-        return device
-
     def get_device(self, device_identity: dict | int | str) -> dict:
-        """Returns the device index for a given device ID or name. 
-        
+        """Returns the device index for a given device ID or name.
+
         For device_identity you can pass:
         - A device object (dict) to retrieve it directly.
         - The device ID (int) to look it up by ID.
@@ -477,10 +864,9 @@ class ShellyControl:
             device (dict): The device object if found.
         """
         if isinstance(device_identity, dict):
-            if device_identity.get("ObjectType") == 'device':
+            if device_identity.get("ObjectType") == "device":
                 return device_identity  # If a dict is passed, return it directly
-            else:
-                return self.get_device(device_identity["DeviceID"])  # If a component dict is passed, return the parent device
+            return self.get_device(device_identity["DeviceID"])  # If a component dict is passed, return the parent device
         for device in self.devices:
             if device["ID"] == device_identity or device["ClientName"] == device_identity:
                 return device
@@ -488,12 +874,13 @@ class ShellyControl:
         error_msg = f"Device {device_identity} not found."
         raise RuntimeError(error_msg)
 
-    def get_device_component(self, component_type: str, component_identity: int | str) -> dict:
+    def get_device_component(self, component_type: str, component_identity: int | str, use_index: bool | None = None) -> dict:  # noqa: FBT001
         """Returns a device component's index for a given component ID or name.
 
         Args:
             component_type (str): The type of component to retrieve ('input', 'output', or 'meter').
             component_identity (int | str): The ID or name of the component to retrieve.
+            use_index (bool | None): If True, lookup by index instead of ID or name.
 
         Raises:
             RuntimeError: If the component is not found in the list.
@@ -513,6 +900,8 @@ class ShellyControl:
             raise RuntimeError(error_msg)
 
         for component in component_list:
+            if use_index and component["ComponentIndex"] == component_identity:
+                return component
             if component["ID"] == component_identity or component["Name"] == component_identity:
                 return component
 
@@ -638,7 +1027,22 @@ class ShellyControl:
                     return_str += f"  Total Power: {device['TotalPower']} W\n"
                     return_str += f"  Total Energy: {device['TotalEnergy']} kWh\n"
                     return_str += f"  Uptime: {device['Uptime']} seconds\n"
-                    return_str += f"  Restart Required: {device['RestartRequired']}\n"
+
+                    # Iterate through the supported webhooks
+                    if device["SupportedWebhooks"]:
+                        return_str += f"  Supported Webhooks: {len(device['SupportedWebhooks'])}\n"
+                        for webhook in device["SupportedWebhooks"]:
+                            return_str += f"    - {webhook.get('name')}\n"
+
+                        # Iterate through the installed webhooks
+                        if device["InstalledWebhooks"]:
+                            return_str += f"  Installed Webhooks: {len(device['InstalledWebhooks'])}\n"
+                            for webhook in device["InstalledWebhooks"]:
+                                return_str += f"    - {webhook.get('name')}\n"
+                        else:
+                            return_str += "  No installed webhooks found.\n"
+                    else:
+                        return_str += "  Webhooks are not supported on this device.\n"
 
             return_str = return_str.strip()  # Remove trailing newline
         except RuntimeError as e:
@@ -935,7 +1339,7 @@ class ShellyControl:
                             if len(em_result_data) <= device["Meters"] or len(emdata_result_data) <= device["Meters"]:
                                 error_msg = f"Device {device['Label']} is online, but meters are separate and at least one EM1.GetStatus RPC call failed. Cannot get meter status. Check models file."
                                 self.logger.log_message(error_msg, "error")
-                                raise RuntimeError(error_msg)
+                                raise RuntimeError(error_msg)  # noqa: TRY301
                             device_meter["Power"] = result_data.get("params", {}).get("act_power", None)
                             device_meter["Voltage"] = result_data.get("params", {}).get("voltage", None)
                             device_meter["Current"] = result_data.get("params", {}).get("current", None)
@@ -980,7 +1384,7 @@ class ShellyControl:
                         # Note that current and power factor are not available in the REST API for gen 1 devices, so we set them to None
                         device_meter["Current"] = None
                         device_meter["PowerFactor"] = None
-        except (AttributeError, KeyError) as e:
+        except (AttributeError, KeyError, RuntimeError) as e:
             error_msg = f"Error extracting status data for device {device['Label']}: {e}"
             self.logger.log_message(error_msg, "error")
             raise RuntimeError(error_msg) from e
@@ -988,9 +1392,39 @@ class ShellyControl:
         # If we have any energy meters, sum the power and energy readings for each meter and add them to the device
         self._calculate_device_totals(device)
 
+        # Finally, install the default webhooks if we were offline and are now back
+        if device["Online"] and device["WebhookInstallPending"]:
+            self._set_supported_webhooks(device)
+
+            # Install all the webhooks if not already done
+            if self.does_device_have_webhooks(device) and not device["InstalledWebhooks"]:
+                self.logger.log_message(f"{device['Label']} came back online, installing default webhooks", "debug")
+                self._install_webhooks(device)
+
         self.logger.log_message(f"Device {device['Label']} status retrieved successfully.", "debug")
 
         return True
+
+    def does_device_have_webhooks(self, device: dict) -> bool:
+        """Returns True if the device has any webhooks installed, False otherwise.
+
+        Args:
+            device (dict): The Shelly device dictionary to check for webhooks.
+
+        Returns:
+            bool: True if the device has webhooks installed, False otherwise.
+        """
+        for component in self.inputs + self.outputs + self.meters:
+            if component["DeviceIndex"] != device["Index"]:
+                continue
+
+            # If the component does not have the Webhooks attribute, skip it
+            if "Webhooks" not in component or not component["Webhooks"]:
+                continue
+
+            return True  # This is our device and at least one of its components has Webhooks set to True
+
+        return False
 
     def refresh_all_device_statuses(self) -> None:
         """Refreshes the status of all Shelly devices.
@@ -1123,6 +1557,69 @@ class ShellyControl:
 
         self.logger.log_message(f"Device output {output_identity} on device {device['Label']} is already {'on' if new_state else 'off'}. No change made.", "debug")
         return True, False
+
+    def get_device_location(self, device_identity: dict | int | str) -> dict | None:
+        """Gets the timezone and location of a Shelly device if available.
+
+        Returns a dict in the following format:
+           "tz": "Europe/Sofia",
+           "lat": 42.67236,
+           "lon": 23.38738
+
+        Args:
+            device_identity (dict | int | str): A device dict, or the ID or name of the device to check.
+
+        Raises:
+            RuntimeError: If the device is not found in the list of devices or if there is an error getting the status.
+            TimeoutError: If the device is online (ping) but the request times out while getting the device status.
+
+        Returns:
+            location (dict | None): A dictionary containing the timezone and location of the device, or None if not available.
+        """
+        # Get the device object
+        if isinstance(device_identity, dict):
+            # If we are passed a device dictionary, use that directly
+            device = device_identity
+        else:
+            try:
+                device = self.get_device(device_identity)
+                if not device:
+                    self.logger.log_message(f"Device {device_identity} not found.", "error")
+                    return None
+            except RuntimeError as e:
+                self.logger.log_message(f"Error getting device status for {device_identity}: {e}", "error")
+                raise RuntimeError(e) from e
+
+        # If device is in simulation mode, read from the json file
+        if device["Simulate"]:
+            # Return a fake location
+            location = {
+                "tz": "Europe/Sofia",
+                "lat": 42.67236,
+                "lon": 23.38738
+            }
+            return location
+
+        if not device["Online"]:
+            return None
+
+        if device["Protocol"] != "RPC":
+            return None
+
+        try:
+            payload = {"id": 0, "method": "Shelly.DetectLocation"}
+            result, result_data = self._rpc_request(device, payload)
+            if not result:
+                self.logger.log_message(f"Failed to gett device location for device {device.get('Name')}: {result_data}", "error")
+                return None
+        except TimeoutError as e:
+            self.logger.log_message(f"Timeout error getting device location for {device['Label']}: {e}", "error")
+            raise TimeoutError(e) from e
+        except RuntimeError as e:
+            self.logger.log_message(f"Error getting location for device {device['Label']}: {e}", "error")
+            raise RuntimeError(e) from e
+        else:
+            return result_data
 
     def get_device_information(self, device_identity: dict | int | str, refresh_status: bool = False) -> dict:  # noqa: FBT001, FBT002
         """Returns a consolidated copy of a Shelly device information as a single dictionary, including its inputs, outputs, and meters.

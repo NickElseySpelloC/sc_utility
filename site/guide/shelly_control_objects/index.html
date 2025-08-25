@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://github.com/NickElseySpelloC/sc_utility/guide/getting_started/">
+        <link rel="canonical" href="https://github.com/NickElseySpelloC/sc_utility/guide/shelly_control_objects/">
       
       
-        <link rel="prev" href="../..">
+        <link rel="prev" href="../shelly_models_list/">
       
       
-        <link rel="next" href="../shelly_control/">
+        <link rel="next" href="../../reference/csvreader/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Using the Library - Spello Consulting Utility Library</title>
+        <title>Shelly Control Object Reference - Spello Consulting Utility Library</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#spello-consulting-utility-library-getting-started" class="md-skip">
+        <a href="#shellycontrol-object-reference" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Using the Library
+              Shelly Control Object Reference
             
           </span>
         </div>
@@ -257,19 +257,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
         
   
   
@@ -280,7 +271,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -336,10 +326,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../shelly_control_objects/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Shelly Control Object Reference
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -350,6 +362,86 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Devices
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#device-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Device Components
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Device Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      Input component
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      Output component
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meter-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      Meter component
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#footnotes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Footnotes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -565,6 +657,74 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Devices
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#device-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Device Components
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Device Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      Input component
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      Output component
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meter-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      Meter component
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#footnotes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Footnotes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -579,242 +739,86 @@
 
 
 
-<h1 id="spello-consulting-utility-library-getting-started">Spello Consulting Utility Library Getting Started</h1>
-<h1 id="installing-the-library">Installing the library</h1>
-<p>The library is available from PyPi, so to add it to your Python project use pip:</p>
-<pre><code>pip install sc_utility
-</code></pre>
-<p>Or better yet, use UV:</p>
-<pre><code>uv add sc_utility
-</code></pre>
-<h1 id="configuration-file">Configuration File</h1>
-<p>The library uses a YAML file for configuration. An example config file (<em>config.yaml.example</em>) is <a href="https://github.com/NickElseySpelloC/sc_utility">available on Github</a>. Copy this to <em>[your_app_name].yaml</em> before using the library. </p>
-<p>Here's the example file - the library expects to find the Files and Email sections in the file:</p>
-<pre><code class="language-yaml">AmberAPI:
-    APIKey: somerandomkey342
-    BaseUrl: https://api.amber.com.au/v1
-    Timeout: 15
-
-Files:
-    LogfileName: logfile.log
-    LogfileMaxLines: 500
-    LogProcessID: False
-    LogfileVerbosity: detailed
-    ConsoleVerbosity: detailed
-
-Email:
-    EnableEmail: True
-    SMTPServer: smtp.gmail.com
-    SMTPPort: 587
-    SMTPUsername: me@gmail.com
-    SMTPPassword: &lt;Your SMTP password&gt;
-    SubjectPrefix: &quot;[Bob Portfolio]: &quot;
-</code></pre>
-<h2 id="configuration-parameters">Configuration Parameters</h2>
-<h3 id="section-files">Section: Files</h3>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">Parameter</th>
-<th style="text-align: left;">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;">LogfileName</td>
-<td style="text-align: left;">The name of the log file, can be a relative or absolute path.</td>
-</tr>
-<tr>
-<td style="text-align: left;">LogfileMaxLines</td>
-<td style="text-align: left;">Maximum number of lines to keep in the log file. If zero, file will never be truncated.</td>
-</tr>
-<tr>
-<td style="text-align: left;">LogfileVerbosity</td>
-<td style="text-align: left;">The level of detail captured in the log file. One of: none; error; warning; summary; detailed; debug; all</td>
-</tr>
-<tr>
-<td style="text-align: left;">ConsoleVerbosity</td>
-<td style="text-align: left;">Controls the amount of information written to the console. One of: error; warning; summary; detailed; debug; all. Errors are written to stderr all other messages are written to stdout</td>
-</tr>
-</tbody>
-</table>
-<h3 id="section-email">Section: Email</h3>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">Parameter</th>
-<th style="text-align: left;">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;">EnableEmail</td>
-<td style="text-align: left;">Set to <em>True</em> if you want to allow the app to send emails. If True, the remaining settings in this section must be configured correctly.</td>
-</tr>
-<tr>
-<td style="text-align: left;">SMTPServer</td>
-<td style="text-align: left;">The SMTP host name that supports TLS encryption. If using a Google account, set to smtp.gmail.com</td>
-</tr>
-<tr>
-<td style="text-align: left;">SMTPPort</td>
-<td style="text-align: left;">The port number to use to connect to the SMTP server. If using a Google account, set to 587</td>
-</tr>
-<tr>
-<td style="text-align: left;">SMTPUsername</td>
-<td style="text-align: left;">Your username used to login to the SMTP server. If using a Google account, set to your Google email address.</td>
-</tr>
-<tr>
-<td style="text-align: left;">SMTPPassword</td>
-<td style="text-align: left;">The password used to login to the SMTP server. If using a Google account, create an app password for the app at https://myaccount.google.com/apppasswords</td>
-</tr>
-<tr>
-<td style="text-align: left;">SubjectPrefix</td>
-<td style="text-align: left;">Optional. If set, the app will add this text to the start of any email subject line for emails it sends.</td>
-</tr>
-</tbody>
-</table>
-<h1 id="example-code">Example code</h1>
-<p>Here's an example module that shows how to use the library classes. Use the <strong>API Reference</strong> navigation to view the API methods for each class. The code example and the companion config and Excel files is available in the examples/ folder in the Github repo.</p>
-<pre><code class="language-python">
-  &quot;&quot;&quot;Example code using the sc_utility libraries. Should not be included in the distrbution.&quot;&quot;&quot;
-
-  import datetime as dt
-  import platform
-  import pprint
-  import sys
-
-  from example_config_schemas import ConfigSchema
-
-  from sc_utility import CSVReader, DateHelper, ExcelReader, SCConfigManager, SCLogger
-
-  CONFIG_FILE = &quot;examples/example_config.yaml&quot;
-  EXCEL_FILE = &quot;examples/example_excel.xlsx&quot;
-  CSV_FILE = &quot;examples/example_csv.csv&quot;
-
-
-  def update_csv():
-      header_config = [
-          {
-              &quot;name&quot;: &quot;Symbol&quot;,
-              &quot;type&quot;: &quot;str&quot;,
-              &quot;match&quot;: True,
-              &quot;sort&quot;: 2,
-          },
-          {
-              &quot;name&quot;: &quot;Date&quot;,
-              &quot;type&quot;: &quot;date&quot;,
-              &quot;format&quot;: &quot;%Y-%m-%d&quot;,
-              &quot;match&quot;: True,
-              &quot;sort&quot;: 1,
-              &quot;minimum&quot;: None,
-          },
-          {
-              &quot;name&quot;: &quot;Name&quot;,
-              &quot;type&quot;: &quot;str&quot;,
-          },
-          {
-              &quot;name&quot;: &quot;Currency&quot;,
-              &quot;type&quot;: &quot;str&quot;,
-          },
-          {
-              &quot;name&quot;: &quot;Price&quot;,
-              &quot;type&quot;: &quot;float&quot;,
-              &quot;format&quot;: &quot;.2f&quot;,
-          },
-      ]
-
-      extra_data = [
-          {
-              &quot;Symbol&quot;: &quot;AAPL&quot;,
-              &quot;Date&quot;: dt.date(2023, 10, 1),
-              &quot;Name&quot;: &quot;Apple Inc.&quot;,
-              &quot;Currency&quot;: &quot;USD&quot;,
-              &quot;Price&quot;: 150.00,
-          },
-          ]
-
-      # Create an instance of the CSVReader class
-      try:
-          csv_reader = CSVReader(CSV_FILE, header_config)
-      except (ImportError, TypeError, ValueError) as e:
-          print(e, file=sys.stderr)
-          return
-
-      csv_reader.update_csv_file(extra_data)
-
-
-  def main():
-      &quot;&quot;&quot;Main function to run the example code.&quot;&quot;&quot;
-      print(f&quot;Hello from sc-utility running on {platform.system()}&quot;)
-
-      # Get our default schema, validation schema, and placeholders
-      schemas = ConfigSchema()
-
-      # Initialize the SC_ConfigManager class
-      try:
-          config = SCConfigManager(
-              config_file=CONFIG_FILE,
-              default_config=schemas.default,
-              validation_schema=schemas.validation,
-              placeholders=schemas.placeholders
-          )
-      except RuntimeError as e:
-          print(f&quot;Configuration file error: {e}&quot;, file=sys.stderr)
-          return
-
-      # Print a value from the sample config file
-      print(f&quot;API key = {config.get('AmberAPI', 'APIKey')}&quot;)
-
-      # Initialize the SC_Logger class
-      try:
-          logger = SCLogger(config.get_logger_settings())
-      except RuntimeError as e:
-          print(f&quot;Logger initialisation error: {e}&quot;, file=sys.stderr)
-          return
-
-      logger.log_message(&quot;This is a test message at the summary level.&quot;, &quot;summary&quot;)
-
-      # Setup email
-      email_settings = config.get_email_settings()
-
-      if email_settings is not None:
-          logger.register_email_settings(email_settings)
-
-          text_msg = &quot;Hello world from sc-utility example code.&quot;
-          if logger.send_email(&quot;Hello world&quot;, text_msg):
-              logger.log_message(&quot;Email sent OK.&quot;, &quot;detailed&quot;)
-
-      # Use DateHelper to get the current date and time
-      prior_date = DateHelper.today_add_days(-7)
-      print(f&quot;Prior date (7 days ago): {prior_date}&quot;)
-
-      # Create an instance of ExcelReader
-      print(&quot;Testing ExcelReader...&quot;)
-      excel_reader = ExcelReader(EXCEL_FILE)
-
-      # Extract a table
-      try:
-          table_data = excel_reader.extract_data(source_name=&quot;Table1&quot;, source_type=&quot;table&quot;)
-      except ImportError as e:
-          print(f&quot;Error extracting table: {e}&quot;)
-          sys.exit(1)
-      else:
-          print(&quot;Table data extracted successfully:\n&quot;)
-          pprint.pprint(table_data)
-
-      # Update a CSV file
-      update_csv()
-
-      # See if we have a fatal error from a previous run
-      if logger.get_fatal_error():
-          print(&quot;Prior fatal error detected.&quot;)
-          logger.clear_fatal_error()
-
-
-  if __name__ == &quot;__main__&quot;:
-      main()
-
-</code></pre>
+<h1 id="shellycontrol-object-reference">ShellyControl Object Reference</h1>
+<p>This page provides a quick reference to the attributes of the main ShellyControl dictionary object types. </p>
+<h2 id="devices">Devices</h2>
+<p>ShellyControl.devices is a list of all the Shelly smart switch devices being managed by this class. You can reference this attribute directly or use ShellyControl.get_device() to return a device dict, looking up by ID, name, etc. </p>
+<p>Each device has the following attrbutes</p>
+<ul>
+<li><strong>Index</strong>: The index of the device in the devices list. Counts from 0.</li>
+<li><strong>Model</strong>: The model tag, used to look up the device characteristics in the shelly_models.json file~</li>
+<li><strong>ClientName</strong>: Client provided name for the device~</li>
+<li><strong>ID</strong>: Client provided numeric ID for the device, or auto numbered (starting at 1) if not provided~</li>
+<li><strong>ObjectType</strong>: Will always be 'device'</li>
+<li><strong>Simulate</strong>: Whether to simulate the device or not, default is False~</li>
+<li><strong>SimulationFile</strong>: The file to use for simulation. None if not in simulation mode.</li>
+<li><strong>ModelName</strong>: The vendor's model name**</li>
+<li><strong>Label</strong>: Combination of the ClientName and ID used in logging messages</li>
+<li><strong>URL</strong>: URL to the vendor's product page**</li>
+<li><strong>Hostname</strong>: The DNS hostname or IP address of the device~</li>
+<li><strong>Port</strong>: The port number to use for communication with the device, default is 80~</li>
+<li><strong>Generation</strong>: Numeric value representing which generation this device is.**</li>
+<li><strong>Protocol</strong>: Which API protocol is used to communicate with the device: REST or RPC**</li>
+<li><strong>Inputs</strong>: Number of switch inputs supported by the device, if any**</li>
+<li><strong>Outputs</strong>: Number of relay outputs supported by the device, if any**</li>
+<li><strong>Meters</strong>: Number of energy meters supported by the device, if any**</li>
+<li><strong>MetersSeperate</strong>: Are the energy meters separate from the relay outputs?**</li>
+<li><strong>TemperatureMonitoring</strong>: Is temperature monitoring supported by the device?**</li>
+<li><strong>Online</strong>: Is the device online?^</li>
+<li><strong>MacAddress</strong>: The MAC address of the device, if available.^</li>
+<li><strong>Temperature</strong>: The current temperature of the device, if available.^</li>
+<li><strong>Uptime</strong>: The uptime of the device in seconds, if available.^</li>
+<li><strong>RestartRequired</strong>: Whether the device requires a restart to apply changes, if available.^</li>
+<li><strong>SupportedWebhooks</strong>: If this device supports webhooks, this will list the event types supported.</li>
+<li><strong>InstalledWebhooks</strong>: The list of webhooks currently installed on this device.</li>
+<li><strong>customkeylist</strong>: A list of any custom key / value pairs that have been added to the device via the configuration file.</li>
+</ul>
+<h2 id="device-components">Device Components</h2>
+<p>A component is a specific hardware component of a Shelly device. Three component types are supported:</p>
+<ul>
+<li><strong>Inputs</strong>: An input usually wiring in from a physical light switch. Used to send a hardware signal to the Shelly device (e.g. light switch has been turned on)</li>
+<li><strong>Outputs</strong>: A relay output from the Shelly device. This is how the Shelly controls things like lights, motors, etc.</li>
+<li><strong>Meters</strong>: An energy meter that can measure the voltage, current and power draw on an output or a dedicated external eMeter clamps (depending on the model).</li>
+</ul>
+<p>Different Shelly models have different numbers of inputs, outputs and meters and some may have only a subset of these features. The print_model_library() function will return a list of all supported Shelly devices and the number and type of components that each model supports. The Inputs, Outputs and Meters attributes of the device object (see above) provides a count of the number of components of each type supported by that particular device.</p>
+<p>All components support the following core attrbutes:</p>
+<ul>
+<li><strong>DeviceIndex</strong>: The Index of the parent device that this component is a part of.</li>
+<li><strong>DeviceID</strong>: The ID of the parent device that this component is a part of.~</li>
+<li><strong>ComponentIndex</strong>: The index of the component in the list of components of this type on this device. For example the second Input component on the third device in our list will have a ComponentIndex=1. </li>
+<li><strong>ObjectType</strong>: What type of component is this - one of input; output or meter.</li>
+<li><strong>ID</strong>: Client provided numeric ID for the component, or auto numbered (starting at 1) if not provided. This is unique.~</li>
+<li><strong>Name</strong>: Client provided name for the component~</li>
+<li><strong>Webhooks</strong>: True if one or more webhooks have been set for this component.</li>
+<li><strong>customkeylist</strong>: A list of any custom key / value pairs that have been added to the component via the configuration file.</li>
+</ul>
+<h3 id="input-component">Input component</h3>
+<p>Input components will also have these attrbutes:</p>
+<ul>
+<li><strong>State</strong>: Is the input currently on (True) or off (False).</li>
+</ul>
+<h3 id="output-component">Output component</h3>
+<p>Output components will also have these attrbutes:</p>
+<ul>
+<li><strong>HasMeter</strong>: Is there an energy meter associated with this output.</li>
+<li><strong>State</strong>: Is the output currently on (True) or off (False).</li>
+<li><strong>Temperature</strong>: Reported temperature reading for this output relay.</li>
+</ul>
+<h3 id="meter-component">Meter component</h3>
+<p>Meter components will also have these attrbutes:</p>
+<ul>
+<li><strong>OnOutput</strong>: Is this meter part of an output relay (True) or a seperate eMeter (False)</li>
+<li><strong>Power</strong>: Current power reading in watts.</li>
+<li><strong>Voltage</strong>: Current voltage reading.</li>
+<li><strong>Current</strong>: Current current reading.</li>
+<li><strong>PowerFactor</strong>: The power factor reading.</li>
+<li><strong>Energy</strong>: Total energy consumed in watt / hours.</li>
+</ul>
+<p>Note, depending on the Shelly models, some of these attrbutes may be empty. For example, some earlier generation 1 models would report power but not voltage or current.</p>
+<h2 id="footnotes">Footnotes</h2>
+<p>**These attributes are retrieved from the <em>shelly_models.json</em> file.
+~These attributes are provided by the client in the configuration file.
+^This attribute is set when checking the switch status.</p>
 
 
 

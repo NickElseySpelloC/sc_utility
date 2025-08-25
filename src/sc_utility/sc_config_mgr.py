@@ -86,6 +86,24 @@ class SCConfigManager:
 
         return True
 
+    def get_config_file_last_modified(self) -> dt.datetime | None:
+        """Get the last modified time of the config file.
+
+        Returns:
+            dt.datetime | None: The last modified time if the config file exists, None otherwise.
+        """
+        if not self.config_path:
+            return None
+
+        # get the last modified time of the config file
+        local_tz = dt.datetime.now().astimezone().tzinfo
+
+        last_modified = self.config_path.stat().st_mtime
+        # Convert last_modified to a datetime object
+        last_modified_dt = dt.datetime.fromtimestamp(last_modified, tz=local_tz)
+
+        return last_modified_dt
+
     def check_for_config_changes(self, last_check: dt.datetime) -> dt.datetime | None:
         """Check if the configuration file has changed. If it has, reload the configuration.
 
@@ -95,14 +113,9 @@ class SCConfigManager:
         Returns:
             result (dt.datetime | None): The new last modified time if the config has changed and was reloaded, None otherwise.
         """
-        # get the last modified time of the config file
-        local_tz = dt.datetime.now().astimezone().tzinfo
-        if not self.config_path:
+        last_modified_dt = self.get_config_file_last_modified()
+        if last_modified_dt is None:
             return None
-
-        last_modified = self.config_path.stat().st_mtime
-        # Convert last_modified to a datetime object
-        last_modified_dt = dt.datetime.fromtimestamp(last_modified, tz=local_tz)
 
         if last_check is None or last_modified_dt > last_check:
             # The config file has changed, reload it
