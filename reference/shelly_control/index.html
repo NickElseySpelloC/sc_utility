@@ -318,6 +318,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/shelly_control_objects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Shelly Control Object Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -564,6 +587,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.does_device_have_webhooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      does_device_have_webhooks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_shelly_control.ShellyControl.get_device" class="md-nav__link">
     <span class="md-ellipsis">
       get_device
@@ -591,6 +623,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.get_device_location" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_device_location
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_shelly_control.ShellyControl.get_device_status" class="md-nav__link">
     <span class="md-ellipsis">
       get_device_status
@@ -603,6 +644,15 @@
   <a href="#sc_utility.sc_shelly_control.ShellyControl.initialize_settings" class="md-nav__link">
     <span class="md-ellipsis">
       initialize_settings
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.install_webhook" class="md-nav__link">
+    <span class="md-ellipsis">
+      install_webhook
     </span>
   </a>
   
@@ -630,6 +680,15 @@
   <a href="#sc_utility.sc_shelly_control.ShellyControl.print_model_library" class="md-nav__link">
     <span class="md-ellipsis">
       print_model_library
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.pull_webhook_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      pull_webhook_event
     </span>
   </a>
   
@@ -714,6 +773,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.does_device_have_webhooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      does_device_have_webhooks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_shelly_control.ShellyControl.get_device" class="md-nav__link">
     <span class="md-ellipsis">
       get_device
@@ -741,6 +809,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.get_device_location" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_device_location
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_shelly_control.ShellyControl.get_device_status" class="md-nav__link">
     <span class="md-ellipsis">
       get_device_status
@@ -753,6 +830,15 @@
   <a href="#sc_utility.sc_shelly_control.ShellyControl.initialize_settings" class="md-nav__link">
     <span class="md-ellipsis">
       initialize_settings
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.install_webhook" class="md-nav__link">
+    <span class="md-ellipsis">
+      install_webhook
     </span>
   </a>
   
@@ -780,6 +866,15 @@
   <a href="#sc_utility.sc_shelly_control.ShellyControl.print_model_library" class="md-nav__link">
     <span class="md-ellipsis">
       print_model_library
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.pull_webhook_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      pull_webhook_event
     </span>
   </a>
   
@@ -847,7 +942,7 @@
 
 
 <h2 id="sc_utility.sc_shelly_control.ShellyControl.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">device_settings</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">device_settings</span><span class="p">,</span> <span class="n">app_wake_event</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -898,6 +993,22 @@
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>app_wake_event</code>
+            </td>
+            <td>
+                  <code><span title="threading.Event">Event</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional event to wake the application when a webhook is received.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -1065,6 +1176,78 @@
 <div class="doc doc-object doc-function">
 
 
+<h2 id="sc_utility.sc_shelly_control.ShellyControl.does_device_have_webhooks" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">does_device_have_webhooks</span><span class="p">(</span><span class="n">device</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Returns True if the device has any webhooks installed, False otherwise.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>device</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The Shelly device dictionary to check for webhooks.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True if the device has webhooks installed, False otherwise.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h2 id="sc_utility.sc_shelly_control.ShellyControl.get_device" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">get_device</span><span class="p">(</span><span class="n">device_identity</span><span class="p">)</span></code>
 
@@ -1073,7 +1256,7 @@
 
     <div class="doc doc-contents ">
 
-        <p>Returns the device index for a given device ID or name. </p>
+        <p>Returns the device index for a given device ID or name.</p>
 <p>For device_identity you can pass:
 - A device object (dict) to retrieve it directly.
 - The device ID (int) to look it up by ID.
@@ -1166,7 +1349,7 @@
 
 
 <h2 id="sc_utility.sc_shelly_control.ShellyControl.get_device_component" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_device_component</span><span class="p">(</span><span class="n">component_type</span><span class="p">,</span> <span class="n">component_identity</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_device_component</span><span class="p">(</span><span class="n">component_type</span><span class="p">,</span> <span class="n">component_identity</span><span class="p">,</span> <span class="n">use_index</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1217,6 +1400,22 @@
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>use_index</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, lookup by index instead of ID or name.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -1387,6 +1586,118 @@
 <div class="doc doc-object doc-function">
 
 
+<h2 id="sc_utility.sc_shelly_control.ShellyControl.get_device_location" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_device_location</span><span class="p">(</span><span class="n">device_identity</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Gets the timezone and location of a Shelly device if available.</p>
+
+
+<details class="returns-a-dict-in-the-following-format" open>
+  <summary>Returns a dict in the following format</summary>
+  <p>"tz": "Europe/Sofia",
+"lat": 42.67236,
+"lon": 23.38738</p>
+</details>
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>device_identity</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span> | <span title="int">int</span> | <span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A device dict, or the ID or name of the device to check.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the device is not found in the list of devices or if there is an error getting the status.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TimeoutError">TimeoutError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the device is online (ping) but the request times out while getting the device status.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>location</code></td>            <td>
+                  <code><span title="dict">dict</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary containing the timezone and location of the device, or None if not available.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h2 id="sc_utility.sc_shelly_control.ShellyControl.get_device_status" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">get_device_status</span><span class="p">(</span><span class="n">device_identity</span><span class="p">)</span></code>
 
@@ -1493,7 +1804,7 @@
 
 
 <h2 id="sc_utility.sc_shelly_control.ShellyControl.initialize_settings" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">initialize_settings</span><span class="p">(</span><span class="n">device_settings</span><span class="p">,</span> <span class="n">refresh_status</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">initialize_settings</span><span class="p">(</span><span class="n">device_settings</span><span class="p">,</span> <span class="n">refresh_status</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1543,7 +1854,7 @@
               </div>
             </td>
             <td>
-                  <code>False</code>
+                  <code>True</code>
             </td>
           </tr>
       </tbody>
@@ -1566,6 +1877,143 @@
             <td>
               <div class="doc-md-description">
                 <p>If the device settings are invalid or incomplete.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="sc_utility.sc_shelly_control.ShellyControl.install_webhook" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">install_webhook</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">additional_payload</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Install a webhook for the specified device and component.</p>
+<p>The function is used internally to install input and/or output webhooks that will be handled by the ShellyControl webhook
+handler server, but it can also be used to install additional webhooks that point to your own enpoint. If you use this
+function for custom webhooks, make sure your device supports the webhook event.</p>
+<p>The SupportedWebhooks attrbute of the device object lists the webhook events that each device supports (if any). See this page for documentation:
+https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Webhook#webhookcreate</p>
+<p>You must have set the ShellyDevices: WebhooksEnabled configuration parameter to True for this function to install a webhook.</p>
+
+
+<details class="the-following-arguments-will-automatically-be-added-to-the-url-string-if-not-already-provided" open>
+  <summary>The following arguments will automatically be added to the url string if not already provided</summary>
+  <p>Event: The event type that triggered the webhook
+DeviceID: The ID attribute of the device that this webhook came from.
+ObjectType: The type of the component that this webhook came from. One of "input", "output", "meter"
+ComponentID: The ID attribute of the component that this webhook came from.</p>
+</details>        <p>For example:
+   http://192.16.81.23:8787/shelly/webhook?Event=input.toggle_on&amp;DeviceID=1&amp;ObjectType=input&amp;ComponentID=2</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>event</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The event type to install the webhook for. This is case sensitive and must match the event type supported by the device
+         and componnent. For example "input.toggle_on". A RunTime error will be thrown is the event type is not supported.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>component</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The component object for the device component that you want to install the webhook on.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>url</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The URL to send the webhook to. If None, the URL will be constructed using the webhook host, port, and path.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>additional_payload</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional key/value pairs to include in the webhook payload, for example active_between.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the webhook installation fails.</p>
               </div>
             </td>
           </tr>
@@ -1845,6 +2293,49 @@
             <td>
               <div class="doc-md-description">
                 <p>A string representation of the Shelly model library.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="sc_utility.sc_shelly_control.ShellyControl.pull_webhook_event" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">pull_webhook_event</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Pulls a webhook event from the queue.</p>
+<p>Use this if your app has been interrupted by a webhook event (your app_wake_event was set).
+This will return the earliest webhook event that was received and remove it from the queue.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>dict | None: The next webhook event from the queue, or None if the queue is empty.</p>
               </div>
             </td>
           </tr>
