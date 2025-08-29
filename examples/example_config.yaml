@@ -8,6 +8,7 @@ AmberAPI:
 
 # Settings for oen or more Shelly smart switches. See documentation for more details.
 ShellyDevices:
+  AllowDebugLogging: True
   ResponseTimeout: 5
   RetryCount: 1
   RetryDelay: 2
