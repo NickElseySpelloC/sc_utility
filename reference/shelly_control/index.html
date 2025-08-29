@@ -623,6 +623,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.get_device_location" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_device_location
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_shelly_control.ShellyControl.get_device_status" class="md-nav__link">
     <span class="md-ellipsis">
       get_device_status
@@ -794,6 +803,15 @@
   <a href="#sc_utility.sc_shelly_control.ShellyControl.get_device_information" class="md-nav__link">
     <span class="md-ellipsis">
       get_device_information
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_shelly_control.ShellyControl.get_device_location" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_device_location
     </span>
   </a>
   
@@ -1554,6 +1572,118 @@
             <td>
               <div class="doc-md-description">
                 <p>A dictionary containing the device's attributes, inputs, outputs, and meters.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="sc_utility.sc_shelly_control.ShellyControl.get_device_location" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_device_location</span><span class="p">(</span><span class="n">device_identity</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Gets the timezone and location of a Shelly device if available.</p>
+
+
+<details class="returns-a-dict-in-the-following-format" open>
+  <summary>Returns a dict in the following format</summary>
+  <p>"tz": "Europe/Sofia",
+"lat": 42.67236,
+"lon": 23.38738</p>
+</details>
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>device_identity</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span> | <span title="int">int</span> | <span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A device dict, or the ID or name of the device to check.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the device is not found in the list of devices or if there is an error getting the status.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TimeoutError">TimeoutError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the device is online (ping) but the request times out while getting the device status.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>location</code></td>            <td>
+                  <code><span title="dict">dict</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary containing the timezone and location of the device, or None if not available.</p>
               </div>
             </td>
           </tr>
