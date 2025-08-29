@@ -33,6 +33,7 @@ class ShellyControl:
         Raises:
             RuntimeError: If the switch_settings configuration is invalid or incomplete or the model file cannot be found.
         """
+        self.allow_debug_logging = device_settings.get("AllowDebugLogging", False)
         self.logger = logger
         self.response_timeout = 5   # Number of seconds to wait for a response from the switch
         self.retry_count = 1        # Number of times to retry a request
@@ -62,6 +63,15 @@ class ShellyControl:
         # Start the webhook server if needed
         self._start_webhook_server()
 
+    def _log_debug_message(self, message: str) -> None:
+        """Logs a debug message.
+
+        Args:
+            message (str): The message to log.
+        """
+        if self.allow_debug_logging:
+            self.logger.log_message(message, "debug")
+
     def _import_models(self) -> bool:
         """Imports the Shelly models from the shelly_models.json file.
 
@@ -83,7 +93,7 @@ class ShellyControl:
             error_msg = f"JSON error loading Shelly models: {e}"
             raise RuntimeError(error_msg) from e
         else:
-            self.logger.log_message(f"Imported Shelly models data from {model_file}.", "debug")
+            self._log_debug_message(f"Imported Shelly models data from {model_file}.")
             return True
 
     def initialize_settings(self, device_settings: dict, refresh_status: bool | None = True):  # noqa: FBT001, FBT002
@@ -138,7 +148,7 @@ class ShellyControl:
 
             # Skip if device is in simulation mode
             if device.get("Simulate", False):
-                self.logger.log_message(f"Device {device.get('Name')} is in simulation mode, skipping determining supported webhooks.", "debug")
+                self._log_debug_message(f"Device {device.get('Name')} is in simulation mode, skipping determining supported webhooks.")
                 continue
 
             # Skip if device is offline
@@ -347,7 +357,7 @@ class ShellyControl:
             }
             result, result_data = self._rpc_request(device, payload)
             if result:
-                self.logger.log_message(f"Installed {event} webhook rev {result_data.get('rev')} for on component {component.get('Name')}", "debug")
+                self._log_debug_message(f"Installed {event} webhook rev {result_data.get('rev')} for on component {component.get('Name')}")
             else:
                 error_msg = f"Failed to create {event} webhook for component {component.get('Name')}: {result_data}"
                 self.logger.log_message(error_msg, "error")
@@ -416,7 +426,7 @@ class ShellyControl:
         """
         # If webhooks are disabled, return
         if not self.webhook_enabled:
-            self.logger.log_message("Webhook server is disabled. Webhook server will not be started.", "debug")
+            self._log_debug_message("Webhook server is disabled. Webhook server will not be started.")
             return None
 
         # If we are about to start the server, the self.app_wake_event must be valid
@@ -439,7 +449,7 @@ class ShellyControl:
             self.logger.log_message(error_msg, "error")
             raise RuntimeError(error_msg) from e
         else:
-            self.logger.log_message(f"Webhook server started on http://{self.webhook_host}:{self.webhook_port}{self.webhook_path}", "debug")
+            self._log_debug_message(f"Webhook server started on http://{self.webhook_host}:{self.webhook_port}{self.webhook_path}")
             return server
 
     def _push_webhook_event(self, args: dict) -> None:
@@ -448,7 +458,7 @@ class ShellyControl:
         Args:
             args (dict): The arguments for the webhook event.
         """
-        self.logger.log_message(f"Webhook event received: {args}", "debug")
+        self._log_debug_message(f"Webhook event received: {args}")
 
         # Create a new event entry
         event_entry = {
@@ -508,6 +518,7 @@ class ShellyControl:
             RuntimeError: If the configuration is invalid or incomplete.
         """
         # First load the common settings
+        self.allow_debug_logging = settings.get("AllowDebugLogging", False)
         self.response_timeout = settings.get("ResponseTimeout", self.response_timeout)   # Number of seconds to wait for a response from the switch
         self.retry_count = settings.get("RetryCount", self.retry_count)  # Number of times to retry a request
         self.retry_delay = settings.get("RetryDelay", self.retry_delay)  # Number of seconds to wait between retries
@@ -614,7 +625,7 @@ class ShellyControl:
         self._import_device_information_from_json(new_device, create_if_no_file=True)
 
         # Finished
-        self.logger.log_message(f"Added Shelly device {new_device['ClientName']}.", "debug")
+        self._log_debug_message(f"Added Shelly device {new_device['ClientName']}.")
 
     def _get_device_attributes(self, device_model: str) -> dict:
         """Creates a devie attrbutes object and populates the basic information on its model.
@@ -680,7 +691,7 @@ class ShellyControl:
             error_msg = f"Device {device['ClientName']} (ID: {device['ID']}) has a mismatch between the number of outputs ({device['Outputs']}) and meters ({device['Meters']}) when meters are not separate. Please check the configuration."
             raise RuntimeError(error_msg)
 
-        self.logger.log_message(f"Retrieved Shelly model {device_model} ({device['ModelName']}) from models file.", "debug")
+        self._log_debug_message(f"Retrieved Shelly model {device_model} ({device['ModelName']}) from models file.")
         return device
 
     def _add_device_components(self, device_index: int, component_type: str, component_config: list[dict] | None) -> None:  # noqa: PLR0912, PLR0915
@@ -938,7 +949,7 @@ class ShellyControl:
                     if not device_online:
                         found_offline_device = True
 
-                    self.logger.log_message(f"Shelly device {device['Label']} is {'online' if device_online else 'offline'}", "debug")
+                    self._log_debug_message(f"Shelly device {device['Label']} is {'online' if device_online else 'offline'}")
 
         except RuntimeError as e:
             raise RuntimeError(e) from e
@@ -1099,7 +1110,7 @@ class ShellyControl:
         Returns:
             tuple[bool, dict]: Returns True on success, False if the device is offline. If success, returns the response result data as a dictionary, None otherwise.
         """
-        self.logger.log_message(f"Getting the status of device {device['Label']} at {device['Hostname']} via REST", "debug")
+        self._log_debug_message(f"Getting the status of device {device['Label']} at {device['Hostname']} via REST")
 
         # First ping the device to check if it is online
         if not self.is_device_online(device["ID"]):
@@ -1144,7 +1155,7 @@ class ShellyControl:
 
             # If we fall throught to here, we don't have a valid response, so we need to retry or raise an error
             if fatal_error is None:
-                self.logger.log_message(f"Retrying REST request for device {device['Label']} (retry # {retry_count})", "debug")
+                self._log_debug_message(f"Retrying REST request for device {device['Label']} (retry # {retry_count})")
                 time.sleep(self.retry_delay)
 
         return False, {}   # Should never reach here, but just in case, return an empty dictionary
@@ -1166,7 +1177,7 @@ class ShellyControl:
         Returns:
             tuple[bool, dict]: Returns True on success, False if the device is offline. If success, returns the response result data as a dictionary, None otherwise.
         """
-        self.logger.log_message(f"Getting the status of device {device['Label']} at {device['Hostname']} via RPC", "debug")
+        self._log_debug_message(f"Getting the status of device {device['Label']} at {device['Hostname']} via RPC")
 
         # First ping the device to check if it is online
         if not self.is_device_online(device):
@@ -1222,7 +1233,7 @@ class ShellyControl:
 
             # If we fall throught to here, we don't have a valid response, so we need to retry or raise an error
             if fatal_error is None:
-                self.logger.log_message(f"Retrying RPC request for device {device['Label']} (retry # {retry_count})", "debug")
+                self._log_debug_message(f"Retrying RPC request for device {device['Label']} (retry # {retry_count})")
                 time.sleep(self.retry_delay)
 
         return False, {}   # Should never reach here, but just in case, return an empty dictionary
@@ -1398,10 +1409,10 @@ class ShellyControl:
 
             # Install all the webhooks if not already done
             if self.does_device_have_webhooks(device) and not device["InstalledWebhooks"]:
-                self.logger.log_message(f"{device['Label']} came back online, installing default webhooks", "debug")
+                self._log_debug_message(f"{device['Label']} came back online, installing default webhooks")
                 self._install_webhooks(device)
 
-        self.logger.log_message(f"Device {device['Label']} status retrieved successfully.", "debug")
+        self._log_debug_message(f"Device {device['Label']} status retrieved successfully.")
 
         return True
 
@@ -1552,74 +1563,11 @@ class ShellyControl:
             self._export_device_information_to_json(device)
 
         if new_state != current_state:
-            self.logger.log_message(f"Device output {output_identity} on device {device['Label']} was changed to {'on' if new_state else 'off'}.", "debug")
+            self._log_debug_message(f"Device output {output_identity} on device {device['Label']} was changed to {'on' if new_state else 'off'}.")
             return True, True
 
-        self.logger.log_message(f"Device output {output_identity} on device {device['Label']} is already {'on' if new_state else 'off'}. No change made.", "debug")
+        self._log_debug_message(f"Device output {output_identity} on device {device['Label']} is already {'on' if new_state else 'off'}. No change made.")
         return True, False
-
-    def get_device_location(self, device_identity: dict | int | str) -> dict | None:
-        """Gets the timezone and location of a Shelly device if available.
-
-        Returns a dict in the following format:
-           "tz": "Europe/Sofia",
-           "lat": 42.67236,
-           "lon": 23.38738
-
-        Args:
-            device_identity (dict | int | str): A device dict, or the ID or name of the device to check.
-
-        Raises:
-            RuntimeError: If the device is not found in the list of devices or if there is an error getting the status.
-            TimeoutError: If the device is online (ping) but the request times out while getting the device status.
-
-        Returns:
-            location (dict | None): A dictionary containing the timezone and location of the device, or None if not available.
-        """
-        # Get the device object
-        if isinstance(device_identity, dict):
-            # If we are passed a device dictionary, use that directly
-            device = device_identity
-        else:
-            try:
-                device = self.get_device(device_identity)
-                if not device:
-                    self.logger.log_message(f"Device {device_identity} not found.", "error")
-                    return None
-            except RuntimeError as e:
-                self.logger.log_message(f"Error getting device status for {device_identity}: {e}", "error")
-                raise RuntimeError(e) from e
-
-        # If device is in simulation mode, read from the json file
-        if device["Simulate"]:
-            # Return a fake location
-            location = {
-                "tz": "Europe/Sofia",
-                "lat": 42.67236,
-                "lon": 23.38738
-            }
-            return location
-
-        if not device["Online"]:
-            return None
-
-        if device["Protocol"] != "RPC":
-            return None
-
-        try:
-            payload = {"id": 0, "method": "Shelly.DetectLocation"}
-            result, result_data = self._rpc_request(device, payload)
-            if not result:
-                self.logger.log_message(f"Failed to gett device location for device {device.get('Name')}: {result_data}", "error")
-                return None
-        except TimeoutError as e:
-            self.logger.log_message(f"Timeout error getting device location for {device['Label']}: {e}", "error")
-            raise TimeoutError(e) from e
-        except RuntimeError as e:
-            self.logger.log_message(f"Error getting location for device {device['Label']}: {e}", "error")
-            raise RuntimeError(e) from e
-        else:
-            return result_data
 
     def get_device_information(self, device_identity: dict | int | str, refresh_status: bool = False) -> dict:  # noqa: FBT001, FBT002
         """Returns a consolidated copy of a Shelly device information as a single dictionary, including its inputs, outputs, and meters.
@@ -1665,7 +1613,7 @@ class ShellyControl:
         """
         # If we're not in simulation mode for this device, do nothing
         if not device.get("Simulate"):
-            self.logger.log_message(f"Device {device['Label']} is not in simulation mode. Skipping export.", "debug")
+            self._log_debug_message(f"Device {device['Label']} is not in simulation mode. Skipping export.")
             return False
 
         # Get the path to the JSON file
@@ -1694,7 +1642,7 @@ class ShellyControl:
             self.logger.log_message(error_msg, "error")
             raise RuntimeError(error_msg) from e
         else:
-            self.logger.log_message(f"Device information for {device['Label']} exported to {file_path}", "debug")
+            self._log_debug_message(f"Device information for {device['Label']} exported to {file_path}")
             return True
 
     def _import_device_information_from_json(self, device: dict, create_if_no_file: bool) -> bool:  # noqa: FBT001, PLR0912, PLR0915
@@ -1715,7 +1663,7 @@ class ShellyControl:
         """
         # If we're not in simulation mode for this device, do nothing
         if not device.get("Simulate"):
-            self.logger.log_message(f"Device {device['Label']} is not in simulation mode. Skipping import.", "debug")
+            self._log_debug_message(f"Device {device['Label']} is not in simulation mode. Skipping import.")
             return False
 
         # Get the path to the JSON file
@@ -1729,7 +1677,7 @@ class ShellyControl:
         if not file_path.exists():
             # If the file does not exist and create_if_no_file is True, export the device information to JSON
             if create_if_no_file:
-                self.logger.log_message(f"JSON file {file_path} does not exist. Creating new file.", "debug")
+                self._log_debug_message(f"JSON file {file_path} does not exist. Creating new file.")
                 return self._export_device_information_to_json(device)
             error_msg = f"JSON file {file_path} does not exist and create_if_no_file is False."
             raise RuntimeError(error_msg)
@@ -1804,5 +1752,5 @@ class ShellyControl:
             self.logger.log_message(f"Error importing device information from {file_path}: {e}", "error")
             raise RuntimeError(e) from e
         else:
-            self.logger.log_message(f"Device simulation information imported from {file_path} for device {device['Label']}", "debug")
+            self._log_debug_message(f"Device simulation information imported from {file_path} for device {device['Label']}")
             return True
