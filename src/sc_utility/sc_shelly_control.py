@@ -1569,6 +1569,69 @@ class ShellyControl:
         self._log_debug_message(f"Device output {output_identity} on device {device['Label']} is already {'on' if new_state else 'off'}. No change made.")
         return True, False
 
+    def get_device_location(self, device_identity: dict | int | str) -> dict | None:
+        """Gets the timezone and location of a Shelly device if available.
+
+        Returns a dict in the following format:
+           "tz": "Europe/Sofia",
+           "lat": 42.67236,
+           "lon": 23.38738
+
+        Args:
+            device_identity (dict | int | str): A device dict, or the ID or name of the device to check.
+
+        Raises:
+            RuntimeError: If the device is not found in the list of devices or if there is an error getting the status.
+            TimeoutError: If the device is online (ping) but the request times out while getting the device status.
+
+        Returns:
+            location (dict | None): A dictionary containing the timezone and location of the device, or None if not available.
+        """
+        # Get the device object
+        if isinstance(device_identity, dict):
+            # If we are passed a device dictionary, use that directly
+            device = device_identity
+        else:
+            try:
+                device = self.get_device(device_identity)
+                if not device:
+                    self.logger.log_message(f"Device {device_identity} not found.", "error")
+                    return None
+            except RuntimeError as e:
+                self.logger.log_message(f"Error getting device status for {device_identity}: {e}", "error")
+                raise RuntimeError(e) from e
+
+        # If device is in simulation mode, read from the json file
+        if device["Simulate"]:
+            # Return a fake location
+            location = {
+                "tz": "Europe/Sofia",
+                "lat": 42.67236,
+                "lon": 23.38738
+            }
+            return location
+
+        if not device["Online"]:
+            return None
+
+        if device["Protocol"] != "RPC":
+            return None
+
+        try:
+            payload = {"id": 0, "method": "Shelly.DetectLocation"}
+            result, result_data = self._rpc_request(device, payload)
+            if not result:
+                self.logger.log_message(f"Failed to gett device location for device {device.get('Name')}: {result_data}", "error")
+                return None
+        except TimeoutError as e:
+            self.logger.log_message(f"Timeout error getting device location for {device['Label']}: {e}", "error")
+            raise TimeoutError(e) from e
+        except RuntimeError as e:
+            self.logger.log_message(f"Error getting location for device {device['Label']}: {e}", "error")
+            raise RuntimeError(e) from e
+        else:
+            return result_data
+
     def get_device_information(self, device_identity: dict | int | str, refresh_status: bool = False) -> dict:  # noqa: FBT001, FBT002
         """Returns a consolidated copy of a Shelly device information as a single dictionary, including its inputs, outputs, and meters.
 
