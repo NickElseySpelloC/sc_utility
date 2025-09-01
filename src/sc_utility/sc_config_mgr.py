@@ -81,10 +81,46 @@ class SCConfigManager:
                     v = Validator()
 
                     if not v.validate(self._config, self.validation_schema):  # type: ignore[call-arg]
-                        msg = f"Validation error for config file {self.config_path}: {v.errors}"  # type: ignore[call-arg]
+                        # Format cerberus errors into human readable lines like "path.to.field: error message"
+
+                        error_lines = self._format_validator_errors(v.errors)  # type: ignore[call-arg]
+                        nice = "\n".join(error_lines)
+                        msg = f"Validation error for config file {self.config_path}: \n{nice}"
                         raise RuntimeError(msg)
 
         return True
+
+    @staticmethod
+    def _format_validator_errors(err, path=""):
+        msgs = []
+        # dict: descend into keys
+        if isinstance(err, dict):
+            for k, vv in err.items():
+                new_path = f"{path}.{k}" if path else str(k)
+                msgs.extend(SCConfigManager._format_validator_errors(vv, new_path))
+            return msgs
+        # list: may contain strings or nested dicts (e.g. list of item errors)
+        if isinstance(err, list):
+            for idx, item in enumerate(err):
+                if isinstance(item, (dict, list)):
+                    # for list-items that are dicts, include index in path
+                    if isinstance(item, dict):
+                        new_path = f"{path}[{idx}]" if path else f"[{idx}]"
+                        msgs.extend(SCConfigManager._format_validator_errors(item, new_path))
+                    else:
+                        msgs.extend(SCConfigManager._format_validator_errors(item, path))
+                # item is an error string
+                elif path:
+                    msgs.append(f"{path}: {item}")
+                else:
+                    msgs.append(str(item))
+            return msgs
+        # fallback
+        if path:
+            msgs.append(f"{path}: {err}")
+        else:
+            msgs.append(str(err))
+        return msgs
 
     def get_config_file_last_modified(self) -> dt.datetime | None:
         """Get the last modified time of the config file.
