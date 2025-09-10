@@ -10,4 +10,5 @@ Note: If making changes to the sc_utility library, use this command to sync in a
 
 ```bash
 uv sync --extra all
+source .venv/bin/activate
 ```
