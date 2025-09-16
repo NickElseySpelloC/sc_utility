@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://github.com/NickElseySpelloC/sc_utility/reference/datehelper/">
+        <link rel="canonical" href="https://github.com/NickElseySpelloC/sc_utility/reference/jsonencoder/">
       
       
-        <link rel="prev" href="../csvreader/">
+        <link rel="prev" href="../excelreader/">
       
       
-        <link rel="next" href="../excelreader/">
+        <link rel="next" href="../configmanager/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>DateHelper - Spello Consulting Utility Library</title>
+        <title>JSONEncoder - Spello Consulting Utility Library</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#date-helper" class="md-skip">
+        <a href="#json-encoder" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              DateHelper
+              JSONEncoder
             
           </span>
         </div>
@@ -417,32 +417,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    DateHelper
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../datehelper/" class="md-nav__link">
         
   
   
@@ -453,143 +431,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper" class="md-nav__link">
-    <span class="md-ellipsis">
-      DateHelper
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.add_days" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_days
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.days_between" class="md-nav__link">
-    <span class="md-ellipsis">
-      days_between
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.format_date" class="md-nav__link">
-    <span class="md-ellipsis">
-      format_date
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.get_file_date" class="md-nav__link">
-    <span class="md-ellipsis">
-      get_file_date
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.get_file_datetime" class="md-nav__link">
-    <span class="md-ellipsis">
-      get_file_datetime
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.is_valid_date" class="md-nav__link">
-    <span class="md-ellipsis">
-      is_valid_date
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.now" class="md-nav__link">
-    <span class="md-ellipsis">
-      now
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.now_str" class="md-nav__link">
-    <span class="md-ellipsis">
-      now_str
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.parse_date" class="md-nav__link">
-    <span class="md-ellipsis">
-      parse_date
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.today" class="md-nav__link">
-    <span class="md-ellipsis">
-      today
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.today_add_days" class="md-nav__link">
-    <span class="md-ellipsis">
-      today_add_days
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.today_str" class="md-nav__link">
-    <span class="md-ellipsis">
-      today_str
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -622,10 +463,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../jsonencoder/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    JSONEncoder
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -636,6 +499,80 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      JSONEncoder
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder.deserialise_from_json" class="md-nav__link">
+    <span class="md-ellipsis">
+      deserialise_from_json
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder.read_from_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      read_from_file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder.ready_dict_for_json" class="md-nav__link">
+    <span class="md-ellipsis">
+      ready_dict_for_json
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder.save_to_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      save_to_file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder.serialise_to_json" class="md-nav__link">
+    <span class="md-ellipsis">
+      serialise_to_json
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -744,117 +681,54 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper" class="md-nav__link">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder" class="md-nav__link">
     <span class="md-ellipsis">
-      DateHelper
+      JSONEncoder
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.add_days" class="md-nav__link">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder.deserialise_from_json" class="md-nav__link">
     <span class="md-ellipsis">
-      add_days
+      deserialise_from_json
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.days_between" class="md-nav__link">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder.read_from_file" class="md-nav__link">
     <span class="md-ellipsis">
-      days_between
+      read_from_file
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.format_date" class="md-nav__link">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder.ready_dict_for_json" class="md-nav__link">
     <span class="md-ellipsis">
-      format_date
+      ready_dict_for_json
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.get_file_date" class="md-nav__link">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder.save_to_file" class="md-nav__link">
     <span class="md-ellipsis">
-      get_file_date
+      save_to_file
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.get_file_datetime" class="md-nav__link">
+  <a href="#sc_utility.sc_json_encoder.JSONEncoder.serialise_to_json" class="md-nav__link">
     <span class="md-ellipsis">
-      get_file_datetime
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.is_valid_date" class="md-nav__link">
-    <span class="md-ellipsis">
-      is_valid_date
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.now" class="md-nav__link">
-    <span class="md-ellipsis">
-      now
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.now_str" class="md-nav__link">
-    <span class="md-ellipsis">
-      now_str
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.parse_date" class="md-nav__link">
-    <span class="md-ellipsis">
-      parse_date
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.today" class="md-nav__link">
-    <span class="md-ellipsis">
-      today
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.today_add_days" class="md-nav__link">
-    <span class="md-ellipsis">
-      today_add_days
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sc_utility.sc_date_helper.DateHelper.today_str" class="md-nav__link">
-    <span class="md-ellipsis">
-      today_str
+      serialise_to_json
     </span>
   </a>
   
@@ -876,20 +750,18 @@
 
 
 
-<h1 id="date-helper">Date Helper</h1>
+<h1 id="json-encoder">JSON Encoder</h1>
 
 
 <div class="doc doc-object doc-class">
 
 
 
-<a id="sc_utility.sc_date_helper.DateHelper"></a>
+<a id="sc_utility.sc_json_encoder.JSONEncoder"></a>
     <div class="doc doc-contents first">
 
 
-        <p>Class for simplyify date operations.</p>
-<p>This class provides static methods to handle date formatting, parsing, and calculations. It defaults to the "YYYY-MM-DD" format for date strings, but this can be overridden by passing a different format string.
-It also handles timezone-aware dates by using the local timezone of the system when parsing and formatting dates.</p>
+        <p>Class to handle encoding and decoding of JSON data with special handling for datetime objects and enumerations.</p>
 
 
 
@@ -913,8 +785,8 @@ It also handles timezone-aware dates by using the local timezone of the system w
 <div class="doc doc-object doc-function">
 
 
-<h2 id="sc_utility.sc_date_helper.DateHelper.add_days" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_days</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">days</span><span class="p">)</span></code>
+<h2 id="sc_utility.sc_json_encoder.JSONEncoder.deserialise_from_json" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">deserialise_from_json</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
@@ -925,7 +797,7 @@ It also handles timezone-aware dates by using the local timezone of the system w
 
     <div class="doc doc-contents ">
 
-        <p>Add days to a date or datetime object.</p>
+        <p>Deserialises the JSON string to an object, converting as needed.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -941,30 +813,14 @@ It also handles timezone-aware dates by using the local timezone of the system w
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>start_date</code>
+                <code>json_string</code>
             </td>
             <td>
-                  <code><span title="date">date</span> | <span title="datetime">datetime</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The date/datetime to which days will be added.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>days</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The number of days to add.</p>
+                <p>The JSON string to deserialise.</p>
               </div>
             </td>
             <td>
@@ -975,7 +831,7 @@ It also handles timezone-aware dates by using the local timezone of the system w
     </table>
 
 
-    <p><span class="doc-section-title">Returns:</span></p>
+<p><span class="doc-section-title">Raises:</span></p>
     <table>
       <thead>
         <tr>
@@ -986,81 +842,12 @@ It also handles timezone-aware dates by using the local timezone of the system w
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="datetime.date">date</span> | <span title="datetime.datetime">datetime</span> | None</code>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>result (date | datetime) : A new date or datetime object with the added days, or None if start_date or days is None.</p>
+                <p>If the data cannot be deserialized.</p>
               </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="sc_utility.sc_date_helper.DateHelper.days_between" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">days_between</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Calculate the number of days between two date or datetime objects.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>start_date</code>
-            </td>
-            <td>
-                  <code><span title="date">date</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The start date.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>end_date</code>
-            </td>
-            <td>
-                  <code><span title="date">date</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The end date.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
       </tbody>
@@ -1077,12 +864,12 @@ It also handles timezone-aware dates by using the local timezone of the system w
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>difference</code></td>            <td>
-                  <code><span title="int">int</span></code>
+<td><code>return_data</code></td>            <td>
+                  <code><span title="object">object</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The number of days between the two dates, or None if either date is None.</p>
+                <p>The deserialized object.</p>
               </div>
             </td>
           </tr>
@@ -1097,8 +884,8 @@ It also handles timezone-aware dates by using the local timezone of the system w
 <div class="doc doc-object doc-function">
 
 
-<h2 id="sc_utility.sc_date_helper.DateHelper.format_date" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">format_date</span><span class="p">(</span><span class="n">date_obj</span><span class="p">,</span> <span class="n">date_format</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span></code>
+<h2 id="sc_utility.sc_json_encoder.JSONEncoder.read_from_file" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">read_from_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
@@ -1109,99 +896,7 @@ It also handles timezone-aware dates by using the local timezone of the system w
 
     <div class="doc doc-contents ">
 
-        <p>Format a date object to a string.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>date_obj</code>
-            </td>
-            <td>
-                  <code><span title="date">date</span> | <span title="datetime">datetime</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The date or datetime object to format.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>date_format</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The format string to use for formatting the date or datetime.</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;%Y-%m-%d&#39;</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>date_str</code></td>            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The formatted date string, or None if date_obj is None.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="sc_utility.sc_date_helper.DateHelper.get_file_date" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_file_date</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Get the last modified date of a file.</p>
+        <p>Reads the JSON data from a file and decodes it.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1220,15 +915,38 @@ It also handles timezone-aware dates by using the local timezone of the system w
                 <code>file_path</code>
             </td>
             <td>
-                  <code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>
+                  <code><span title="pathlib.Path">Path</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Path to the file. Can be a string or a Path object.</p>
+                <p>The path to the JSON file.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the data cannot be read or decoded.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -1245,12 +963,12 @@ It also handles timezone-aware dates by using the local timezone of the system w
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>date_obj</code></td>            <td>
-                  <code><span title="date">date</span></code>
+<td><code>dict</code></td>            <td>
+                  <code><span title="object">object</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The last modified date of the file as a date object, or None if the file does not exist.</p>
+                <p>The decoded JSON data or None if the file does not exist.</p>
               </div>
             </td>
           </tr>
@@ -1265,8 +983,8 @@ It also handles timezone-aware dates by using the local timezone of the system w
 <div class="doc doc-object doc-function">
 
 
-<h2 id="sc_utility.sc_date_helper.DateHelper.get_file_datetime" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_file_datetime</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></code>
+<h2 id="sc_utility.sc_json_encoder.JSONEncoder.ready_dict_for_json" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">ready_dict_for_json</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
@@ -1277,7 +995,7 @@ It also handles timezone-aware dates by using the local timezone of the system w
 
     <div class="doc doc-contents ">
 
-        <p>Get the last modified datetime of a file.</p>
+        <p>Prepares a dict or list for JSON serialization.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1291,16 +1009,131 @@ It also handles timezone-aware dates by using the local timezone of the system w
         </tr>
       </thead>
       <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The data to prepare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the data cannot be prepared.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>object</code></td>            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dict or list ready for export to JSON.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="sc_utility.sc_json_encoder.JSONEncoder.save_to_file" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">save_to_file</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Saves the date to a JSON file, converting as needed.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The data to prepare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
           <tr class="doc-section-item">
             <td>
                 <code>file_path</code>
             </td>
             <td>
-                  <code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>
+                  <code><span title="pathlib.Path">Path</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Path to the file. Can be a string or a Path object.</p>
+                <p>The path to the JSON file to be created.</p>
               </div>
             </td>
             <td>
@@ -1311,92 +1144,23 @@ It also handles timezone-aware dates by using the local timezone of the system w
     </table>
 
 
-    <p><span class="doc-section-title">Returns:</span></p>
+<p><span class="doc-section-title">Raises:</span></p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>datetime_obj</code></td>            <td>
-                  <code><span title="datetime">datetime</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The last modified datetime of the file as a date object, or None if the file does not exist.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="sc_utility.sc_date_helper.DateHelper.is_valid_date" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">is_valid_date</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="n">date_format</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Check if a date or datetime string is valid according to the specified format.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>date_str</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The date string to check.</p>
+                <p>If the data cannot be serialized.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>date_format</code>
-            </td>
-            <td>
-                  <code><span title="Optional">Optional</span>[<span title="str">str</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The format string to use for checking the date. Defaults to "%Y-%m-%d".</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;%Y-%m-%d&#39;</code>
             </td>
           </tr>
       </tbody>
@@ -1418,7 +1182,7 @@ It also handles timezone-aware dates by using the local timezone of the system w
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True if the date string is valid, False otherwise.</p>
+                <p>True if the pricing data was saved, False if not.</p>
               </div>
             </td>
           </tr>
@@ -1433,8 +1197,8 @@ It also handles timezone-aware dates by using the local timezone of the system w
 <div class="doc doc-object doc-function">
 
 
-<h2 id="sc_utility.sc_date_helper.DateHelper.now" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">now</span><span class="p">()</span></code>
+<h2 id="sc_utility.sc_json_encoder.JSONEncoder.serialise_to_json" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">serialise_to_json</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
@@ -1445,52 +1209,7 @@ It also handles timezone-aware dates by using the local timezone of the system w
 
     <div class="doc doc-contents ">
 
-        <p>Get today's date and time.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>result</code></td>            <td>
-                  <code><span title="datetime">datetime</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Today's date and time as a date object, using the local timezone.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="sc_utility.sc_date_helper.DateHelper.now_str" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">now_str</span><span class="p">(</span><span class="n">datetime_format</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Get the current time in string format.</p>
+        <p>Serialises the data to a JSON string, converting as needed.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1506,227 +1225,14 @@ It also handles timezone-aware dates by using the local timezone of the system w
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>datetime_format</code>
+                <code>data</code>
             </td>
             <td>
-                  <code><span title="Optional">Optional</span>[<span title="str">str</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The format string to use for formatting the datetime.</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;%Y-%m-%d %H:%M:%S&#39;</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>result</code></td>            <td>
-                  <code><span title="str">str</span></code>
+                  <code><span title="object">object</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Current time as a formatted string, using the specified datetime format.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="sc_utility.sc_date_helper.DateHelper.parse_date" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">parse_date</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="n">date_format</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Parse a date string to a date or datetime object.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>date_str</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The date string to parse.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>date_format</code>
-            </td>
-            <td>
-                  <code><span title="Optional">Optional</span>[<span title="str">str</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The format string to use for parsing the date. Defaults to "%Y-%m-%d".</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;%Y-%m-%d&#39;</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>date_obj</code></td>            <td>
-                  <code><span title="date">date</span> | <span title="datetime">datetime</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A date or datetime object representing the parsed date_str, or None if date_str is empty.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="sc_utility.sc_date_helper.DateHelper.today" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">today</span><span class="p">()</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Get today's date.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>result</code></td>            <td>
-                  <code><span title="date">date</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Today's date as a date object, using the local timezone.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="sc_utility.sc_date_helper.DateHelper.today_add_days" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">today_add_days</span><span class="p">(</span><span class="n">days</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Get today's date ofset by days.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>days</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The number of days to offset from today. Can be positive or negative</p>
+                <p>The data to prepare.</p>
               </div>
             </td>
             <td>
@@ -1737,76 +1243,23 @@ It also handles timezone-aware dates by using the local timezone of the system w
     </table>
 
 
-    <p><span class="doc-section-title">Returns:</span></p>
+<p><span class="doc-section-title">Raises:</span></p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>result</code></td>            <td>
-                  <code><span title="date">date</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Today's date offset by the specified number of days.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="sc_utility.sc_date_helper.DateHelper.today_str" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">today_str</span><span class="p">(</span><span class="n">date_format</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Get today's date in string format.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>date_format</code>
-            </td>
-            <td>
-                  <code><span title="Optional">Optional</span>[<span title="str">str</span>]</code>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The format string to use for formatting the date.</p>
+                <p>If the data cannot be serialized.</p>
               </div>
-            </td>
-            <td>
-                  <code>&#39;%Y-%m-%d&#39;</code>
             </td>
           </tr>
       </tbody>
@@ -1823,12 +1276,12 @@ It also handles timezone-aware dates by using the local timezone of the system w
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>result</code></td>            <td>
+<td><code>str</code></td>            <td>
                   <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Today's date as a formatted string, using the specified date format.</p>
+                <p>The JSON string representation of the data.</p>
               </div>
             </td>
           </tr>
