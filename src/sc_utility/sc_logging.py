@@ -3,18 +3,30 @@ Spello Consulting Logging Module.
 
 Provides general purpose logging functions.
 """
-
+import datetime as dt
 import inspect
 import smtplib
 import ssl
 import sys
 import traceback
-from datetime import datetime
+from dataclasses import dataclass
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
 
 from sc_utility.sc_common import SCCommon
+from sc_utility.sc_date_helper import DateHelper
+
+
+@dataclass
+class NotifiableIssue:
+    entity: str
+    issue_type: str
+    first_reported: dt.datetime
+    last_reported: dt.datetime
+    send_delay: int
+    message: str
+    email_sent: bool = False
 
 
 class SCLogger:
@@ -65,6 +77,7 @@ class SCLogger:
         self.max_lines = 1000
         self.log_process_id = False
         self.file_logging_enabled = False
+        self.notifiable_issues: list[NotifiableIssue] = []
 
         self.initialise_settings(logger_settings=logger_settings,
                  logfile_name=logfile_name,
@@ -189,8 +202,7 @@ class SCLogger:
                         file.write("\n")
                     else:
                         # Use the local timezone for the log timestamp
-                        local_tz = datetime.now().astimezone().tzinfo
-                        file.write(f"{datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S')}{error_str}: {process_str}{message}\n")
+                        file.write(f"{DateHelper.now().strftime('%Y-%m-%d %H:%M:%S')}{error_str}: {process_str}{message}\n")
 
     def register_email_settings(self, email_settings: dict | None) -> None:
         """
@@ -426,3 +438,75 @@ class SCLogger:
         """
         with Path(self.fatal_error_file_path).open("w", encoding="utf-8") as file:
             file.write(message)
+
+    def report_notifiable_issue(self, entity: str, issue_type: str, send_delay: int, message: str) -> bool:
+        """
+        Log a notifiable issue and send an email if configured to do so.
+
+        When a new combination of entity and issue_type is reported, it will be noted including the current timestamp.
+        If one or more issues of the same type are reported for the same entity at least send_delay seconds after the last notification,
+        an email will be sent including the first time this issue was reported. Subsequent issues of the same type for the same
+        entity will be ignored until the issue is cleared.
+
+        Args:
+            entity (str): The entity reporting the issue (e.g., "Device 123", "Module", etc.)
+            issue_type (str): A brief description of the issue (e.g. "Offline").
+            send_delay (int): The delay in seconds before sending the email
+            message (str): The issue message to log and email.
+
+        Returns:
+            result (bool): True if the email was sent, False otherwise.
+        """
+        # Search self.notifiable_issues to see if we have a match by entity and issue_type
+        now = DateHelper.now()
+        issue_found = False
+        for issue in self.notifiable_issues:
+            if issue.entity == entity and issue.issue_type == issue_type:
+                issue_found = True
+                # We have a match - see if we need to send an email
+                if (now - issue.first_reported).total_seconds() >= issue.send_delay:
+                    # Update the last reported time
+                    issue.last_reported = now
+
+                    # Send the email if not already sent
+                    if not issue.email_sent:
+                        email_subject = f"{self.app_dir.name} - {entity} {issue_type} issue"
+                        email_body = f"{entity}: {message}\n\nFirst reported: {issue.first_reported.strftime('%Y-%m-%d %H:%M')}"
+                        if self.send_email(email_subject, email_body):
+                            issue.email_sent = True
+                            return True
+
+                break
+
+        if not issue_found:
+            # No existing issue found, create a new one
+            new_issue = NotifiableIssue(
+                entity=entity,
+                issue_type=issue_type,
+                first_reported=now,
+                last_reported=now,
+                send_delay=send_delay,
+                message=message,
+            )
+            self.notifiable_issues.append(new_issue)
+
+        return False
+
+    def clear_notifiable_issue(self, entity: str, issue_type: str) -> bool:
+        """
+        Clear a notifiable issue.
+
+        Args:
+            entity (str): The entity reporting the issue (e.g., "Device 123", "Module", etc.)
+            issue_type (str): A brief description of the issue (e.g. "Offline").
+
+        Returns:
+            result (bool): True if the issue was found and cleared, False otherwise.
+        """
+        # Search self.notifiable_issues to see if we have a match by entity and issue_type
+        for issue in self.notifiable_issues:
+            if issue.entity == entity and issue.issue_type == issue_type:
+                self.notifiable_issues.remove(issue)
+                return True
+
+        return False

@@ -1,4 +1,5 @@
 """ShellyControl class for controlling Shelly Smart Switch devices."""
+import datetime as dt
 import json
 import threading
 import time
@@ -39,11 +40,11 @@ class ShellyControl:
         self.retry_count = 1        # Number of times to retry a request
         self.retry_delay = 2        # Number of seconds to wait between retries
 
-        self.webhook_enabled = False
         self.webhook_host = DEFAULT_WEBHOOK_HOST
         self.webhook_port = DEFAULT_WEBHOOK_PORT
         self.webhook_path = DEFAULT_WEBHOOK_PATH
         self.app_wake_event = app_wake_event
+        self.webhook_enabled = device_settings.get("WebhooksEnabled", False) and self.app_wake_event is not None
         self.webhook_event_queue = []
 
         self.devices = []           # List to hold multiple Shelly devices
@@ -525,7 +526,7 @@ class ShellyControl:
         self.ping_allowed = settings.get("PingAllowed", True)  # Whether to allow pinging the devices
 
         # Now the webhook settings
-        self.webhook_enabled = settings.get("WebhooksEnabled", False)
+        self.webhook_enabled = settings.get("WebhooksEnabled", False) and self.app_wake_event is not None
         self.webhook_host = settings.get("WebhookHost", "0.0.0.0")  # noqa: S104
         self.webhook_port = settings.get("WebhookPort", 8787)
         self.webhook_path = settings.get("WebhookPath", "/shelly/webhook")
@@ -773,6 +774,8 @@ class ShellyControl:
             elif component_type == "meter":
                 new_component["State"] = False
                 new_component["OnOutput"] = not device["MetersSeperate"]
+                new_component["MockRate"] = 0
+                new_component["MockRate"] = component_config[component_idx].get("MockRate", 0) if component_config else 0
 
             # Add any additional custom key / value pairs defined in component_config that don't already exist in new_component
             new_component["customkeylist"] = []  # Initialize custom key list
@@ -854,6 +857,7 @@ class ShellyControl:
             new_component["Current"] = None
             new_component["PowerFactor"] = None
             new_component["Energy"] = None
+            new_component["MockRate"] = 0
         return new_component
 
     def get_device(self, device_identity: dict | int | str) -> dict:
@@ -1755,7 +1759,7 @@ class ShellyControl:
 
             # HERE - change to included keys only
 
-            # Update alloed device attributes
+            # Update allowed device attributes
             device_included_keys = {"MACAddress", "Uptime", "RestartRequired"}
             for key, value in device_info.items():
                 if key in device_included_keys and key in device:
@@ -1794,6 +1798,15 @@ class ShellyControl:
                             for key, value in imported_meter.items():
                                 if key in {"Power", "Voltage", "Current", "PowerFactor", "Energy"}:
                                     device_meter[key] = value
+
+                            # If we have a mock rate set, override the energy value based on the rate and current UNIX time
+                            if device_meter.get("MockRate", 0) > 0:
+                                # get the number of seconds sine 1/9/2025
+                                local_tz = dt.datetime.now().astimezone().tzinfo
+                                elapsed_sec = (DateHelper.now() - dt.datetime(2025, 1, 1, 0, 0, 0, tzinfo=local_tz)).total_seconds()
+
+                                # Generate a mock meter reading based on elapsed seconds since 1/9/2025 and the MockRate
+                                device_meter["Energy"] = device_meter.get("MockRate") * elapsed_sec
                             break
 
             # Update the device's total power and energy readings

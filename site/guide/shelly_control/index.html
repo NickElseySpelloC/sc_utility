@@ -517,6 +517,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/jsonencoder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    JSONEncoder
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/configmanager/" class="md-nav__link">
         
   
@@ -718,6 +741,7 @@
         - Name: &quot;Test Switch&quot;
       Meters:
         - Name: &quot;Test Meter&quot;
+          MockRate: 0.23
 </code></pre>
 <p>The entries are used as follows:</p>
 <table>
@@ -809,7 +833,7 @@
 </tr>
 <tr>
 <td style="text-align: left;">Meters</td>
-<td style="text-align: left;">A list of dict defining the meters (if any) for this device. Note that depending on the devices, the actual meters might be part of the output or seperate energy meters (EM1 API calls). Either way, in this class meters are reported seperately from outputs. This section is optional but if defined, the number of entries must match the number of meters supported by this model. For each meter, define a Name and/or an ID.</td>
+<td style="text-align: left;">A list of dict defining the meters (if any) for this device. Note that depending on the devices, the actual meters might be part of the output or seperate energy meters (EM1 API calls). Either way, in this class meters are reported seperately from outputs. This section is optional but if defined, the number of entries must match the number of meters supported by this model. For each meter, define a Name and/or an ID.<br>  Optionally, use the MockRate key to set a Watts / second metering rate for this meter when the device is in Simulation mode.</td>
 </tr>
 </tbody>
 </table>
