@@ -466,6 +466,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../jsonencoder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    JSONEncoder
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../configmanager/" class="md-nav__link">
         
   
@@ -566,6 +589,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_logging.SCLogger.clear_notifiable_issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      clear_notifiable_issue
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_logging.SCLogger.get_fatal_error" class="md-nav__link">
     <span class="md-ellipsis">
       get_fatal_error
@@ -605,6 +637,15 @@
   <a href="#sc_utility.sc_logging.SCLogger.register_email_settings" class="md-nav__link">
     <span class="md-ellipsis">
       register_email_settings
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_logging.SCLogger.report_notifiable_issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      report_notifiable_issue
     </span>
   </a>
   
@@ -730,6 +771,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_logging.SCLogger.clear_notifiable_issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      clear_notifiable_issue
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_logging.SCLogger.get_fatal_error" class="md-nav__link">
     <span class="md-ellipsis">
       get_fatal_error
@@ -769,6 +819,15 @@
   <a href="#sc_utility.sc_logging.SCLogger.register_email_settings" class="md-nav__link">
     <span class="md-ellipsis">
       register_email_settings
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_logging.SCLogger.report_notifiable_issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      report_notifiable_issue
     </span>
   </a>
   
@@ -1009,6 +1068,94 @@
             <td>
               <div class="doc-md-description">
                 <p>True if the file was deleted, False if it did not exist.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="sc_utility.sc_logging.SCLogger.clear_notifiable_issue" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">clear_notifiable_issue</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">issue_type</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Clear a notifiable issue.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>entity</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The entity reporting the issue (e.g., "Device 123", "Module", etc.)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>issue_type</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A brief description of the issue (e.g. "Offline").</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>result</code></td>            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True if the issue was found and cleared, False otherwise.</p>
               </div>
             </td>
           </tr>
@@ -1439,6 +1586,130 @@ dictionary directly to this method with these keys:
             <td>
               <div class="doc-md-description">
                 <p>If any required keys are missing from the email_settings dictionary.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="sc_utility.sc_logging.SCLogger.report_notifiable_issue" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">report_notifiable_issue</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">issue_type</span><span class="p">,</span> <span class="n">send_delay</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Log a notifiable issue and send an email if configured to do so.</p>
+<p>When a new combination of entity and issue_type is reported, it will be noted including the current timestamp.
+If one or more issues of the same type are reported for the same entity at least send_delay seconds after the last notification,
+an email will be sent including the first time this issue was reported. Subsequent issues of the same type for the same
+entity will be ignored until the issue is cleared.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>entity</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The entity reporting the issue (e.g., "Device 123", "Module", etc.)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>issue_type</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A brief description of the issue (e.g. "Offline").</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>send_delay</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The delay in seconds before sending the email</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>message</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The issue message to log and email.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>result</code></td>            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True if the email was sent, False otherwise.</p>
               </div>
             </td>
           </tr>

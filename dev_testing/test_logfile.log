@@ -1,0 +1,468 @@
+2025-09-16 15:05:47: [Proc 29308] Imported Shelly models data from /Users/nick/dev/sc_utility/src/sc_utility/shelly_models.json.
+2025-09-16 15:05:47: [Proc 29308] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-09-16 15:05:47: [Proc 29308] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:05:47: [Proc 29308] Added Shelly device Spello Test A.
+2025-09-16 15:05:47: [Proc 29308] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-09-16 15:05:47: [Proc 29308] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Dev.json for device Spello Dev (ID: 2)
+2025-09-16 15:05:47: [Proc 29308] Added Shelly device Spello Dev.
+2025-09-16 15:05:47: [Proc 29308] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:05:47: [Proc 29308] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Dev.json for device Spello Dev (ID: 2)
+2025-09-16 15:05:47: [Proc 29308] Device Spello Test A is in simulation mode, skipping determining supported webhooks.
+2025-09-16 15:05:47: [Proc 29308] Device Spello Dev is in simulation mode, skipping determining supported webhooks.
+2025-09-16 15:05:47: [Proc 29308] ShellyControl initialized successfully.
+2025-09-16 15:05:47: [Proc 29308] Webhook server is disabled. Webhook server will not be started.
+2025-09-16 15:05:47: [Proc 29308] Device summaries:
+ Spello Test A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 2, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Spello Pool Switch, Has Metering: True, State: True, Temp.: None
+    - Index: 1, ID: 2, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 11172773.7859845
+    - Index: 1, ID: 2, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 11172773.7859845 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+Spello Dev (ID: 2) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.33:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Dev
+  Number of Inputs: 2
+    - Index: 0, ID: 3, Name: Spello Dev I1, State: False
+    - Index: 1, ID: 4, Name: Spello Dev I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 3, Name: Spello Dev S1, Has Metering: True, State: False, Temp.: None, Group: Patio
+    - Index: 1, ID: 4, Name: Spello Dev S2, Has Metering: True, State: False, Temp.: None, Group: Patio
+  Number of Meters: 2
+    - Index: 0, ID: 3, Name: Meter 3, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 4, Name: Meter 4, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-09-16 15:05:47: [Proc 29308] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:05:47: [Proc 29308] Spello Test A before output change:
+ Spello Test A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 2, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Spello Pool Switch, Has Metering: True, State: True, Temp.: None
+    - Index: 1, ID: 2, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 11172773.7866985
+    - Index: 1, ID: 2, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 11172773.7866985 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-09-16 15:05:47: [Proc 29308] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:05:47: [Proc 29308] Device information for Spello Test A (ID: 1) exported to /Users/nick/dev/sc_utility/Spello_Test_A.json
+2025-09-16 15:05:47: [Proc 29308] Device output Spello Pool Switch on device Spello Test A (ID: 1) was changed to off.
+2025-09-16 15:05:47: [Proc 29308] Spello Test A after output change:
+ Spello Test A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 2, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Spello Pool Switch, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 11172773.7869745
+    - Index: 1, ID: 2, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 11172773.7869745 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-09-16 15:07:29: [Proc 29729] Imported Shelly models data from /Users/nick/dev/sc_utility/src/sc_utility/shelly_models.json.
+2025-09-16 15:07:29: [Proc 29729] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-09-16 15:07:29: [Proc 29729] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:07:29: [Proc 29729] Added Shelly device Spello Test A.
+2025-09-16 15:07:29: [Proc 29729] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-09-16 15:07:29: [Proc 29729] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Dev.json for device Spello Dev (ID: 2)
+2025-09-16 15:07:29: [Proc 29729] Added Shelly device Spello Dev.
+2025-09-16 15:07:29: [Proc 29729] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:07:29: [Proc 29729] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Dev.json for device Spello Dev (ID: 2)
+2025-09-16 15:07:29: [Proc 29729] Device Spello Test A is in simulation mode, skipping determining supported webhooks.
+2025-09-16 15:07:29: [Proc 29729] Device Spello Dev is in simulation mode, skipping determining supported webhooks.
+2025-09-16 15:07:29: [Proc 29729] ShellyControl initialized successfully.
+2025-09-16 15:07:29: [Proc 29729] Webhook server is disabled. Webhook server will not be started.
+2025-09-16 15:07:29: [Proc 29729] Device summaries:
+ Spello Test A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 2, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Spello Pool Switch, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 11172824.57485
+    - Index: 1, ID: 2, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 11172824.57485 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+Spello Dev (ID: 2) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.33:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Dev
+  Number of Inputs: 2
+    - Index: 0, ID: 3, Name: Spello Dev I1, State: False
+    - Index: 1, ID: 4, Name: Spello Dev I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 3, Name: Spello Dev S1, Has Metering: True, State: False, Temp.: None, Group: Patio
+    - Index: 1, ID: 4, Name: Spello Dev S2, Has Metering: True, State: False, Temp.: None, Group: Patio
+  Number of Meters: 2
+    - Index: 0, ID: 3, Name: Meter 3, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 4, Name: Meter 4, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-09-16 15:07:29: [Proc 29729] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:07:29: [Proc 29729] Spello Test A before output change:
+ Spello Test A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 2, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Spello Pool Switch, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 11172824.5755055
+    - Index: 1, ID: 2, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 11172824.5755055 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-09-16 15:07:29: [Proc 29729] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:07:29: [Proc 29729] Device information for Spello Test A (ID: 1) exported to /Users/nick/dev/sc_utility/Spello_Test_A.json
+2025-09-16 15:07:29: [Proc 29729] Device output Spello Pool Switch on device Spello Test A (ID: 1) was changed to on.
+2025-09-16 15:08:36: [Proc 30139] Imported Shelly models data from /Users/nick/dev/sc_utility/src/sc_utility/shelly_models.json.
+2025-09-16 15:08:36: [Proc 30139] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-09-16 15:08:36: [Proc 30139] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:08:36: [Proc 30139] Added Shelly device Spello Test A.
+2025-09-16 15:08:36: [Proc 30139] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-09-16 15:08:36: [Proc 30139] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Dev.json for device Spello Dev (ID: 2)
+2025-09-16 15:08:36: [Proc 30139] Added Shelly device Spello Dev.
+2025-09-16 15:08:36: [Proc 30139] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:08:36: [Proc 30139] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Dev.json for device Spello Dev (ID: 2)
+2025-09-16 15:08:36: [Proc 30139] Device Spello Test A is in simulation mode, skipping determining supported webhooks.
+2025-09-16 15:08:36: [Proc 30139] Device Spello Dev is in simulation mode, skipping determining supported webhooks.
+2025-09-16 15:08:36: [Proc 30139] ShellyControl initialized successfully.
+2025-09-16 15:08:36: [Proc 30139] Webhook server is disabled. Webhook server will not be started.
+2025-09-16 15:08:36: [Proc 30139] Device summaries:
+ Spello Test A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 2, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Spello Pool Switch, Has Metering: True, State: True, Temp.: None
+    - Index: 1, ID: 2, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 11172858.019597
+    - Index: 1, ID: 2, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 11172858.019597 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+Spello Dev (ID: 2) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.33:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Dev
+  Number of Inputs: 2
+    - Index: 0, ID: 3, Name: Spello Dev I1, State: False
+    - Index: 1, ID: 4, Name: Spello Dev I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 3, Name: Spello Dev S1, Has Metering: True, State: False, Temp.: None, Group: Patio
+    - Index: 1, ID: 4, Name: Spello Dev S2, Has Metering: True, State: False, Temp.: None, Group: Patio
+  Number of Meters: 2
+    - Index: 0, ID: 3, Name: Meter 3, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 4, Name: Meter 4, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-09-16 15:08:36: [Proc 30139] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:08:36: [Proc 30139] Spello Test A before output change:
+ Spello Test A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 2, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Spello Pool Switch, Has Metering: True, State: True, Temp.: None
+    - Index: 1, ID: 2, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 11172858.0213245
+    - Index: 1, ID: 2, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 11172858.0213245 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-09-16 15:08:36: [Proc 30139] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:08:36: [Proc 30139] Device information for Spello Test A (ID: 1) exported to /Users/nick/dev/sc_utility/Spello_Test_A.json
+2025-09-16 15:08:36: [Proc 30139] Device output Spello Pool Switch on device Spello Test A (ID: 1) was changed to off.
+2025-09-16 15:08:36: [Proc 30139] Spello Test A after output change:
+ Spello Test A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 2, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Spello Pool Switch, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 11172858.021828
+    - Index: 1, ID: 2, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 11172858.021828 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-09-16 15:08:41: [Proc 30456] Imported Shelly models data from /Users/nick/dev/sc_utility/src/sc_utility/shelly_models.json.
+2025-09-16 15:08:41: [Proc 30456] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-09-16 15:08:41: [Proc 30456] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:08:41: [Proc 30456] Added Shelly device Spello Test A.
+2025-09-16 15:08:41: [Proc 30456] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-09-16 15:08:41: [Proc 30456] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Dev.json for device Spello Dev (ID: 2)
+2025-09-16 15:08:41: [Proc 30456] Added Shelly device Spello Dev.
+2025-09-16 15:08:41: [Proc 30456] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:08:41: [Proc 30456] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Dev.json for device Spello Dev (ID: 2)
+2025-09-16 15:08:41: [Proc 30456] Device Spello Test A is in simulation mode, skipping determining supported webhooks.
+2025-09-16 15:08:41: [Proc 30456] Device Spello Dev is in simulation mode, skipping determining supported webhooks.
+2025-09-16 15:08:41: [Proc 30456] ShellyControl initialized successfully.
+2025-09-16 15:08:41: [Proc 30456] Webhook server is disabled. Webhook server will not be started.
+2025-09-16 15:08:41: [Proc 30456] Device summaries:
+ Spello Test A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 2, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Spello Pool Switch, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 11172860.688391
+    - Index: 1, ID: 2, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 11172860.688391 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+Spello Dev (ID: 2) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.33:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Dev
+  Number of Inputs: 2
+    - Index: 0, ID: 3, Name: Spello Dev I1, State: False
+    - Index: 1, ID: 4, Name: Spello Dev I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 3, Name: Spello Dev S1, Has Metering: True, State: False, Temp.: None, Group: Patio
+    - Index: 1, ID: 4, Name: Spello Dev S2, Has Metering: True, State: False, Temp.: None, Group: Patio
+  Number of Meters: 2
+    - Index: 0, ID: 3, Name: Meter 3, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 4, Name: Meter 4, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-09-16 15:08:41: [Proc 30456] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:08:41: [Proc 30456] Spello Test A before output change:
+ Spello Test A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 2, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Spello Pool Switch, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 11172860.6895635
+    - Index: 1, ID: 2, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 11172860.6895635 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-09-16 15:08:41: [Proc 30456] Device simulation information imported from /Users/nick/dev/sc_utility/Spello_Test_A.json for device Spello Test A (ID: 1)
+2025-09-16 15:08:41: [Proc 30456] Device information for Spello Test A (ID: 1) exported to /Users/nick/dev/sc_utility/Spello_Test_A.json
+2025-09-16 15:08:41: [Proc 30456] Device output Spello Pool Switch on device Spello Test A (ID: 1) was changed to on.
+2025-09-16 15:08:41: [Proc 30456] Spello Test A after output change:
+ Spello Test A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 2, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Spello Pool Switch, Has Metering: True, State: True, Temp.: None
+    - Index: 1, ID: 2, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 11172860.689899
+    - Index: 1, ID: 2, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 11172860.689899 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-09-16 16:40:07: [Proc 40128] This is a test message at the summary level.
+2025-09-16 16:44:06: [Proc 40726] This is a test message at the summary level.
+2025-09-16 16:44:30: [Proc 41072] This is a test message at the summary level.
+2025-09-16 16:45:18: [Proc 41458] This is a test message at the summary level.
+2025-09-16 16:50:25: [Proc 42109] This is a test message at the summary level.
+2025-09-16 18:04:44: [Proc 47699] This is a test message at the summary level.
+2025-09-16 18:05:56: [Proc 48115] This is a test message at the summary level.
+2025-09-16 18:06:07: [Proc 48455] This is a test message at the summary level.
+2025-09-16 18:06:55: [Proc 48842] This is a test message at the summary level.
+2025-09-16 18:06:56: [Proc 48842] Test mode: Email with subject 'Hello world' would be sent to nick@elseyworld.com.
+2025-09-16 18:09:09: [Proc 49298] This is a test message at the summary level.
+2025-09-16 18:09:10: [Proc 49298] Test mode: Email with subject 'Hello world' would be sent to nick@elseyworld.com.
+2025-09-16 18:09:40: [Proc 49653] This is a test message at the summary level.
+2025-09-16 18:09:40: [Proc 49653] Test mode: Email with subject 'Hello world' would be sent to nick@elseyworld.com.

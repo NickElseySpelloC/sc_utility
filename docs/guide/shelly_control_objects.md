@@ -80,7 +80,7 @@ Meter components will also have these attrbutes:
 - **Voltage**: Current voltage reading.
 - **Current**: Current current reading.
 - **PowerFactor**: The power factor reading.
-- **Energy**: Total energy consumed in watt / hours.
+- **Energy**: Total energy consumed in watt / hours. (When a device is an Simulation mode, you can add a MockRate key to the Meter's configuration section to set a Watts/second metering rate.)
 
 Note, depending on the Shelly models, some of these attrbutes may be empty. For example, some earlier generation 1 models would report power but not voltage or current.
 
