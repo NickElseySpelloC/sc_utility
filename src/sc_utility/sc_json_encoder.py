@@ -80,7 +80,7 @@ class JSONEncoder:
         """
         try:
             json_data = json.loads(json_string)
-            return_data = JSONEncoder._decode_object(json_data)
+            return_data = JSONEncoder.decode_object(json_data)
         except (json.JSONDecodeError, ValueError) as e:
             raise RuntimeError from e
         else:
@@ -128,7 +128,7 @@ class JSONEncoder:
         try:
             with file_path.open("r", encoding="utf-8") as json_file:
                 json_data = json.load(json_file)
-                return_data = JSONEncoder._decode_object(json_data)
+                return_data = JSONEncoder.decode_object(json_data)
                 return return_data
         except (json.JSONDecodeError, OSError) as e:
             raise RuntimeError from e
@@ -190,11 +190,11 @@ class JSONEncoder:
         raise TypeError(error_msg)
 
     @staticmethod
-    def _decode_object(obj):  # noqa: PLR0912, PLR0915
-        """Convert the JSON object back to its original form, including date and datetime objects.
+    def decode_object(obj):  # noqa: PLR0912, PLR0915
+        """Convert the object back to its original form, including date and datetime objects.
 
         Args:
-            obj: The JSON object to convert.
+            obj: The object (list, dict, etc.) to convert.
 
         Returns:
             The original object.
@@ -271,7 +271,7 @@ class JSONEncoder:
                     except ValueError:
                         pass    # Just ignore
                 elif isinstance(v, (dict, list)):
-                    obj[k] = JSONEncoder._decode_object(v)
+                    obj[k] = JSONEncoder.decode_object(v)
         elif isinstance(obj, list):
-            return [JSONEncoder._decode_object(item) for item in obj]
+            return [JSONEncoder.decode_object(item) for item in obj]
         return obj

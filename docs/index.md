@@ -2,11 +2,13 @@
 
 This utility library provides some basic utility functions for:
 
-- [SCConfigManager](reference/configmanager.md): Reading from and validating YAML style config files
-- [SCLogging](reference/logging.md): Logging messages to the console and a log file and sending email in plain text or HTML format
+- [CSVReader](reference/csvreader.md): Reading data from and and writing to CSV files
 - [DateHelper](reference/datehelper.md): Date and datetime helper functions
 - [ExcelReader](reference/excelreader.md): Reading data from Excel worksheets, ranges and tables
-- [CSVReader](reference/csvreader.md): Reading data from and and writing to CSV files
+- [JSONEncoder](reference/jsonencoder.md): Helps convert dicts and lists to json and back, preserving datetime and enum data types.
+- [SCCommon](reference/common.md): Some common functions used by other classes.
+- [SCConfigManager](reference/configmanager.md): Reading from and validating YAML style config files
+- [SCLogging](reference/logging.md): Logging messages to the console and a log file and sending email in plain text or HTML format
 - [ShellyControl](reference/shelly_control.md): Controlling Shelly smart switches and energy meters
 
 To get started, see the [Getting Started](guide/getting_started.md) page.

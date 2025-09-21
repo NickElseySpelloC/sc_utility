@@ -71,7 +71,7 @@ class SCCommon:
         return False, None
 
     @staticmethod
-    def ping_host(ip_address: str, timeout: int = 1):
+    def ping_host(ip_address: str, timeout: int = 1) -> bool:
         """Pings an IP address and returns True if the host is responding, False otherwise.
 
         Args:
@@ -82,7 +82,7 @@ class SCCommon:
             RuntimeError: If the IP address is invalid or the ping system call fails.
 
         Returns:
-            True if the host responds, False otherwise.
+            result (bool): True if the host responds, False otherwise.
         """
         # Determine the ping command based on the operating system
         param = "-n" if platform.system().lower() == "windows" else "-c"
@@ -109,8 +109,8 @@ class SCCommon:
         """Check if the system has an active internet connection by trying to open a connection to common websites.
 
         Args:
-            urls: A list of URLs to check for internet connectivity. Defaults to common DNS servers and websites.
-            timeout: The timeout in seconds for each request.
+            urls (list): A list of URLs to check for internet connectivity. Defaults to common DNS servers and websites.
+            timeout (int): The timeout in seconds for each request.
 
         Returns:
             True if the system is connected to the internet, False otherwise.
