@@ -23,6 +23,7 @@ nav:
       - Shelly Models Library: guide/shelly_models_list.md
       - Shelly Control Object Reference: guide/shelly_control_objects.md
   - API Reference:
+      - Common Utilities: reference/common.md
       - CSVReader: reference/csvreader.md
       - DateHelper: reference/datehelper.md
       - ExcelReader: reference/excelreader.md
