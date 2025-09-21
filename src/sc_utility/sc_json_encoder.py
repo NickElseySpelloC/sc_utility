@@ -194,10 +194,10 @@ class JSONEncoder:
         """Convert the object back to its original form, including date and datetime objects.
 
         Args:
-            obj: The object (list, dict, etc.) to convert.
+            obj (obj): The object (list, dict, etc.) to convert.
 
         Returns:
-            The original object.
+            object (obj): The original object.
         """
         if isinstance(obj, dict):  # noqa: PLR1702
             for k, v in list(obj.items()):
