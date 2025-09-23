@@ -186,14 +186,34 @@ class SCCommon:
         return bool(path_obj.suffix and path_obj.suffix.lower() is not None)
 
     @staticmethod
+    def get_project_root() -> Path:
+        """Return the root folder of the Python project.
+
+        Returns:
+            root_dir (Path): The root folder of the Python project as a Path object.
+        """
+        main_file = getattr(sys.modules["__main__"], "__file__", None)
+        if main_file:
+            return Path(main_file).parent.resolve()
+
+        # Fallback to current scripts working directory
+        return Path(sys.argv[0]).parent.resolve()
+
+    @staticmethod
     def select_file_location(file_name: str) -> Path | None:
-        """Select the file location for the given file name.
+        """Select the file location for the given file name. It resolves an absolute path for the file_name as follows.
+
+        1. If file_name is an absolute path, return it as a Path object.
+        2. If file_name is a relative path (contains parent directories), return the absolute path based on the current working directory.
+        3. If file_name is just a file name, look for it in the current working directory first, then in the root directory.
+
+        The root directly is defined as the directory containing the main script being executed (the module containing __main__).
 
         Args:
             file_name: The name of the file to locate. Can be just a file name, or a relative or absolute path.
 
         Returns:
-            The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.
+            file_path (Path): The full path to the file as a Path object.
         """
         # Look at the file_name and see if it looks like a path
         if not SCCommon.is_probable_path(file_name):
@@ -214,10 +234,10 @@ class SCCommon:
 
         # Otherwise, assume it's just a file name and look for it in the current directory and the script directory
         current_dir = Path.cwd()
-        app_dir = Path(sys.argv[0]).parent.resolve()
         file_path = current_dir / file_name
         if not file_path.exists():
-            file_path = app_dir / file_name
+            project_root_dir = SCCommon.get_project_root()
+            file_path = project_root_dir / file_name
         return file_path
 
     @staticmethod

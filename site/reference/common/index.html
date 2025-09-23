@@ -492,6 +492,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_common.SCCommon.get_project_root" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_project_root
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_common.SCCommon.is_probable_path" class="md-nav__link">
     <span class="md-ellipsis">
       is_probable_path
@@ -770,6 +779,15 @@
   <a href="#sc_utility.sc_common.SCCommon.get_process_id" class="md-nav__link">
     <span class="md-ellipsis">
       get_process_id
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_common.SCCommon.get_project_root" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_project_root
     </span>
   </a>
   
@@ -1120,6 +1138,51 @@
 <div class="doc doc-object doc-function">
 
 
+<h2 id="sc_utility.sc_common.SCCommon.get_project_root" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_project_root</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the root folder of the Python project.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>root_dir</code></td>            <td>
+                  <code><span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The root folder of the Python project as a Path object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h2 id="sc_utility.sc_common.SCCommon.is_probable_path" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">is_probable_path</span><span class="p">(</span><span class="n">possible_path</span><span class="p">)</span></code>
 
@@ -1400,7 +1463,13 @@
 
     <div class="doc doc-contents ">
 
-        <p>Select the file location for the given file name.</p>
+        <p>Select the file location for the given file name. It resolves an absolute path for the file_name as follows.</p>
+<ol>
+<li>If file_name is an absolute path, return it as a Path object.</li>
+<li>If file_name is a relative path (contains parent directories), return the absolute path based on the current working directory.</li>
+<li>If file_name is just a file name, look for it in the current working directory first, then in the root directory.</li>
+</ol>
+<p>The root directly is defined as the directory containing the main script being executed (the module containing <strong>main</strong>).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1438,18 +1507,18 @@
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
-                  <code><span title="pathlib.Path">Path</span> | None</code>
+<td><code>file_path</code></td>            <td>
+                  <code><span title="pathlib.Path">Path</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The full path to the file as a Path object. If the file does not exist in the current directory, it will look in the script directory.</p>
+                <p>The full path to the file as a Path object.</p>
               </div>
             </td>
           </tr>
