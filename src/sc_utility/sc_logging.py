@@ -52,7 +52,7 @@ class SCLogger:
             log_process_id (Optional[bool], optional): If True, include the process ID in log messages. Defaults to False.
         """
         # Make a note of the app directory
-        self.app_dir = self.client_dir = Path(sys.argv[0]).parent.resolve()
+        self.app_dir = self.client_dir = SCCommon.get_project_root()
 
         # Setup the path to the fatal error tracking file
         self.fatal_error_file_path = self.app_dir / f"{self.app_dir.name}_fatal_error.txt"
@@ -122,12 +122,7 @@ class SCLogger:
         self.file_logging_enabled = self.logfile_name is not None
 
         if self.file_logging_enabled and self.logfile_name is not None:
-            # Determine the file path for the log file
-            current_dir = Path.cwd()
-
-            self.logfile_path = current_dir / self.logfile_name
-            if not self.logfile_path.exists():
-                self.logfile_path = self.app_dir / self.logfile_name
+            self.logfile_path = SCCommon.select_file_location(self.logfile_name)
 
             # Truncate the log file if it exists
             self._initialise_monitoring_logfile()
