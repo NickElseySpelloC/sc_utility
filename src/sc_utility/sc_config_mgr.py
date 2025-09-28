@@ -237,6 +237,7 @@ class SCConfigManager:
             "console_verbosity": self.get(config_section, "ConsoleVerbosity", default="summary"),
             "max_lines": self.get(config_section, "LogfileMaxLines", default=10000),
             "log_process_id": self.get(config_section, "LogProcessID", default=False),
+            "log_thread_id": self.get(config_section, "LogThreadID", default=False),
         }
         return logger_settings
 

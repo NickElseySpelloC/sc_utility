@@ -42,7 +42,7 @@ class ConfigSchema:
             "AmberAPI": {
                 "type": "dict",
                 "schema": {
-                    "APIKey": {"type": "string", "required": True},
+                    "APIKey": {"type": "string", "required": False, "nullable": True},
                     "BaseUrl": {"type": "string", "required": True},
                     "Timeout": {"type": "number", "required": True, "min": 5, "max": 60},
                 },
@@ -53,6 +53,7 @@ class ConfigSchema:
                     "LogfileName": {"type": "string", "required": False, "nullable": True},
                     "LogfileMaxLines": {"type": "number", "required": False, "nullable": True, "min": 0, "max": 100000},
                     "LogProcessID": {"type": "boolean", "required": False, "nullable": True},
+                    "LogThreadID": {"type": "boolean", "required": False, "nullable": True},
                     "LogfileVerbosity": {"type": "string", "required": True, "allowed": ["none", "error", "warning", "summary", "detailed", "debug", "all"]},
                     "ConsoleVerbosity": {"type": "string", "required": True, "allowed": ["error", "warning", "summary", "detailed", "debug"]},
                 },
