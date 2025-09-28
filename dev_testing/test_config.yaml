@@ -37,7 +37,9 @@ ShellyDevices:
       Simulate: True
       Inputs: 
         - Name: "Spello Pool I1"
+          Webhooks: 23
         - Name: "Spello Pool I2"
+          Webhooks: 23
       Outputs:
         - Name: "Spello Pool Switch"
         - Name: "Spello Pool Switch Spare"
@@ -65,7 +67,7 @@ Files:
   LogProcessID: True
   LogThreadID: True
   LogfileVerbosity: all
-  ConsoleVerbosity: summary
+  ConsoleVerbosity: blah
 
 # Enter your settings here if you want to be emailed when there's a critical error 
 Email:
