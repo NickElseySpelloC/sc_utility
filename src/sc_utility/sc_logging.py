@@ -8,6 +8,7 @@ import inspect
 import smtplib
 import ssl
 import sys
+import threading
 import traceback
 from dataclasses import dataclass
 from email.mime.multipart import MIMEMultipart
@@ -91,7 +92,8 @@ class SCLogger:
                  file_verbosity: str | None = "detailed",
                  console_verbosity: str | None = "summary",
                  max_lines: int | None = 10000,
-                 log_process_id: bool | None = False):  # noqa: FBT001, FBT002
+                 log_process_id: bool | None = False,  # noqa: FBT001, FBT002
+                 log_thread_id: bool | None = False):  # noqa: FBT001, FBT002
         """
         Set / reset the logger configuration settings.
 
@@ -104,6 +106,7 @@ class SCLogger:
             console_verbosity  (Optional[str], optional): Verbosity level for console logging
             max_lines  (Optional[int], optional): Maximum number of lines to keep in the log file
             log_process_id (Optional[bool], optional): If True, include the process ID in log messages. Defaults to False.
+            log_thread_id (Optional[bool], optional): If True, include the thread ID in log messages. Defaults to False.
         """
         if logger_settings is not None:
             self.logfile_name = logger_settings["logfile_name"]
@@ -111,12 +114,14 @@ class SCLogger:
             self.console_verbosity = logger_settings["console_verbosity"]
             self.max_lines = logger_settings["max_lines"]
             self.log_process_id = logger_settings["log_process_id"]
+            self.log_thread_id = logger_settings["log_thread_id"]
         else:
             self.logfile_name = logfile_name
             self.file_verbosity = file_verbosity
             self.console_verbosity = console_verbosity
             self.max_lines = max_lines
             self.log_process_id = log_process_id
+            self.log_thread_id = log_thread_id
 
         # See if logfile writing is required
         self.file_logging_enabled = self.logfile_name is not None
@@ -175,8 +180,12 @@ class SCLogger:
         message_level = self.verbosity_levels.get(verbosity, 0)
 
         process_str = ""
-        if self.log_process_id:
+        if self.log_process_id and self.log_thread_id:
+            process_str = f"[Proc {SCCommon.get_process_id()}, Thread {threading.current_thread().name}] "
+        elif self.log_process_id:
             process_str = f"[Proc {SCCommon.get_process_id()}] "
+        elif self.log_thread_id:
+            process_str = f"[Thread {threading.current_thread().name}] "
 
         # Deal with console message first
         if console_level >= message_level and console_level > 0:

@@ -1212,7 +1212,7 @@
 
 
 <h2 id="sc_utility.sc_logging.SCLogger.initialise_settings" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">initialise_settings</span><span class="p">(</span><span class="n">logger_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logfile_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_verbosity</span><span class="o">=</span><span class="s1">&#39;detailed&#39;</span><span class="p">,</span> <span class="n">console_verbosity</span><span class="o">=</span><span class="s1">&#39;summary&#39;</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">log_process_id</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">initialise_settings</span><span class="p">(</span><span class="n">logger_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logfile_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_verbosity</span><span class="o">=</span><span class="s1">&#39;detailed&#39;</span><span class="p">,</span> <span class="n">console_verbosity</span><span class="o">=</span><span class="s1">&#39;summary&#39;</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">log_process_id</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_thread_id</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1324,6 +1324,22 @@
             <td>
               <div class="doc-md-description">
                 <p>If True, include the process ID in log messages. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>log_thread_id</code>
+            </td>
+            <td>
+                  <code><span title="Optional">Optional</span>[<span title="bool">bool</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, include the thread ID in log messages. Defaults to False.</p>
               </div>
             </td>
             <td>

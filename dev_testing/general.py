@@ -1,5 +1,6 @@
 """Manual testing code for the sc_utility libraries. Should not be included in the distrbution."""
 
+import datetime as dt
 import platform
 import sys
 from time import sleep
@@ -7,7 +8,8 @@ from time import sleep
 from config_schemas import ConfigSchema
 
 from sc_utility import (
-    SCCommon,
+    DateHelper,
+    SCCommon,  # noqa: F401
     SCConfigManager,
     SCLogger,
 )
@@ -62,23 +64,32 @@ def main():
         return
     logger.log_message("This is a test message at the summary level.", "summary")
 
-    # Test internet connection
-    if not SCCommon.check_internet_connection():
-        logger.log_message("No internet connection detected.", "summary")
+    # General test
+    time_now = DateHelper.now()
+    print(f"Current time is {time_now}")
 
-    # Setup email
-    email_settings = config.get_email_settings()
-    if email_settings is not None:
-        logger.register_email_settings(email_settings)
-        assert logger.send_email("Hello world", "Hello world from sc-utility example code.", test_mode=True), "Sending text string email."
-        logger.send_email("sc_utility test - main()", "This is a test email.")
+    some_date = dt.date(2023, 1, 1)
+    local_tz = dt.datetime.now().astimezone().tzinfo
+    end_time = dt.datetime.combine(some_date, dt.time(23, 59, 59), tzinfo=local_tz)
+    print(f"End time is {end_time}")
+
+    # # Test internet connection
+    # if not SCCommon.check_internet_connection():
+    #     logger.log_message("No internet connection detected.", "summary")
+
+    # # Setup email
+    # email_settings = config.get_email_settings()
+    # if email_settings is not None:
+    #     logger.register_email_settings(email_settings)
+    #     assert logger.send_email("Hello world", "Hello world from sc-utility example code.", test_mode=True), "Sending text string email."
+    #     logger.send_email("sc_utility test - main()", "This is a test email.")
 
     # See if we have a fatal error from a previous run
     if logger.get_fatal_error():
         print("Prior fatal error detected.")
         logger.clear_fatal_error()
 
-    test_reportable_issue(logger)
+    #  test_reportable_issue(logger)
 
 
 if __name__ == "__main__":
