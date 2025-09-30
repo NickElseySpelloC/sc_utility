@@ -52,6 +52,7 @@ class ConfigSchema:
                 "schema": {
                     "LogfileName": {"type": "string", "required": False, "nullable": True},
                     "LogfileMaxLines": {"type": "number", "required": False, "nullable": True, "min": 0, "max": 100000},
+                    "TimestampFormat": {"type": "string", "required": False, "nullable": True},
                     "LogProcessID": {"type": "boolean", "required": False, "nullable": True},
                     "LogThreadID": {"type": "boolean", "required": False, "nullable": True},
                     "LogfileVerbosity": {"type": "string", "required": True, "allowed": ["none", "error", "warning", "summary", "detailed", "debug", "all"]},

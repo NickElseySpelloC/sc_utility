@@ -11,6 +11,18 @@ COMMENT=$2
 
 PYPROJECT="pyproject.toml"
 
+# Make sure our virtual environment is activated
+if [ -z "$VIRTUAL_ENV" ]; then
+    echo "Error: No virtual environment activated."
+    exit 1
+fi
+
+# Make sure pytest is in the path
+if ! command -v pytest &> /dev/null; then
+    echo "Error: pytest could not be found. Please install it in your virtual environment."
+    exit 1
+fi
+
 # Get the current version from pyproject.toml
 if [ -f "$PYPROJECT" ]; then
     CURRENT_VERSION=$(grep -E '^version *= *"' "$PYPROJECT" | head -1 | sed -E 's/^version *= *"([^"]+)".*$/\1/')
@@ -28,6 +40,13 @@ read -p "Enter Y to continue, any other key to abort: " CONFIRM
 if [[ "$CONFIRM" != "Y" && "$CONFIRM" != "y" ]]; then
     echo "Aborted."
     exit 0
+fi
+
+# Run tests using pytest and check for errors
+pytest
+if [ $? -ne 0 ]; then
+    echo "Error: Tests failed."
+    exit 1
 fi
 
 # Build the documentation using mkdocs and check for errors
