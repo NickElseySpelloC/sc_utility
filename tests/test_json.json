@@ -2,7 +2,7 @@
     "string": "Hello, World!",
     "integer": 42,
     "float": 123.456,
-    "datetime": "2025-09-30T10:26:48.183891+02:00",
+    "datetime": "2025-09-30T10:27:04.976280+02:00",
     "datetime__datatype": "datetime",
     "date": "2025-09-30",
     "date__datatype": "date",
