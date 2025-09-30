@@ -64,25 +64,15 @@ def main():
         return
     logger.log_message("This is a test message at the summary level.", "summary")
 
-    # General test
-    time_now = DateHelper.now()
-    print(f"Current time is {time_now}")
-
-    some_date = dt.date(2023, 1, 1)
-    local_tz = dt.datetime.now().astimezone().tzinfo
-    end_time = dt.datetime.combine(some_date, dt.time(23, 59, 59), tzinfo=local_tz)
-    print(f"End time is {end_time}")
-
-    # # Test internet connection
+    # Test internet connection
     # if not SCCommon.check_internet_connection():
     #     logger.log_message("No internet connection detected.", "summary")
 
-    # # Setup email
-    # email_settings = config.get_email_settings()
-    # if email_settings is not None:
-    #     logger.register_email_settings(email_settings)
-    #     assert logger.send_email("Hello world", "Hello world from sc-utility example code.", test_mode=True), "Sending text string email."
-    #     logger.send_email("sc_utility test - main()", "This is a test email.")
+    # Setup email
+    email_settings = config.get_email_settings()
+    if email_settings is not None:
+        logger.register_email_settings(email_settings)
+        logger.send_email("sc_utility test - main()", "This is a test email.")
 
     # See if we have a fatal error from a previous run
     if logger.get_fatal_error():
