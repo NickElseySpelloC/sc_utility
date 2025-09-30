@@ -33,24 +33,22 @@ class NotifiableIssue:
 class SCLogger:
     """A class to handle logging messages with different verbosity levels."""
 
-    def __init__(self, logger_settings: dict | None = None,
-                 logfile_name: str | None = None,
-                 file_verbosity: str | None = "detailed",
-                 console_verbosity: str | None = "summary",
-                 max_lines: int | None = 10000,
-                 log_process_id: bool | None = False):  # noqa: FBT001, FBT002
+    def __init__(self, logger_settings: dict):
         """
         Initializes the logger with configuration settings.
 
-        If logger_settings are provided, it will override the individual parameters.
+        The structure of logger_settings is as follows:
+        {
+            "logfile_name": Optional[str],  # The name of the log file. If None, no file logging will be done.
+            "file_verbosity": Optional[str],  # Verbosity level for file logging
+            "console_verbosity": Optional[str],  # Verbosity level for console logging
+            "max_lines": Optional[int],  # Maximum number of lines to keep in the log file
+            "log_process_id": Optional[bool],  # If True, include the process ID in log messages. Defaults to False.
+            "log_thread_id": Optional[bool],  # If True, include the thread ID in log messages. Defaults to False.
+        }
 
         Args:
-            logger_settings (Optional[dict], optional): A dictionary containing logger settings. If provided, it should include the same keys as the individual parameters below:
-            logfile_name (Optional[str], optional): The name of the log file. If None, no file logging will be done.
-            file_verbosity (Optional[str], optional): Verbosity level for file logging
-            console_verbosity  (Optional[str], optional): Verbosity level for console logging
-            max_lines  (Optional[int], optional): Maximum number of lines to keep in the log file
-            log_process_id (Optional[bool], optional): If True, include the process ID in log messages. Defaults to False.
+            logger_settings (Optional[dict]): A dictionary containing logger settings
         """
         # Make a note of the app directory
         self.app_dir = self.client_dir = SCCommon.get_project_root()
@@ -76,52 +74,28 @@ class SCLogger:
         self.file_verbosity = "summary"
         self.console_verbosity = "summary"
         self.max_lines = 1000
+        self.timestamp_format = "%Y-%m-%d %H:%M:%S"
         self.log_process_id = False
+        self.log_thread_id = False
         self.file_logging_enabled = False
         self.notifiable_issues: list[NotifiableIssue] = []
 
-        self.initialise_settings(logger_settings=logger_settings,
-                 logfile_name=logfile_name,
-                 file_verbosity=file_verbosity,
-                 console_verbosity=console_verbosity,
-                 max_lines=max_lines,
-                 log_process_id=log_process_id)
+        self.initialise_settings(logger_settings)
 
-    def initialise_settings(self, logger_settings: dict | None = None,
-                 logfile_name: str | None = None,
-                 file_verbosity: str | None = "detailed",
-                 console_verbosity: str | None = "summary",
-                 max_lines: int | None = 10000,
-                 log_process_id: bool | None = False,  # noqa: FBT001, FBT002
-                 log_thread_id: bool | None = False):  # noqa: FBT001, FBT002
+    def initialise_settings(self, logger_settings: dict):
         """
-        Set / reset the logger configuration settings.
-
-        If logger_settings are provided, it will override the individual parameters.
+        Set / reset the logger configuration settings. See the __init__() method for the structure of logger_settings.
 
         Args:
-            logger_settings (Optional[dict], optional): A dictionary containing logger settings. If provided, it should include the same keys as the individual parameters below:
-            logfile_name (Optional[str], optional): The name of the log file. If None, no file logging will be done.
-            file_verbosity (Optional[str], optional): Verbosity level for file logging
-            console_verbosity  (Optional[str], optional): Verbosity level for console logging
-            max_lines  (Optional[int], optional): Maximum number of lines to keep in the log file
-            log_process_id (Optional[bool], optional): If True, include the process ID in log messages. Defaults to False.
-            log_thread_id (Optional[bool], optional): If True, include the thread ID in log messages. Defaults to False.
+            logger_settings (Optional[dict]): A dictionary containing logger settings.
         """
-        if logger_settings is not None:
-            self.logfile_name = logger_settings["logfile_name"]
-            self.file_verbosity = logger_settings["file_verbosity"]
-            self.console_verbosity = logger_settings["console_verbosity"]
-            self.max_lines = logger_settings["max_lines"]
-            self.log_process_id = logger_settings["log_process_id"]
-            self.log_thread_id = logger_settings["log_thread_id"]
-        else:
-            self.logfile_name = logfile_name
-            self.file_verbosity = file_verbosity
-            self.console_verbosity = console_verbosity
-            self.max_lines = max_lines
-            self.log_process_id = log_process_id
-            self.log_thread_id = log_thread_id
+        self.logfile_name = logger_settings.get("logfile_name")
+        self.file_verbosity = logger_settings.get("file_verbosity", "summary")
+        self.console_verbosity = logger_settings.get("console_verbosity", "summary")
+        self.max_lines = logger_settings.get("max_lines", 1000)
+        self.timestamp_format = logger_settings.get("timestamp_format", "%Y-%m-%d %H:%M:%S")
+        self.log_process_id = logger_settings.get("log_process_id", False)
+        self.log_thread_id = logger_settings.get("log_thread_id", False)
 
         # See if logfile writing is required
         self.file_logging_enabled = self.logfile_name is not None
@@ -206,7 +180,7 @@ class SCLogger:
                         file.write("\n")
                     else:
                         # Use the local timezone for the log timestamp
-                        file.write(f"{DateHelper.now().strftime('%Y-%m-%d %H:%M:%S')}{error_str}: {process_str}{message}\n")
+                        file.write(f"{DateHelper.now().strftime(self.timestamp_format)}{error_str}: {process_str}{message}\n")
 
     def register_email_settings(self, email_settings: dict | None) -> None:
         """

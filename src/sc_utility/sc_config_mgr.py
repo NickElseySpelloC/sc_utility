@@ -232,10 +232,11 @@ class SCConfigManager:
             settings (dict): A dictionary of logger settings that can be passed to the SCLogger() class initialization.
         """
         logger_settings = {
-            "logfile_name": self.get(config_section, "LogfileName", default="default_logfile.log"),
-            "file_verbosity": self.get(config_section, "LogfileVerbosity", default="detailed"),
+            "logfile_name": self.get(config_section, "LogfileName"),
+            "file_verbosity": self.get(config_section, "LogfileVerbosity", default="summary"),
             "console_verbosity": self.get(config_section, "ConsoleVerbosity", default="summary"),
             "max_lines": self.get(config_section, "LogfileMaxLines", default=10000),
+            "timestamp_format": self.get(config_section, "TimestampFormat", default="%Y-%m-%d %H:%M:%S"),
             "log_process_id": self.get(config_section, "LogProcessID", default=False),
             "log_thread_id": self.get(config_section, "LogThreadID", default=False),
         }

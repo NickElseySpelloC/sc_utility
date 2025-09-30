@@ -6,3 +6,6 @@
 2025-09-25 14:16:49: [Proc 7010] This is a test message at the summary level.
 2025-09-25 14:21:38: [Proc 8074] This is a test message at the summary level.
 2025-09-28 10:43:44: [Proc 45298, Thread MainThread] This is a test message at the summary level.
+2025-09-30 10:13:07: [Proc 62924, Thread MainThread] This is a test message at the summary level.
+30/$m/2025 10:16:18: [Proc 64444, Thread MainThread] This is a test message at the summary level.
+30/09/2025 10:18:17.760328: [Proc 65277, Thread MainThread] This is a test message at the summary level.

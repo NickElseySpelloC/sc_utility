@@ -37,9 +37,9 @@ ShellyDevices:
       Simulate: True
       Inputs: 
         - Name: "Spello Pool I1"
-          Webhooks: 23
+          Webhooks: True
         - Name: "Spello Pool I2"
-          Webhooks: 23
+          Webhooks: True
       Outputs:
         - Name: "Spello Pool Switch"
         - Name: "Spello Pool Switch Spare"
@@ -64,10 +64,11 @@ ShellyDevices:
 Files:
   LogfileName: test_logfile.log
   LogfileMaxLines: 501
+  TimestampFormat: "%Y-%m-%d %H:%M:%S.%f"
   LogProcessID: True
   LogThreadID: True
-  LogfileVerbosity: all
-  ConsoleVerbosity: blah
+  LogfileVerbosity: debug
+  ConsoleVerbosity: detailed
 
 # Enter your settings here if you want to be emailed when there's a critical error 
 Email:
