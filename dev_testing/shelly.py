@@ -15,7 +15,7 @@ from sc_utility import (
     ShellyControl,
 )
 
-CONFIG_FILE = "test_config.yaml"
+CONFIG_FILE = "dev_testing_config.yaml"
 
 
 def create_shelly_control(config, logger, wake_event: threading.Event | None = None):

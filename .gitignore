@@ -20,3 +20,5 @@ uv.lock
 /*.json
 /*.csv
 /*.yaml
+dev_testing/*.yaml
+dev_testing/*.log
