@@ -67,6 +67,7 @@ ShellyDevices:
     - Name: Outside Lights
       Model: Shelly2PMG3
       Hostname: 192.168.1.25
+      ExpectOffline: True
       ID: 200
       Inputs:
         - ID: 201
@@ -112,6 +113,7 @@ The Devices key in the configuration block supports the following keys :
 | Hostname | The network IP address or hostname for this device. |
 | ID | Your numeric ID for this device. |
 | Simulate | Set this to True if you don't have access to the device but still want to test your code. When True, this device will be in 'simulation' mode. Rather than make API calls to the device, the state will be written to and read from a local json file (with the same name as your Name entry). You can modify some of the values in this file to test your code. |
+| ExpectOffline | If set to True, we can expect this device to be offline at times. No warnings will be issued when this happens |
 | Inputs | A list of dict defining the inputs (if any) for this device. This section is optional but if defined, the number of entries must match the number of inputs supported by this model. For each input, define a Name and/or an ID. Optionally, add a Webhooks: True entry here to install the default webhooks on this input. |
 | Outputs | A list of dict defining the outputs (if any) for this device. This section is optional but if defined, the number of entries must match the number of outputs supported by this model. For each output, define a Name and/or an ID. Optionally, add a Webhooks: True entry here to install the default webhooks on this input. |
 | Meters | A list of dict defining the meters (if any) for this device. Note that depending on the devices, the actual meters might be part of the output or seperate energy meters (EM1 API calls). Either way, in this class meters are reported seperately from outputs. This section is optional but if defined, the number of entries must match the number of meters supported by this model. For each meter, define a Name and/or an ID.<br>  Optionally, use the MockRate key to set a Watts / second metering rate for this meter when the device is in Simulation mode. |

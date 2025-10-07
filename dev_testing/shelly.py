@@ -3,8 +3,10 @@
 import platform
 import sys
 import threading
+import time
 
 from config_schemas import ConfigSchema
+
 from sc_utility import (
     DateHelper,
     SCCommon,
@@ -42,20 +44,19 @@ def create_shelly_control(config, logger, wake_event: threading.Event | None = N
     # print(f"Shelly control initialized successfully: {shelly_control}")
     # print(f"{shelly_control.print_model_library(mode_str='brief')}")
 
-    logger.log_message(f"Device summaries:\n {shelly_control.print_device_status()}", "all")
+    # logger.log_message(f"Device summaries:\n {shelly_control.print_device_status()}", "all")
 
     return shelly_control
 
 
 def test_spello_control(config, logger):
     """Test function for Spello control."""
-    device_identity = "Spello Test A"
-    output_identity = "Spello Pool Switch"
-    meter_identity = "Spello Pool Meter"
+    device_identity = "Sydney Dev A"
+    output_identity = "Sydney Dev A O1"
+    # meter_identity = "Sydney Dev A M1"
 
     shelly_control = create_shelly_control(config, logger)
     assert shelly_control is not None, "Shelly control should be initialized."
-
     try:
         device = shelly_control.get_device(device_identity)
         device_status = shelly_control.get_device_status(device)
@@ -65,23 +66,38 @@ def test_spello_control(config, logger):
             print(f"Device {device_identity} is offline or not found.")
     except RuntimeError as e:
         print(f"Error getting status for device {device_identity}: {e}", file=sys.stderr)
+        sys.exit(1)
     except TimeoutError as e:
         print(f"Timeout error getting status for device {device_identity}: {e}", file=sys.stderr)
+    else:
+        logger.log_message(f"{device_identity} before output change:\n {shelly_control.print_device_status(device_identity)}", "all")
 
-    logger.log_message(f"{device_identity} before output change:\n {shelly_control.print_device_status(device_identity)}", "all")
+        output_obj = shelly_control.get_device_component("output", output_identity)
+        is_online = shelly_control.is_device_online(device)
+        shelly_control.get_device_status(device)
+        current_state = output_obj.get("State", False)  # Default to False if State is not found
+        print(f"#1 Output status for {output_identity}: Is Online: {is_online}, Current State: {current_state}")
 
-    output_obj = shelly_control.get_device_component("output", output_identity)
-    output_status = shelly_control.get_device_status(device)
-    print(f"Output status for {output_identity}: {output_status}")
+        print("Waiting 7 seconds before changing the output state...")
+        for i in range(7):
+            time.sleep(1)  # Short delay to ensure the device is ready for the next command
+            print(f"{i + 1}...", end="", flush=True)
+        print()
 
-    current_state = output_obj.get("State", False)  # Default to False if State is not found
-    shelly_control.change_output(output_identity, not current_state)
+        print("Attempting to change the output state...")
+        shelly_control.change_output(output_identity, not current_state)
 
-    meter_obj = shelly_control.get_device_component("meter", meter_identity)
-    meter_reading = meter_obj.get("Energy", None)
-    print(f"Meter reading for {meter_identity}: {meter_reading}")
+        # meter_obj = shelly_control.get_device_component("meter", meter_identity)
+        # meter_reading = meter_obj.get("Energy", None)
+        # print(f"Meter reading for {meter_identity}: {meter_reading}")
 
-    logger.log_message(f"{device_identity} after output change:\n {shelly_control.print_device_status(device_identity)}", "all")
+        is_online = shelly_control.is_device_online(device)
+        shelly_control.get_device_status(device)
+        current_state = output_obj.get("State", False)  # Default to False if State is not found
+        print(f"#2 Output status for {output_identity}: Is Online: {is_online}, Current State: {current_state}")
+
+        logger.log_message(f"{device_identity} after output change:\n {shelly_control.print_device_status(device_identity)}", "all")
+        # print(shelly_control.print_device_status(device_identity))
 
 
 def test_shelly_loop(config: SCConfigManager, logger: SCLogger):
