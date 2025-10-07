@@ -11,7 +11,7 @@ from sc_utility import (
     SCLogger,
 )
 
-CONFIG_FILE = "test_config.yaml"
+CONFIG_FILE = "dev_testing_config.yaml"
 
 
 def update_csv():

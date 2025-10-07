@@ -9,7 +9,7 @@ from sc_utility import (
     JSONEncoder,
 )
 
-CONFIG_FILE = "test_config.yaml"
+CONFIG_FILE = "dev_testing_config.yaml"
 JSON_FILE = "test_data.json"
 
 
