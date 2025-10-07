@@ -1,0 +1,129 @@
+{
+  "Index": 2,
+  "Model": "Shelly2PMG3",
+  "ClientName": "Spello Dev",
+  "ID": 3,
+  "ObjectType": "device",
+  "Simulate": true,
+  "SimulationFile": "/Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json",
+  "ExpectOffline": false,
+  "ModelName": "Shelly 2PM Gen3",
+  "Label": "Spello Dev (ID: 3)",
+  "URL": "https://www.shelly.com/products/shelly-2pm-gen3",
+  "Hostname": "192.168.86.33",
+  "Port": 80,
+  "Generation": 3,
+  "Protocol": "RPC",
+  "Inputs": [
+    {
+      "DeviceIndex": 2,
+      "DeviceID": 3,
+      "ComponentIndex": 0,
+      "ObjectType": "input",
+      "ID": 5,
+      "Name": "Spello Dev I1",
+      "Webhooks": true,
+      "customkeylist": [],
+      "State": false
+    },
+    {
+      "DeviceIndex": 2,
+      "DeviceID": 3,
+      "ComponentIndex": 1,
+      "ObjectType": "input",
+      "ID": 6,
+      "Name": "Spello Dev I2",
+      "Webhooks": false,
+      "customkeylist": [],
+      "State": false
+    }
+  ],
+  "Outputs": [
+    {
+      "DeviceIndex": 2,
+      "DeviceID": 3,
+      "ComponentIndex": 0,
+      "ObjectType": "output",
+      "ID": 5,
+      "Name": "Spello Dev S1",
+      "Webhooks": false,
+      "customkeylist": [
+        "Group"
+      ],
+      "HasMeter": true,
+      "State": false,
+      "Temperature": null,
+      "Group": "Patio"
+    },
+    {
+      "DeviceIndex": 2,
+      "DeviceID": 3,
+      "ComponentIndex": 1,
+      "ObjectType": "output",
+      "ID": 6,
+      "Name": "Spello Dev S2",
+      "Webhooks": false,
+      "customkeylist": [
+        "Group"
+      ],
+      "HasMeter": true,
+      "State": false,
+      "Temperature": null,
+      "Group": "Patio"
+    }
+  ],
+  "Meters": [
+    {
+      "DeviceIndex": 2,
+      "DeviceID": 3,
+      "ComponentIndex": 0,
+      "ObjectType": "meter",
+      "ID": 5,
+      "Name": "Meter 5",
+      "Webhooks": false,
+      "customkeylist": [],
+      "OnOutput": true,
+      "Power": null,
+      "Voltage": null,
+      "Current": null,
+      "PowerFactor": null,
+      "Energy": null,
+      "MockRate": 0,
+      "State": false
+    },
+    {
+      "DeviceIndex": 2,
+      "DeviceID": 3,
+      "ComponentIndex": 1,
+      "ObjectType": "meter",
+      "ID": 6,
+      "Name": "Meter 6",
+      "Webhooks": false,
+      "customkeylist": [],
+      "OnOutput": true,
+      "Power": null,
+      "Voltage": null,
+      "Current": null,
+      "PowerFactor": null,
+      "Energy": null,
+      "MockRate": 0,
+      "State": false
+    }
+  ],
+  "MetersSeperate": false,
+  "TemperatureMonitoring": true,
+  "Online": false,
+  "MacAddress": null,
+  "Temperature": null,
+  "Uptime": null,
+  "RestartRequired": null,
+  "WebhookInstallPending": false,
+  "SupportedWebhooks": [],
+  "InstalledWebhooks": [],
+  "customkeylist": [
+    "Name"
+  ],
+  "TotalPower": 0.0,
+  "TotalEnergy": 0.0,
+  "Name": "Spello Dev"
+}

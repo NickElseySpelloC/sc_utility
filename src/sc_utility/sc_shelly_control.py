@@ -39,10 +39,12 @@ class ShellyControl:
         self.response_timeout = 5   # Number of seconds to wait for a response from the switch
         self.retry_count = 1        # Number of times to retry a request
         self.retry_delay = 2        # Number of seconds to wait between retries
+        self.ping_allowed = True    # Whether to allow pinging the devices
 
         self.webhook_host = DEFAULT_WEBHOOK_HOST
         self.webhook_port = DEFAULT_WEBHOOK_PORT
         self.webhook_path = DEFAULT_WEBHOOK_PATH
+        self.default_webhook_events = {}
         self.app_wake_event = app_wake_event
         self.webhook_enabled = device_settings.get("WebhooksEnabled", False) and self.app_wake_event is not None
         self.webhook_event_queue = []
@@ -128,7 +130,7 @@ class ShellyControl:
         self._install_webhooks()
 
         # Finished
-        self.logger.log_message("ShellyControl initialized successfully.", "detailed")
+        self._log_debug_message("ShellyControl initialized successfully.")
 
     def _set_supported_webhooks(self, selected_device: dict | None = None) -> None:
         """Set the SupportedWebhooks attrbute for each device using the Webhook.ListSupported API call.
@@ -568,6 +570,7 @@ class ShellyControl:
         new_device["ClientName"] = device_config.get("Name", f"Shelly Device {device_index + 1}")
         new_device["ID"] = device_config.get("ID", device_index + 1)
         new_device["Simulate"] = device_config.get("Simulate", False)  # Default to False if not specified
+        new_device["ExpectOffline"] = device_config.get("ExpectOffline", False)
         new_device["Label"] = f"{new_device['ClientName']} (ID: {new_device['ID']})"
         new_device["Hostname"] = device_config.get("Hostname")
         new_device["Port"] = device_config.get("Port", 80)  # Default port is 80
@@ -662,6 +665,7 @@ class ShellyControl:
             "ObjectType": "device",
             "Simulate": False,  # Default to False if not specified
             "SimulationFile": None,  # This will be set later if in simulation mode
+            "ExpectOffline": False,  # Set to True if the device is expected to be offline
             "ModelName": model_dict.get("name", "Unknown Model Name"),
             "Label": None,
             "URL": model_dict.get("url", None),
@@ -985,6 +989,7 @@ class ShellyControl:
                     return_str += f"  Model: {device['ModelName']}\n"
                     return_str += f"  Simulation Mode: {device['Simulate']}\n"
                     return_str += f"  Hostname: {device['Hostname']}:{device['Port']}\n"
+                    return_str += f"  Expect Offline: {device['ExpectOffline']}\n"
                     return_str += f"  Generation: {device['Generation']}\n"
                     return_str += f"  Protocol: {device['Protocol']}\n"
 
@@ -1118,7 +1123,8 @@ class ShellyControl:
 
         # First ping the device to check if it is online
         if not self.is_device_online(device["ID"]):
-            self.logger.log_message(f"Device {device['Label']} is offline. Cannot send REST request.", "warning")
+            if not device.get("ExpectOffline", False):
+                self.logger.log_message(f"Device {device['Label']} is offline. Cannot send REST request.", "warning")
             return False, {}
 
         url = f"http://{device['Hostname']}:{device['Port']}/{url_args}"
@@ -1185,7 +1191,8 @@ class ShellyControl:
 
         # First ping the device to check if it is online
         if not self.is_device_online(device):
-            self.logger.log_message(f"Device {device['Label']} is offline. Cannot send RPC request.", "warning")
+            if not device.get("ExpectOffline", False):
+                self.logger.log_message(f"Device {device['Label']} is offline. Cannot send RPC request.", "warning")
             return False, {}
 
         url = f"http://{device['Hostname']}:{device['Port']}/rpc"
@@ -1275,6 +1282,8 @@ class ShellyControl:
             return True  # Simulation mode always returns True
 
         try:
+            em_result_data = []
+            emdata_result_data = []
             if device["Protocol"] == "RPC":
                 # Get the device status via RPC
                 payload = {"id": 0, "method": "Shelly.GetStatus"}
@@ -1284,8 +1293,6 @@ class ShellyControl:
                 # EM1.GetStatus gives use power, voltage, current
                 # EM1Data.GetStatus gives us energy
                 if device["MetersSeperate"]:
-                    em_result_data = []
-                    emdata_result_data = []
                     for meter_index in range(device["Meters"]):
                         payload = {"id": 0,
                                 "method": "EM1.GetStatus",
@@ -1525,7 +1532,8 @@ class ShellyControl:
             try:
                 # First get the device status to ensure it is online
                 if not self.get_device_status(device):
-                    self.logger.log_message(f"Device {device['Label']} is offline. Cannot change output state.", "warning")
+                    if not device.get("ExpectOffline", False):
+                        self.logger.log_message(f"Device {device['Label']} is offline. Cannot change output state.", "warning")
                     return False, False
 
                 if device["Protocol"] == "RPC":

@@ -131,6 +131,7 @@ class ConfigSchema:
                                 "ID": {"type": "number", "required": False, "nullable": True},
                                 "Simulate": {"type": "boolean", "required": False, "nullable": True},
                                 "Colour": {"type": "string", "required": False, "nullable": True},
+                                "ExpectOffline": {"type": "boolean", "required": False, "nullable": True},
                                 "Inputs": {
                                     "type": "list",
                                     "required": False,

@@ -1,0 +1,548 @@
+2025-10-07 11:13:21.521363: [Proc 70362, Thread MainThread] Imported Shelly models data from /Users/nick/dev/sc_utility/src/sc_utility/shelly_models.json.
+2025-10-07 11:13:21.522172: [Proc 70362, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:13:21.528097: [Proc 70362, Thread MainThread] Device Sydney Dev A (ID: 1) is not in simulation mode. Skipping import.
+2025-10-07 11:13:21.528591: [Proc 70362, Thread MainThread] Added Shelly device Sydney Dev A.
+2025-10-07 11:13:21.528985: [Proc 70362, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:13:21.530163: [Proc 70362, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:13:21.530516: [Proc 70362, Thread MainThread] Added Shelly device Spello Test A.
+2025-10-07 11:13:21.530855: [Proc 70362, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:13:21.531691: [Proc 70362, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:13:21.531941: [Proc 70362, Thread MainThread] Added Shelly device Spello Dev.
+2025-10-07 11:13:22.549524: [Proc 70362, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:13:22.550607: [Proc 70362, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:13:23.569549: [Proc 70362, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:13:23.570663: [Proc 70362, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:13:23.576093: [Proc 70362, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:13:23.577039 WARNING: [Proc 70362, Thread MainThread] Device Sydney Dev A is offline, unable to determine supported webhooks.
+2025-10-07 11:13:23.577427: [Proc 70362, Thread MainThread] Device Spello Test A is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:13:23.577679: [Proc 70362, Thread MainThread] Device Spello Dev is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:13:23.577979: [Proc 70362, Thread MainThread] ShellyControl initialized successfully.
+2025-10-07 11:13:23.578254: [Proc 70362, Thread MainThread] Webhook server is disabled. Webhook server will not be started.
+2025-10-07 11:13:27.501682: [Proc 70362, Thread MainThread] Device summaries:
+ Sydney Dev A (ID: 1) is offline.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: False
+  Hostname: 192.168.86.30:80
+  Expect Offline: False
+  Generation: 3
+  Protocol: RPC
+  Name: Sydney Dev A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A I1, State: False
+    - Index: 1, ID: 2, Name: Sydney Dev A I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A O1, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Sydney Dev A O2, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A M1, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 2, Name: Sydney Dev A M2, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: False
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0.0 W
+  Total Energy: 0.0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+Spello Test A (ID: 2) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.39:80
+  Expect Offline: False
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Test A
+  Number of Inputs: 2
+    - Index: 0, ID: 3, Name: Spello Pool I1, State: False
+    - Index: 1, ID: 4, Name: Spello Pool I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 3, Name: Spello Pool Switch, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 4, Name: Spello Pool Switch Spare, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 3, Name: Spello Pool Meter, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: 12073001.78512
+    - Index: 1, ID: 4, Name: Spello Pool Meter Spare, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 12073001.78512 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+Spello Dev (ID: 3) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: True
+  Hostname: 192.168.86.33:80
+  Expect Offline: False
+  Generation: 3
+  Protocol: RPC
+  Name: Spello Dev
+  Number of Inputs: 2
+    - Index: 0, ID: 5, Name: Spello Dev I1, State: False
+    - Index: 1, ID: 6, Name: Spello Dev I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 5, Name: Spello Dev S1, Has Metering: True, State: False, Temp.: None, Group: Patio
+    - Index: 1, ID: 6, Name: Spello Dev S2, Has Metering: True, State: False, Temp.: None, Group: Patio
+  Number of Meters: 2
+    - Index: 0, ID: 5, Name: Meter 5, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 6, Name: Meter 6, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0 W
+  Total Energy: 0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-10-07 11:13:27.502263: [Proc 70362, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:13:28.520429: [Proc 70362, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:13:28.521379: [Proc 70362, Thread MainThread] Sydney Dev A before output change:
+ Sydney Dev A (ID: 1) is offline.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: False
+  Hostname: 192.168.86.30:80
+  Expect Offline: False
+  Generation: 3
+  Protocol: RPC
+  Name: Sydney Dev A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A I1, State: False
+    - Index: 1, ID: 2, Name: Sydney Dev A I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A O1, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Sydney Dev A O2, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A M1, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 2, Name: Sydney Dev A M2, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: False
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0.0 W
+  Total Energy: 0.0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-10-07 11:13:29.540612: [Proc 70362, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:13:29.540971: [Proc 70362, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:13:30.558903: [Proc 70362, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:13:37.581684: [Proc 70362, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:13:38.594829: [Proc 70362, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:13:39.611292: [Proc 70362, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:13:39.611923: [Proc 70362, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:13:40.629595: [Proc 70362, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:13:40.630448: [Proc 70362, Thread MainThread] Sydney Dev A after output change:
+ Sydney Dev A (ID: 1) is offline.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: False
+  Hostname: 192.168.86.30:80
+  Expect Offline: False
+  Generation: 3
+  Protocol: RPC
+  Name: Sydney Dev A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A I1, State: False
+    - Index: 1, ID: 2, Name: Sydney Dev A I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A O1, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Sydney Dev A O2, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A M1, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 2, Name: Sydney Dev A M2, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: False
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0.0 W
+  Total Energy: 0.0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-10-07 11:22:08.766383: [Proc 71344, Thread MainThread] Imported Shelly models data from /Users/nick/dev/sc_utility/src/sc_utility/shelly_models.json.
+2025-10-07 11:22:08.767032: [Proc 71344, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:22:08.772893: [Proc 71344, Thread MainThread] Device Sydney Dev A (ID: 1) is not in simulation mode. Skipping import.
+2025-10-07 11:22:08.773164: [Proc 71344, Thread MainThread] Added Shelly device Sydney Dev A.
+2025-10-07 11:22:08.773422: [Proc 71344, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:22:08.774352: [Proc 71344, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:22:08.774597: [Proc 71344, Thread MainThread] Added Shelly device Spello Test A.
+2025-10-07 11:22:08.774867: [Proc 71344, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:22:08.775578: [Proc 71344, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:22:08.775826: [Proc 71344, Thread MainThread] Added Shelly device Spello Dev.
+2025-10-07 11:22:09.790551: [Proc 71344, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:22:09.791629: [Proc 71344, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:22:10.811845: [Proc 71344, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:22:10.812809: [Proc 71344, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:22:10.818358: [Proc 71344, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:22:10.819238 WARNING: [Proc 71344, Thread MainThread] Device Sydney Dev A is offline, unable to determine supported webhooks.
+2025-10-07 11:22:10.819700: [Proc 71344, Thread MainThread] Device Spello Test A is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:22:10.820049: [Proc 71344, Thread MainThread] Device Spello Dev is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:22:10.820486: [Proc 71344, Thread MainThread] ShellyControl initialized successfully.
+2025-10-07 11:22:10.820986: [Proc 71344, Thread MainThread] Webhook server is disabled. Webhook server will not be started.
+2025-10-07 11:22:10.821460: [Proc 71344, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:22:11.833384: [Proc 71344, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:22:11.834511: [Proc 71344, Thread MainThread] Sydney Dev A before output change:
+ Sydney Dev A (ID: 1) is offline.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: False
+  Hostname: 192.168.86.30:80
+  Expect Offline: False
+  Generation: 3
+  Protocol: RPC
+  Name: Sydney Dev A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A I1, State: False
+    - Index: 1, ID: 2, Name: Sydney Dev A I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A O1, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Sydney Dev A O2, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A M1, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 2, Name: Sydney Dev A M2, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: False
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0.0 W
+  Total Energy: 0.0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-10-07 11:22:12.854561: [Proc 71344, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:22:12.855123: [Proc 71344, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:22:13.877046: [Proc 71344, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:22:20.888546: [Proc 71344, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:22:21.904801: [Proc 71344, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:22:22.917897: [Proc 71344, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:22:22.918437: [Proc 71344, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:22:23.935949: [Proc 71344, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:22:23.936572: [Proc 71344, Thread MainThread] Sydney Dev A after output change:
+ Sydney Dev A (ID: 1) is offline.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: False
+  Hostname: 192.168.86.30:80
+  Expect Offline: False
+  Generation: 3
+  Protocol: RPC
+  Name: Sydney Dev A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A I1, State: False
+    - Index: 1, ID: 2, Name: Sydney Dev A I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A O1, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Sydney Dev A O2, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A M1, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 2, Name: Sydney Dev A M2, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: False
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0.0 W
+  Total Energy: 0.0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-10-07 11:23:36.203401: [Proc 71793, Thread MainThread] Imported Shelly models data from /Users/nick/dev/sc_utility/src/sc_utility/shelly_models.json.
+2025-10-07 11:23:36.203986: [Proc 71793, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:23:36.209545: [Proc 71793, Thread MainThread] Device Sydney Dev A (ID: 1) is not in simulation mode. Skipping import.
+2025-10-07 11:23:36.209798: [Proc 71793, Thread MainThread] Added Shelly device Sydney Dev A.
+2025-10-07 11:23:36.210064: [Proc 71793, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:23:36.210974: [Proc 71793, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:23:36.211230: [Proc 71793, Thread MainThread] Added Shelly device Spello Test A.
+2025-10-07 11:23:36.211486: [Proc 71793, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:23:36.212153: [Proc 71793, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:23:36.212366: [Proc 71793, Thread MainThread] Added Shelly device Spello Dev.
+2025-10-07 11:23:37.224217: [Proc 71793, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:23:37.224894: [Proc 71793, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:23:38.245209: [Proc 71793, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:23:38.245875: [Proc 71793, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:23:38.251259: [Proc 71793, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:23:38.251736 WARNING: [Proc 71793, Thread MainThread] Device Sydney Dev A is offline, unable to determine supported webhooks.
+2025-10-07 11:23:38.252000: [Proc 71793, Thread MainThread] Device Spello Test A is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:23:38.252265: [Proc 71793, Thread MainThread] Device Spello Dev is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:23:38.252590: [Proc 71793, Thread MainThread] ShellyControl initialized successfully.
+2025-10-07 11:23:38.252887: [Proc 71793, Thread MainThread] Webhook server is disabled. Webhook server will not be started.
+2025-10-07 11:23:38.253217: [Proc 71793, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:23:39.263576: [Proc 71793, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:23:39.264349: [Proc 71793, Thread MainThread] Sydney Dev A before output change:
+ Sydney Dev A (ID: 1) is offline.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: False
+  Hostname: 192.168.86.30:80
+  Expect Offline: False
+  Generation: 3
+  Protocol: RPC
+  Name: Sydney Dev A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A I1, State: False
+    - Index: 1, ID: 2, Name: Sydney Dev A I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A O1, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Sydney Dev A O2, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A M1, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 2, Name: Sydney Dev A M2, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: False
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0.0 W
+  Total Energy: 0.0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-10-07 11:23:40.282864: [Proc 71793, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:24:11.462237: [Proc 71793, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:24:13.675319: [Proc 71793, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:10.697725: [Proc 72253, Thread MainThread] Imported Shelly models data from /Users/nick/dev/sc_utility/src/sc_utility/shelly_models.json.
+2025-10-07 11:25:10.698363: [Proc 72253, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:25:10.704360: [Proc 72253, Thread MainThread] Device Sydney Dev A (ID: 1) is not in simulation mode. Skipping import.
+2025-10-07 11:25:10.704616: [Proc 72253, Thread MainThread] Added Shelly device Sydney Dev A.
+2025-10-07 11:25:10.704887: [Proc 72253, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:25:10.705843: [Proc 72253, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:25:10.706117: [Proc 72253, Thread MainThread] Added Shelly device Spello Test A.
+2025-10-07 11:25:10.706343: [Proc 72253, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:25:10.706978: [Proc 72253, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:25:10.707203: [Proc 72253, Thread MainThread] Added Shelly device Spello Dev.
+2025-10-07 11:25:11.722917: [Proc 72253, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:11.723872: [Proc 72253, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:25:12.741505: [Proc 72253, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:12.742226 WARNING: [Proc 72253, Thread MainThread] Device Sydney Dev A (ID: 1) is offline. Cannot send RPC request.
+2025-10-07 11:25:12.748330: [Proc 72253, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:25:12.749090: [Proc 72253, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:25:12.749861 WARNING: [Proc 72253, Thread MainThread] Device Sydney Dev A is offline, unable to determine supported webhooks.
+2025-10-07 11:25:12.750207: [Proc 72253, Thread MainThread] Device Spello Test A is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:25:12.750549: [Proc 72253, Thread MainThread] Device Spello Dev is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:25:12.750995: [Proc 72253, Thread MainThread] ShellyControl initialized successfully.
+2025-10-07 11:25:12.751417: [Proc 72253, Thread MainThread] Webhook server is disabled. Webhook server will not be started.
+2025-10-07 11:25:12.751931: [Proc 72253, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:25:13.764724: [Proc 72253, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:13.765381 WARNING: [Proc 72253, Thread MainThread] Device Sydney Dev A (ID: 1) is offline. Cannot send RPC request.
+2025-10-07 11:25:13.766432: [Proc 72253, Thread MainThread] Sydney Dev A before output change:
+ Sydney Dev A (ID: 1) is offline.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: False
+  Hostname: 192.168.86.30:80
+  Expect Offline: False
+  Generation: 3
+  Protocol: RPC
+  Name: Sydney Dev A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A I1, State: False
+    - Index: 1, ID: 2, Name: Sydney Dev A I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A O1, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Sydney Dev A O2, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A M1, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 2, Name: Sydney Dev A M2, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: False
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0.0 W
+  Total Energy: 0.0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-10-07 11:25:14.782548: [Proc 72253, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:14.783302: [Proc 72253, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:25:15.800582: [Proc 72253, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:15.801207 WARNING: [Proc 72253, Thread MainThread] Device Sydney Dev A (ID: 1) is offline. Cannot send RPC request.
+2025-10-07 11:25:34.212765: [Proc 72622, Thread MainThread] Imported Shelly models data from /Users/nick/dev/sc_utility/src/sc_utility/shelly_models.json.
+2025-10-07 11:25:34.213122: [Proc 72622, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:25:34.219007: [Proc 72622, Thread MainThread] Device Sydney Dev A (ID: 1) is not in simulation mode. Skipping import.
+2025-10-07 11:25:34.219503: [Proc 72622, Thread MainThread] Added Shelly device Sydney Dev A.
+2025-10-07 11:25:34.220002: [Proc 72622, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:25:34.220872: [Proc 72622, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:25:34.221151: [Proc 72622, Thread MainThread] Added Shelly device Spello Test A.
+2025-10-07 11:25:34.221422: [Proc 72622, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:25:34.222115: [Proc 72622, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:25:34.222351: [Proc 72622, Thread MainThread] Added Shelly device Spello Dev.
+2025-10-07 11:25:35.237686: [Proc 72622, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:35.238080: [Proc 72622, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:25:36.255680: [Proc 72622, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:36.256881: [Proc 72622, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:25:36.262342: [Proc 72622, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:25:36.262940 WARNING: [Proc 72622, Thread MainThread] Device Sydney Dev A is offline, unable to determine supported webhooks.
+2025-10-07 11:25:36.263543: [Proc 72622, Thread MainThread] Device Spello Test A is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:25:36.264049: [Proc 72622, Thread MainThread] Device Spello Dev is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:25:36.264545: [Proc 72622, Thread MainThread] ShellyControl initialized successfully.
+2025-10-07 11:25:36.265053: [Proc 72622, Thread MainThread] Webhook server is disabled. Webhook server will not be started.
+2025-10-07 11:25:36.265590: [Proc 72622, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:25:37.280273: [Proc 72622, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:37.281232: [Proc 72622, Thread MainThread] Sydney Dev A before output change:
+ Sydney Dev A (ID: 1) is offline.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: False
+  Hostname: 192.168.86.30:80
+  Expect Offline: True
+  Generation: 3
+  Protocol: RPC
+  Name: Sydney Dev A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A I1, State: False
+    - Index: 1, ID: 2, Name: Sydney Dev A I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A O1, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Sydney Dev A O2, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A M1, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 2, Name: Sydney Dev A M2, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: False
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0.0 W
+  Total Energy: 0.0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-10-07 11:25:38.298421: [Proc 72622, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:38.299046: [Proc 72622, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:25:39.319974: [Proc 72622, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:46.327969: [Proc 72622, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:25:47.340555: [Proc 72622, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:48.356195: [Proc 72622, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:48.356954: [Proc 72622, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:25:49.377742: [Proc 72622, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:25:49.378655: [Proc 72622, Thread MainThread] Sydney Dev A after output change:
+ Sydney Dev A (ID: 1) is offline.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: False
+  Hostname: 192.168.86.30:80
+  Expect Offline: True
+  Generation: 3
+  Protocol: RPC
+  Name: Sydney Dev A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A I1, State: False
+    - Index: 1, ID: 2, Name: Sydney Dev A I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A O1, Has Metering: True, State: False, Temp.: None
+    - Index: 1, ID: 2, Name: Sydney Dev A O2, Has Metering: True, State: False, Temp.: None
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A M1, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+    - Index: 1, ID: 2, Name: Sydney Dev A M2, On Output: True, Power: None, Voltage: None, Current: None, Power Factor: None, Energy: None
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: False
+  MAC Address: None
+  Temperature: None°C
+  Total Power: 0.0 W
+  Total Energy: 0.0 kWh
+  Uptime: None seconds
+  Webhooks are not supported on this device.
+2025-10-07 11:53:48.083264: [Proc 78306, Thread MainThread] Imported Shelly models data from /Users/nick/dev/sc_utility/src/sc_utility/shelly_models.json.
+2025-10-07 11:53:48.083585: [Proc 78306, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:53:48.089195: [Proc 78306, Thread MainThread] Device Sydney Dev A (ID: 1) is not in simulation mode. Skipping import.
+2025-10-07 11:53:48.089449: [Proc 78306, Thread MainThread] Added Shelly device Sydney Dev A.
+2025-10-07 11:53:48.089732: [Proc 78306, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:53:48.090716: [Proc 78306, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:53:48.090967: [Proc 78306, Thread MainThread] Added Shelly device Spello Test A.
+2025-10-07 11:53:48.091228: [Proc 78306, Thread MainThread] Retrieved Shelly model Shelly2PMG3 (Shelly 2PM Gen3) from models file.
+2025-10-07 11:53:48.092098: [Proc 78306, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:53:48.092361: [Proc 78306, Thread MainThread] Added Shelly device Spello Dev.
+2025-10-07 11:53:48.188236: [Proc 78306, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is online
+2025-10-07 11:53:48.188634: [Proc 78306, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:53:48.197871: [Proc 78306, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is online
+2025-10-07 11:53:48.240766: [Proc 78306, Thread MainThread] Device Sydney Dev A (ID: 1) status retrieved successfully.
+2025-10-07 11:53:48.241250: [Proc 78306, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Test_A.json for device Spello Test A (ID: 2)
+2025-10-07 11:53:48.241644: [Proc 78306, Thread MainThread] Device simulation information imported from /Users/nick/dev/sc_utility/dev_testing/Spello_Dev.json for device Spello Dev (ID: 3)
+2025-10-07 11:53:48.241908: [Proc 78306, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:53:48.250121: [Proc 78306, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is online
+2025-10-07 11:53:48.277045: [Proc 78306, Thread MainThread] Device Spello Test A is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:53:48.277379: [Proc 78306, Thread MainThread] Device Spello Dev is in simulation mode, skipping determining supported webhooks.
+2025-10-07 11:53:48.277652: [Proc 78306, Thread MainThread] ShellyControl initialized successfully.
+2025-10-07 11:53:48.277927: [Proc 78306, Thread MainThread] Webhook server is disabled. Webhook server will not be started.
+2025-10-07 11:53:48.278232: [Proc 78306, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:53:48.288406: [Proc 78306, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is online
+2025-10-07 11:53:48.323346: [Proc 78306, Thread MainThread] Device Sydney Dev A (ID: 1) status retrieved successfully.
+2025-10-07 11:53:48.323752: [Proc 78306, Thread MainThread] Sydney Dev A before output change:
+ Sydney Dev A (ID: 1) is online.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: False
+  Hostname: 192.168.86.30:80
+  Expect Offline: True
+  Generation: 3
+  Protocol: RPC
+  Name: Sydney Dev A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A I1, State: False
+    - Index: 1, ID: 2, Name: Sydney Dev A I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A O1, Has Metering: True, State: False, Temp.: 39.6
+    - Index: 1, ID: 2, Name: Sydney Dev A O2, Has Metering: True, State: False, Temp.: 39.6
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A M1, On Output: True, Power: 0.0, Voltage: 246.1, Current: 0.0, Power Factor: 0.0, Energy: 0.0
+    - Index: 1, ID: 2, Name: Sydney Dev A M2, On Output: True, Power: 0.0, Voltage: 246.2, Current: 0.0, Power Factor: 0.0, Energy: 0.0
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: True
+  MAC Address: 30C9224E065C
+  Temperature: 39.6°C
+  Total Power: 0.0 W
+  Total Energy: 0.0 kWh
+  Uptime: 377 seconds
+  Supported Webhooks: 10
+    - input.toggle_on
+    - input.toggle_off
+    - input.button_push
+    - input.button_longpush
+    - input.button_doublepush
+    - input.button_triplepush
+    - input.analog_change
+    - input.analog_measurement
+    - switch.off
+    - switch.on
+  No installed webhooks found.
+2025-10-07 11:53:48.334320: [Proc 78306, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is online
+2025-10-07 11:53:48.334723: [Proc 78306, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:53:48.344340: [Proc 78306, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is online
+2025-10-07 11:53:48.397516: [Proc 78306, Thread MainThread] Device Sydney Dev A (ID: 1) status retrieved successfully.
+2025-10-07 11:53:55.404270: [Proc 78306, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:53:56.419455: [Proc 78306, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:53:57.434231: [Proc 78306, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:53:57.434947: [Proc 78306, Thread MainThread] Getting the status of device Sydney Dev A (ID: 1) at 192.168.86.30 via RPC
+2025-10-07 11:53:58.454543: [Proc 78306, Thread MainThread] Shelly device Sydney Dev A (ID: 1) is offline
+2025-10-07 11:53:58.455563: [Proc 78306, Thread MainThread] Sydney Dev A after output change:
+ Sydney Dev A (ID: 1) is offline.
+  Model: Shelly 2PM Gen3
+  Simulation Mode: False
+  Hostname: 192.168.86.30:80
+  Expect Offline: True
+  Generation: 3
+  Protocol: RPC
+  Name: Sydney Dev A
+  Number of Inputs: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A I1, State: False
+    - Index: 1, ID: 2, Name: Sydney Dev A I2, State: False
+  Number of Output Relays: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A O1, Has Metering: True, State: False, Temp.: 39.6
+    - Index: 1, ID: 2, Name: Sydney Dev A O2, Has Metering: True, State: False, Temp.: 39.6
+  Number of Meters: 2
+    - Index: 0, ID: 1, Name: Sydney Dev A M1, On Output: True, Power: 0.0, Voltage: 245.4, Current: 0.0, Power Factor: 0.0, Energy: 0.0
+    - Index: 1, ID: 2, Name: Sydney Dev A M2, On Output: True, Power: 0.0, Voltage: 245.4, Current: 0.0, Power Factor: 0.0, Energy: 0.0
+  Meters Separate: False
+  Temperature Monitoring: True
+  Online: False
+  MAC Address: 30C9224E065C
+  Temperature: 39.6°C
+  Total Power: 0.0 W
+  Total Energy: 0.0 kWh
+  Uptime: 377 seconds
+  Supported Webhooks: 10
+    - input.toggle_on
+    - input.toggle_off
+    - input.button_push
+    - input.button_longpush
+    - input.button_doublepush
+    - input.button_triplepush
+    - input.analog_change
+    - input.analog_measurement
+    - switch.off
+    - switch.on
+  No installed webhooks found.
