@@ -8,7 +8,7 @@ from sc_utility.sc_date_helper import DateHelper
 
 
 class CSVReader:
-
+    """Class for reading and writing CSV files with header configuration."""
     def __init__(self, file_path: Path | str, header_config: list[dict] | None = None):
         """Initialize the CSVReader with the file path.
 
@@ -50,7 +50,7 @@ class CSVReader:
             1. Make sure it's a list of dictionaries.
             2. Ensure each header is a dictionary with 'name' and 'type' keys.
             3. 'type' can be 'str', 'int', 'float', 'date' or 'datetime'.
-            4. If 'date' or 'datetime', it can have an optional 'format' key.
+            4. If 'date', 'datetime' or 'time', it can have an optional 'format' key.
             5. The only allowed attributes in the header dictionaries are 'name', 'type', 'format', 'match' and 'sort'
 
         Returns:
@@ -63,7 +63,8 @@ class CSVReader:
             return "header_config must be a list of dictionaries."
 
         allowed_keys = {"name", "type", "format", "match", "sort", "minimum"}
-        allowed_types = {"str", "int", "float", "date", "datetime"}
+        allowed_types = {"str", "int", "float", "date", "datetime", "time"}
+
         for header in self.header_config:
             if not isinstance(header, dict):
                 return "Each header in header_config must be a dictionary."
@@ -127,10 +128,9 @@ class CSVReader:
                 error_msg = f"CSV file {self.file_path} is empty or has no header."
                 raise ImportError(error_msg)
 
-            """ Validate the header against the provided configuration:
-            1. All the header names in self.header_config must exist in file_headers, but not necessarily in the same order.
-            2. If additional headers are present in the CSV file that are not in self.header_config, add them to file_headers with a type of 'str'.
-            """
+            # Validate the header against the provided configuration:
+            # 1. All the header names in self.header_config must exist in file_headers, but not necessarily in the same order.
+            # 2. If additional headers are present in the CSV file that are not in self.header_config, add them to file_headers with a type of 'str'.
             header_names = []
             if self.header_config:
                 # Check if all headers in header_config are in file_headers
@@ -165,14 +165,17 @@ class CSVReader:
                             try:
                                 config = self.header_config[i]
                                 if config["type"] == "date":
-                                    # Convert date strings to datetime objects
+                                    # Convert date strings to time objects
                                     date_format = config.get("format", "%Y-%m-%d")
                                     row_dict[header] = DateHelper.parse_date(row[i], date_format)
                                 elif config["type"] == "datetime":
                                     # Convert datetime strings to datetime objects
                                     datetime_format = config.get("format", "%Y-%m-%d %H:%M:%S")
-                                    # local_tz = datetime.now().astimezone().tzinfo
-                                    row_dict[header] = dt.datetime.strptime(row[i], datetime_format)   # .replace(tzinfo=local_tz)  # noqa: DTZ007
+                                    row_dict[header] = dt.datetime.strptime(row[i], datetime_format)
+                                elif config["type"] == "time":
+                                    # Convert time strings to time objects
+                                    time_format = config.get("format", "%H:%M:%S")
+                                    row_dict[header] = dt.datetime.strptime(row[i], time_format).time()
                                 elif config["type"] == "float":
                                     # Convert float strings to float and round if specified
                                     row_dict[header] = float(row[i])
@@ -402,6 +405,9 @@ class CSVReader:
                 elif header["type"] == "datetime" and isinstance(value, dt.datetime):
                     datetime_format = header.get("format", "%Y-%m-%d %H:%M:%S")
                     formatted_row[field_name] = value.strftime(datetime_format)
+                elif header["type"] == "time" and isinstance(value, dt.time):
+                    time_format = header.get("format", "%H:%M")
+                    formatted_row[field_name] = value.strftime(time_format)
                 elif header["type"] == "float" and "format" in header:
                     formatted_row[field_name] = format(value, header["format"])
                 else:

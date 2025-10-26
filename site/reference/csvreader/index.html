@@ -814,11 +814,11 @@
 <p>The <strong>header_config</strong> argument to __init__() is a list of dict objects that defines the expected structure of the CSV file. Each dict object in the list should have the following keys:</p>
 <ul>
 <li><strong>name</strong>: The name of the column.</li>
-<li><strong>type</strong>: The type of the column, which can be 'str', 'int', 'float', or 'date'.</li>
-<li><strong>format</strong> (optional): A string that defines the format for date or float types (e.g., "%Y-%m-%d" for date or ".2f" for float).</li>
+<li><strong>type</strong>: The type of the column, which can be 'str', 'int', 'float', 'date', 'datetime' or 'time'.</li>
+<li><strong>format</strong> (optional): A string that defines the format for date, datetime, time or float types (e.g., "%Y-%m-%d" for date or ".2f" for float).</li>
 <li><strong>match</strong> (optional): A boolean indicating if this column should be used for matching records in the merge_data_sets() function.</li>
 <li><strong>sort</strong> (optional): An integer indicating the sort order of the column.</li>
-<li><strong>minimum</strong> (optional): A date or int that defines a minimum value for filtering by date.</li>
+<li><strong>minimum</strong> (optional): A date or int that defines a minimum value for filtering by date or datetime.</li>
 </ul>
 <p>For example, consider this CSV file:</p>
 <pre><code>Symbol,Date,Name,Currency,Price
@@ -866,6 +866,8 @@ ETL0018AU,2025-04-28,PIMCO Global Bond Wholesale,AUD,0.90
 <a id="sc_utility.sc_csv_reader.CSVReader"></a>
     <div class="doc doc-contents first">
 
+
+        <p>Class for reading and writing CSV files with header configuration.</p>
 
 
 

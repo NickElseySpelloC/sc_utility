@@ -6,11 +6,11 @@ CSVReader class for extracting data from CSV and updating files.
 The **header_config** argument to \__init__() is a list of dict objects that defines the expected structure of the CSV file. Each dict object in the list should have the following keys:
 
 - **name**: The name of the column.
-- **type**: The type of the column, which can be 'str', 'int', 'float', or 'date'.
-- **format** (optional): A string that defines the format for date or float types (e.g., "%Y-%m-%d" for date or ".2f" for float).
+- **type**: The type of the column, which can be 'str', 'int', 'float', 'date', 'datetime' or 'time'.
+- **format** (optional): A string that defines the format for date, datetime, time or float types (e.g., "%Y-%m-%d" for date or ".2f" for float).
 - **match** (optional): A boolean indicating if this column should be used for matching records in the merge_data_sets() function.
 - **sort** (optional): An integer indicating the sort order of the column.
-- **minimum** (optional): A date or int that defines a minimum value for filtering by date.
+- **minimum** (optional): A date or int that defines a minimum value for filtering by date or datetime.
 
 For example, consider this CSV file:
 
