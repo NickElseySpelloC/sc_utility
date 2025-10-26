@@ -15,7 +15,7 @@ CONFIG_FILE = "dev_testing_config.yaml"
 
 
 def update_csv():
-    csv_file_name = "test_csv.csv"
+    csv_file_name = "dev_testing/test_csv.csv"
 
     header_config = [
         {
@@ -45,6 +45,11 @@ def update_csv():
             "type": "float",
             "format": ".2f",
         },
+        {
+            "name": "Time",
+            "type": "time",
+            "format": "%H:%M",
+        },
     ]
 
     extra_data = [
@@ -54,6 +59,7 @@ def update_csv():
             "Name": "Apple Inc.",
             "Currency": "USD",
             "Price": 150.00,
+            "Time": dt.time(9, 45),
         },
         ]
 
@@ -96,11 +102,11 @@ def main():
     logger.log_message("This is a test message at the summary level.", "summary")
 
     # Setup email
-    email_settings = config.get_email_settings()
-    if email_settings is not None:
-        logger.register_email_settings(email_settings)
-        assert logger.send_email("Hello world", "Hello world from sc-utility example code.", test_mode=True), "Sending text string email."
-        logger.send_email("sc_utility test - main()", "This is a test email.")
+    # email_settings = config.get_email_settings()
+    # if email_settings is not None:
+    #     logger.register_email_settings(email_settings)
+    #     assert logger.send_email("Hello world", "Hello world from sc-utility example code.", test_mode=True), "Sending text string email."
+    #     logger.send_email("sc_utility test - main()", "This is a test email.")
 
     update_csv()
 
