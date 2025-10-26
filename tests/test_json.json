@@ -2,7 +2,7 @@
     "string": "Hello, World!",
     "integer": 42,
     "float": 123.456,
-    "datetime": "2025-10-26T16:35:49.678020+11:00",
+    "datetime": "2025-10-26T17:00:15.141643+11:00",
     "datetime__datatype": "datetime",
     "date": "2025-10-26",
     "date__datatype": "date",
