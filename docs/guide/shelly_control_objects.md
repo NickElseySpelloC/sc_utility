@@ -10,11 +10,14 @@ Each device has the following attrbutes
 
 - **Index**: The index of the device in the devices list. Counts from 0.
 - **Model**: The model tag, used to look up the device characteristics in the shelly_models.json file~
+- **Name**: The text name for the device. Will be the ClientName if provided, or an internally generated name otherwise.~
 - **ClientName**: Client provided name for the device~
 - **ID**: Client provided numeric ID for the device, or auto numbered (starting at 1) if not provided~
 - **ObjectType**: Will always be 'device'
 - **Simulate**: Whether to simulate the device or not, default is False~
+- **GetConfig**: Set to True if the device configuration needs to be refreshed during the next get_status() call.
 - **SimulationFile**: The file to use for simulation. None if not in simulation mode.
+- ***ExpectOffline**: If True, it's expected that this device may be offline regularly. Don't issue warnings or errors if it is.
 - **ModelName**: The vendor's model name**
 - **Label**: Combination of the ClientName and ID used in logging messages
 - **URL**: URL to the vendor's product page**
@@ -25,11 +28,12 @@ Each device has the following attrbutes
 - **Inputs**: Number of switch inputs supported by the device, if any**
 - **Outputs**: Number of relay outputs supported by the device, if any**
 - **Meters**: Number of energy meters supported by the device, if any**
+- **TempProbes**: The number of external temperature probes that have been configured for this device.
 - **MetersSeperate**: Are the energy meters separate from the relay outputs?**
-- **TemperatureMonitoring**: Is temperature monitoring supported by the device?**
+- **TemperatureMonitoring**: Is internal temperature monitoring supported by the device?**
 - **Online**: Is the device online?^
 - **MacAddress**: The MAC address of the device, if available.^
-- **Temperature**: The current temperature of the device, if available.^
+- **Temperature**: The internal temperature of the device in C, if available.^
 - **Uptime**: The uptime of the device in seconds, if available.^
 - **RestartRequired**: Whether the device requires a restart to apply changes, if available.^
 - **SupportedWebhooks**: If this device supports webhooks, this will list the event types supported.
@@ -43,6 +47,7 @@ A component is a specific hardware component of a Shelly device. Three component
 - **Inputs**: An input usually wiring in from a physical light switch. Used to send a hardware signal to the Shelly device (e.g. light switch has been turned on)
 - **Outputs**: A relay output from the Shelly device. This is how the Shelly controls things like lights, motors, etc.
 - **Meters**: An energy meter that can measure the voltage, current and power draw on an output or a dedicated external eMeter clamps (depending on the model).
+- **TempProbes**: A ds18b20 digitial temperature probe connected to a Shelly add-on device.
 
 Different Shelly models have different numbers of inputs, outputs and meters and some may have only a subset of these features. The print_model_library() function will return a list of all supported Shelly devices and the number and type of components that each model supports. The Inputs, Outputs and Meters attributes of the device object (see above) provides a count of the number of components of each type supported by that particular device.
 
@@ -69,7 +74,7 @@ Output components will also have these attrbutes:
 
 - **HasMeter**: Is there an energy meter associated with this output.
 - **State**: Is the output currently on (True) or off (False).
-- **Temperature**: Reported temperature reading for this output relay.
+- **Temperature**: Reported temperature reading for this output relay in C.
 
 ### Meter component
 
@@ -81,6 +86,13 @@ Meter components will also have these attrbutes:
 - **Current**: Current current reading.
 - **PowerFactor**: The power factor reading.
 - **Energy**: Total energy consumed in watt / hours. (When a device is an Simulation mode, you can add a MockRate key to the Meter's configuration section to set a Watts/second metering rate.)
+
+### Temperature Probe component
+
+Temperature Probe components will also have these attrbutes:
+
+- **ProbeID**: The internal ID assigned by the Shelly device to this add-on. Typically an integer starting at 100.
+- **Temperature**: Reported temperature reading for this probe in C.
 
 Note, depending on the Shelly models, some of these attrbutes may be empty. For example, some earlier generation 1 models would report power but not voltage or current.
 

@@ -3,8 +3,11 @@
   "Model": "Shelly2PMG3",
   "ClientName": "Device Test 1",
   "ID": 100,
+  "ObjectType": "device",
   "Simulate": true,
-  "SimulationFile": "/Users/nick/Library/CloudStorage/Dropbox/Development/sc_utility/tests/Device_Test_1.json",
+  "GetConfig": true,
+  "SimulationFile": "/Users/nick/dev/sc_utility/tests/Device_Test_1.json",
+  "ExpectOffline": false,
   "ModelName": "Shelly 2PM Gen3",
   "Label": "Device Test 1 (ID: 100)",
   "URL": "https://www.shelly.com/products/shelly-2pm-gen3",
@@ -15,34 +18,50 @@
   "Inputs": [
     {
       "DeviceIndex": 0,
+      "DeviceID": 100,
       "ComponentIndex": 0,
+      "ObjectType": "input",
       "ID": 101,
       "Name": "Device 1.Input 1",
+      "Webhooks": false,
+      "customkeylist": [],
       "State": false
     },
     {
       "DeviceIndex": 0,
+      "DeviceID": 100,
       "ComponentIndex": 1,
+      "ObjectType": "input",
       "ID": 102,
       "Name": "Device 1.Input 2",
+      "Webhooks": false,
+      "customkeylist": [],
       "State": false
     }
   ],
   "Outputs": [
     {
       "DeviceIndex": 0,
+      "DeviceID": 100,
       "ComponentIndex": 0,
+      "ObjectType": "output",
       "ID": 111,
       "Name": "Device 1.Output 1",
+      "Webhooks": false,
+      "customkeylist": [],
       "HasMeter": true,
-      "State": true,
+      "State": false,
       "Temperature": null
     },
     {
       "DeviceIndex": 0,
+      "DeviceID": 100,
       "ComponentIndex": 1,
+      "ObjectType": "output",
       "ID": 112,
       "Name": "Device 1.Output 2",
+      "Webhooks": false,
+      "customkeylist": [],
       "HasMeter": true,
       "State": false,
       "Temperature": null
@@ -51,31 +70,40 @@
   "Meters": [
     {
       "DeviceIndex": 0,
+      "DeviceID": 100,
       "ComponentIndex": 0,
+      "ObjectType": "meter",
       "ID": 1,
       "Name": "Meter 1",
+      "Webhooks": false,
+      "customkeylist": [],
       "OnOutput": true,
       "Power": null,
       "Voltage": null,
       "Current": null,
       "PowerFactor": null,
       "Energy": null,
-      "State": false
+      "MockRate": 0
     },
     {
       "DeviceIndex": 0,
+      "DeviceID": 100,
       "ComponentIndex": 1,
+      "ObjectType": "meter",
       "ID": 2,
       "Name": "Meter 2",
+      "Webhooks": false,
+      "customkeylist": [],
       "OnOutput": true,
       "Power": null,
       "Voltage": null,
       "Current": null,
       "PowerFactor": null,
       "Energy": null,
-      "State": false
+      "MockRate": 0
     }
   ],
+  "TempProbes": [],
   "MetersSeperate": false,
   "TemperatureMonitoring": true,
   "Online": true,
@@ -83,6 +111,13 @@
   "Temperature": null,
   "Uptime": null,
   "RestartRequired": null,
+  "WebhookInstallPending": false,
+  "SupportedWebhooks": [],
+  "InstalledWebhooks": [],
+  "customkeylist": [
+    "Name"
+  ],
   "TotalPower": 0,
-  "TotalEnergy": 0
+  "TotalEnergy": 0,
+  "Name": "Device Test 1"
 }

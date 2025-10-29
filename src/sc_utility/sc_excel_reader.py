@@ -184,13 +184,13 @@ class ExcelReader:
             raise ImportError(msg)
 
         try:
-            min_col, min_row, max_col, max_row = range_boundaries(table_range)
+            min_col, min_row, max_col, max_row = range_boundaries(table_range)  # pyright: ignore[reportArgumentType]
 
             if min_col is None or max_col is None or max_row is None or min_row is None:
                 msg = f"Invalid table range boundaries for table '{table_name}' in file {self.file_path}."
                 raise ImportError(msg)  # noqa: TRY301
 
-            ws = wb[selected_sheet]
+            ws = wb[selected_sheet]  # pyright: ignore[reportArgumentType]
 
             # Extract data from the table range
             data = []
@@ -262,13 +262,13 @@ class ExcelReader:
             raise ImportError(msg)
 
         try:
-            min_col, min_row, max_col, max_row = range_boundaries(ref)
+            min_col, min_row, max_col, max_row = range_boundaries(ref)  # pyright: ignore[reportArgumentType]
 
             if min_col is None or max_col is None or max_row is None or min_row is None:
                 msg = f"Invalid range boundaries for range '{range_name}' in file {self.file_path}."
                 raise ImportError(msg)  # noqa: TRY301
 
-            ws = wb[sheet_name]
+            ws = wb[sheet_name]  # pyright: ignore[reportArgumentType]
 
             # Extract data from the named range
             data = []

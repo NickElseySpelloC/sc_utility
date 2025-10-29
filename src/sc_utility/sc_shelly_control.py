@@ -18,6 +18,7 @@ SHELLY_MODEL_FILE = "shelly_models.json"
 DEFAULT_WEBHOOK_HOST = "0.0.0.0"  # noqa: S104
 DEFAULT_WEBHOOK_PORT = 8787
 DEFAULT_WEBHOOK_PATH = "/shelly/webhook"
+FIRST_TEMP_PROBE_ID = 100
 
 
 class ShellyControl:
@@ -53,6 +54,7 @@ class ShellyControl:
         self.inputs = []            # List to hold multiple switch inputs, each one associated with a Shelly device
         self.outputs = []           # List to hold multiple relay outputs, each one associated with a Shelly device
         self.meters = []            # List to hold multiple energy meters, each one associated with a Shelly device
+        self.temp_probes = []       # List to hold multiple temperature probes, each one associated with a Shelly device
 
         # Load up the model library
         try:
@@ -418,9 +420,6 @@ class ShellyControl:
     def _start_webhook_server(self) -> ThreadingHTTPServer | None:
         """Start the webhook server in a background thread.
 
-        Args:
-            app_wake_event: A reference to the client application's wake event. This will be set when a webhook is received.
-
         Raises:
             RuntimeError: If the webhook server fails to start.
 
@@ -539,6 +538,7 @@ class ShellyControl:
         self.inputs.clear()
         self.outputs.clear()
         self.meters.clear()
+        self.temp_probes.clear()
 
         # Now add each switch in the configuration
         try:
@@ -574,6 +574,7 @@ class ShellyControl:
         new_device["Label"] = f"{new_device['ClientName']} (ID: {new_device['ID']})"
         new_device["Hostname"] = device_config.get("Hostname")
         new_device["Port"] = device_config.get("Port", 80)  # Default port is 80
+        new_device["TempProbes"] = len(device_config.get("TempProbes", [])) or 0
 
         # Validate that the device has an hostname if we are not in simulation mode
         if not new_device["Simulate"] and not new_device["Hostname"]:
@@ -624,6 +625,7 @@ class ShellyControl:
         self._add_device_components(device_index, "input", device_config.get("Inputs"))
         self._add_device_components(device_index, "output", device_config.get("Outputs"))
         self._add_device_components(device_index, "meter", device_config.get("Meters"))
+        self._add_device_components(device_index, "temp_probe", device_config.get("TempProbes"))
 
         # If in simuation mode, create the simulation file if it does not exist. Read the contents of the file if it does exist.
         self._import_device_information_from_json(new_device, create_if_no_file=True)
@@ -664,6 +666,7 @@ class ShellyControl:
             "ID": None,
             "ObjectType": "device",
             "Simulate": False,  # Default to False if not specified
+            "GetConfig": True,  # Set to True if we need to get the config for this device
             "SimulationFile": None,  # This will be set later if in simulation mode
             "ExpectOffline": False,  # Set to True if the device is expected to be offline
             "ModelName": model_dict.get("name", "Unknown Model Name"),
@@ -676,6 +679,7 @@ class ShellyControl:
             "Inputs": model_dict.get("inputs", 1),
             "Outputs": model_dict.get("outputs", 1),
             "Meters": model_dict.get("meters", 0),
+            "TempProbes": 0,    # These are on the Shelly add-on, so we will set this count based on the actual probes listed in the config
             "MetersSeperate": model_dict.get("meters_seperate", False),
             "TemperatureMonitoring": model_dict.get("temperature_monitoring", True),
             # The folowing will be set later when checking the switch status
@@ -715,7 +719,7 @@ class ShellyControl:
             raise RuntimeError(error_msg)
 
         # Validate component type
-        valid_types = {"input", "output", "meter"}
+        valid_types = {"input", "output", "meter", "temp_probe"}
         if component_type not in valid_types:
             error_msg = f"Invalid component type '{component_type}'. Must be one of: {', '.join(valid_types)}."
             raise RuntimeError(error_msg)
@@ -739,6 +743,11 @@ class ShellyControl:
                 "count_key": "Meters",
                 "storage_list": self.meters,
                 "name_prefix": "Meter",
+            },
+            "temp_probe": {
+                "count_key": "TempProbes",
+                "storage_list": self.temp_probes,
+                "name_prefix": "TempProbe",
             }
         }
 
@@ -776,7 +785,6 @@ class ShellyControl:
                 new_component["State"] = False
                 new_component["HasMeter"] = not device["MetersSeperate"]
             elif component_type == "meter":
-                new_component["State"] = False
                 new_component["OnOutput"] = not device["MetersSeperate"]
                 new_component["MockRate"] = 0
                 new_component["MockRate"] = component_config[component_idx].get("MockRate", 0) if component_config else 0
@@ -827,7 +835,7 @@ class ShellyControl:
                 - Additional attributes based on the component type.
         """
         # Validate component type
-        valid_types = {"input", "output", "meter"}
+        valid_types = {"input", "output", "meter", "temp_probe"}
         if component_type not in valid_types:
             error_msg = f"Invalid component type '{component_type}'. Must be one of: {', '.join(valid_types)}."
             raise RuntimeError(error_msg)
@@ -862,6 +870,9 @@ class ShellyControl:
             new_component["PowerFactor"] = None
             new_component["Energy"] = None
             new_component["MockRate"] = 0
+        elif component_type == "temp_probe":
+            new_component["ProbeID"] = None   # The numeric ID assigned by the system, generally starts at 100
+            new_component["Temperature"] = None
         return new_component
 
     def get_device(self, device_identity: dict | int | str) -> dict:
@@ -955,6 +966,7 @@ class ShellyControl:
                     device_online = SCCommon.ping_host(device["Hostname"], self.response_timeout)
                     device["Online"] = device_online
                     if not device_online:
+                        device["GetConfig"] = True   # Flag for a refresh of the config when we come back online
                         found_offline_device = True
 
                     self._log_debug_message(f"Shelly device {device['Label']} is {'online' if device_online else 'offline'}")
@@ -1030,6 +1042,20 @@ class ShellyControl:
                     for device_meter in self.meters:
                         if device_meter["DeviceIndex"] == index:
                             return_str += f"    - Index: {device_meter['ComponentIndex']}, ID: {device_meter['ID']}, Name: {device_meter['Name']}, On Output: {device_meter['OnOutput']}, Power: {device_meter['Power']}, Voltage: {device_meter['Voltage']}, Current: {device_meter['Current']}, Power Factor: {device_meter['PowerFactor']}, Energy: {device_meter['Energy']}"
+
+                            # Print custom meter attributes
+                            custom_attrs = []
+                            for custom_key in device_meter.get("customkeylist", []):
+                                custom_attrs.append(f"{custom_key}: {device_meter[custom_key]}")
+                            if custom_attrs:
+                                return_str += f", {', '.join(custom_attrs)}"
+                            return_str += "\n"
+
+                    return_str += f"  Number of configured TempProbes: {device['TempProbes']}\n"
+                    # Iterate through the temp probes for this device
+                    for device_temp_probe in self.temp_probes:
+                        if device_temp_probe["DeviceIndex"] == index:
+                            return_str += f"    - Index: {device_temp_probe['ComponentIndex']}, Temp.: {device_temp_probe['Temperature']}"
 
                             # Print custom meter attributes
                             custom_attrs = []
@@ -1123,7 +1149,7 @@ class ShellyControl:
 
         # First ping the device to check if it is online
         if not self.is_device_online(device["ID"]):
-            if not device.get("ExpectOffline", False):
+            if not device.get("ExpectOffline"):
                 self.logger.log_message(f"Device {device['Label']} is offline. Cannot send REST request.", "warning")
             return False, {}
 
@@ -1170,7 +1196,7 @@ class ShellyControl:
 
         return False, {}   # Should never reach here, but just in case, return an empty dictionary
 
-    def _rpc_request(self, device: dict, payload: dict) -> tuple[bool, dict]:
+    def _rpc_request(self, device: dict, payload: dict) -> tuple[bool, dict]:  # noqa: PLR0912, PLR0915
         """Sends an RPC request to a Shelly gen 2+ device.
 
         Automatically retries the request if it fails for the configured number of retries.
@@ -1191,7 +1217,7 @@ class ShellyControl:
 
         # First ping the device to check if it is online
         if not self.is_device_online(device):
-            if not device.get("ExpectOffline", False):
+            if not device.get("ExpectOffline"):
                 self.logger.log_message(f"Device {device['Label']} is offline. Cannot send RPC request.", "warning")
             return False, {}
 
@@ -1240,6 +1266,16 @@ class ShellyControl:
                 fatal_error = f"Error fetching Shelly switch status: {e}"
                 raise RuntimeError(fatal_error) from e
             else:
+                # Debug: dump the response to a JSON file for debugging
+                if self.allow_debug_logging:
+                    method_name = payload.get("method", "Unknown Method")
+                    debug_file = Path(f"{device['ClientName']} RPC {method_name} response .json")
+                    try:
+                        with debug_file.open("w", encoding="utf-8") as f:
+                            json.dump(response_payload, f, indent=2, ensure_ascii=False)
+                        self._log_debug_message(f"RPC response dumped to {debug_file}")
+                    except OSError as e:
+                        self.logger.log_message(f"Failed to dump RPC response to file: {e}", "error")
                 return True, response_data
 
             # If we fall throught to here, we don't have a valid response, so we need to retry or raise an error
@@ -1248,6 +1284,104 @@ class ShellyControl:
                 time.sleep(self.retry_delay)
 
         return False, {}   # Should never reach here, but just in case, return an empty dictionary
+
+    def _get_device_config(self, device: dict) -> dict:
+        """Gets the configuration of a Shelly device.
+
+        See https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Shelly#shellygetconfig for details.
+
+        Args:
+            device (dict): A device dict.
+
+        Raises:
+            RuntimeError: If the device is not found in the list of devices or if there is an error getting the configuration.
+            TimeoutError: If the device is online (ping) but the request times out while getting the device configuration.
+
+        Returns:
+            A config dict if success, an empty object otherwise
+        """
+        # If device is in simulation mode, return
+        if device["Simulate"]:
+            return {}
+
+        try:
+            if device["Protocol"] == "RPC":
+                # Get the device status via RPC
+                payload = {"id": 0, "method": "Shelly.GetConfig"}
+                result, result_data = self._rpc_request(device, payload)
+            elif device["Protocol"] == "REST":
+                # Get the device status via REST
+                url_args = "settings"
+                result, result_data = self._rest_request(device, url_args)
+            else:
+                error_msg = f"Unsupported protocol {device['Protocol']} for device {device['Label']}. Only RPC and REST are supported."
+                self.logger.log_message(error_msg, "error")
+                raise RuntimeError(error_msg)  # noqa: TRY301
+        except TimeoutError as e:
+            self.logger.log_message(f"Timeout error getting device settings for {device['Label']}: {e}", "error")
+            raise TimeoutError(e) from e
+        except RuntimeError as e:
+            self.logger.log_message(f"Error getting settings for device {device['Label']}: {e}", "error")
+            raise RuntimeError(e) from e
+
+        # Process the response payload
+        if result:  # Warning has already been logged if the device is offline
+            self._log_debug_message(f"Device {device['Label']} config retrieved successfully.")
+            return result_data
+
+        return {}
+
+    def _process_device_config(self, device: dict):
+        """Gets the device's config if needed and processs the resulting dict into the device settings.
+
+        Args:
+            device (dict): A device dict.
+        """
+        # If device is in simulation mode, read from the json file
+        if device["Simulate"]:
+            self._log_debug_message(f"Unable to get configuration for device {device['Label']} while in simulation mode.")
+            return
+        if not device.get("GetConfig"):
+            self._log_debug_message(f"No requirement to refresh the configuration for device {device['Label']}.")
+            return
+        if not self.is_device_online(device):
+            self._log_debug_message(f"Unable to get configuration for device {device['Label']} while offline.")
+            return
+
+        try:
+            config_response = self._get_device_config(device)
+        except (TimeoutError, RuntimeError):
+            return  # Already handled in _get_device_config()
+        else:
+            device["GetConfig"] = False  # Clear the flag so that we don't get it again
+
+            # If we have an RPC device, see if we have any temperature probes
+            if config_response and device["Protocol"] == "RPC":
+                self._extract_temp_probe_config(device, config_response)
+
+    def _extract_temp_probe_config(self, device: dict, payload: dict):
+        """Extracts temp probe data from anRPC GetConfig payload.
+
+        Args:
+            device (dict): A device dict.
+            payload(dict): The payload returned by a GetConfig call
+        """
+        probe_id = FIRST_TEMP_PROBE_ID
+        while True:
+            probe_data = payload.get(f"temperature:{probe_id}", {})
+            if not probe_data:
+                break
+
+            # We got something
+            probe_id = probe_data.get("id")
+            probe_data_name = probe_data.get("name")
+            if probe_data_name:  # Probe has a name, see if we can match it with any configured temp_probe
+                for probe in self.temp_probes:
+                    if probe["DeviceIndex"] == device["Index"] and probe.get("Name") == probe_data_name:    # Name and parent device matches
+                        probe["ProbeID"] = probe_id     # copy the ID into the component
+            probe_id += 1
+            if (probe_id - FIRST_TEMP_PROBE_ID) > 20:
+                break
 
     def get_device_status(self, device_identity: dict | int | str) -> bool:  # noqa: PLR0912, PLR0915
         """Gets the status of a Shelly device.
@@ -1281,6 +1415,10 @@ class ShellyControl:
             self._import_device_information_from_json(device, create_if_no_file=True)
             return True  # Simulation mode always returns True
 
+        # Get the config first if needed
+        self._process_device_config(device)
+
+        # Now try to get the status information
         try:
             em_result_data = []
             emdata_result_data = []
@@ -1334,8 +1472,6 @@ class ShellyControl:
         if not result:  # Warning has already been logged if the device is offline
             return result
 
-        # self.logger.log_message(f"REST response:\n {json.dumps(result_data, indent=2)}", "all")
-
         try:  # noqa: PLR1702
             if device["Protocol"] == "RPC":
                 # Process the response payload for RPC protocol
@@ -1343,7 +1479,7 @@ class ShellyControl:
                 device["Uptime"] = result_data.get("sys", {}).get("uptime", None)  # Uptime in seconds
                 device["RestartRequired"] = result_data.get("sys", {}).get("restart_required", False)  # Restart required flag
 
-                # # Itterate through the inputs, outputs, and meters for this device
+                # # Itterate through the inputs, outputs, meters and temp probes for this device
                 for device_input in self.inputs:
                     if device_input["DeviceIndex"] == device["Index"]:
                         component_index = device_input["ComponentIndex"]
@@ -1374,6 +1510,10 @@ class ShellyControl:
                             device_meter["Current"] = result_data.get(f"switch:{component_index}", {}).get("current", None)
                             device_meter["PowerFactor"] = result_data.get(f"switch:{component_index}", {}).get("pf", None)
                             device_meter["Energy"] = result_data.get(f"switch:{component_index}", {}).get("aenergy", {}).get("total", None)
+                for device_temp_probe in self.temp_probes:
+                    if device_temp_probe["DeviceIndex"] == device["Index"]:
+                        probe_id = device_temp_probe["ProbeID"]
+                        device_temp_probe["Temperature"] = result_data.get(f"temperature:{probe_id}", {}).get("tC", None)  # Probe temperature
             else:
                 # Process the response payload for REST protocol
                 device["MacAddress"] = result_data.get("mac", None)  # MAC address
@@ -1670,7 +1810,8 @@ class ShellyControl:
         device_info = device.copy()  # Create a copy of the device dictionary
         device_info["Inputs"] = [component_input for component_input in self.inputs if component_input["DeviceIndex"] == device_index]
         device_info["Outputs"] = [component_output for component_output in self.outputs if component_output["DeviceIndex"] == device_index]
-        device_info["Meters"] = [component_meter for component_meter in self.meters if component_meter["DeviceIndex"] == device_index]
+        device_info["Meters"] = [component_output for component_output in self.meters if component_output["DeviceIndex"] == device_index]
+        device_info["TempProbes"] = [component_temp_probe for component_temp_probe in self.temp_probes if component_temp_probe["DeviceIndex"] == device_index]
 
         return device_info
 
@@ -1765,8 +1906,6 @@ class ShellyControl:
 
             device_index = device["Index"]
 
-            # HERE - change to included keys only
-
             # Update allowed device attributes
             device_included_keys = {"MACAddress", "Uptime", "RestartRequired"}
             for key, value in device_info.items():
@@ -1816,6 +1955,16 @@ class ShellyControl:
                                 # Generate a mock meter reading based on elapsed seconds since 1/9/2025 and the MockRate
                                 device_meter["Energy"] = device_meter.get("MockRate") * elapsed_sec
                             break
+
+            # Update temp_probes
+            if "TempProbes" in device_info and device["TempProbes"] > 0:
+                for imported_temp_probe in device_info["Outputs"]:
+                    # Find matching temp_probe by ComponentIndex
+                    for device_temp_probe in self.temp_probes:
+                        if (device_temp_probe["DeviceIndex"] == device_index and
+                            device_temp_probe["ComponentIndex"] == imported_temp_probe.get("ComponentIndex")):
+                            # Update just the Temperature if available
+                            device_temp_probe["Temperature"] = imported_temp_probe.get("Temperature", device_temp_probe.get("Temperature"))
 
             # Update the device's total power and energy readings
             self._calculate_device_totals(device)

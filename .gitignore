@@ -23,3 +23,5 @@ uv.lock
 dev_testing/*.yaml
 dev_testing/*.log
 dev_testing/*.json
+dev_testing/test_api.sh
+dev_testing/api_hack.sh

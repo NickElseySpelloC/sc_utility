@@ -26,7 +26,7 @@ class _ShellyWebhookHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def do_GET(self):  # noqa: N802
+    def do_GET(self):
         # Validate path like do_POST
         try:
             expected_path = getattr(self.server, "webhook_path", DEFAULT_WEBHOOK_PATH)

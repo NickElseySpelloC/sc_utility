@@ -424,6 +424,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#temperature-probe-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      Temperature Probe component
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -755,6 +764,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#temperature-probe-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      Temperature Probe component
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -793,11 +811,14 @@
 <ul>
 <li><strong>Index</strong>: The index of the device in the devices list. Counts from 0.</li>
 <li><strong>Model</strong>: The model tag, used to look up the device characteristics in the shelly_models.json file~</li>
+<li><strong>Name</strong>: The text name for the device. Will be the ClientName if provided, or an internally generated name otherwise.~</li>
 <li><strong>ClientName</strong>: Client provided name for the device~</li>
 <li><strong>ID</strong>: Client provided numeric ID for the device, or auto numbered (starting at 1) if not provided~</li>
 <li><strong>ObjectType</strong>: Will always be 'device'</li>
 <li><strong>Simulate</strong>: Whether to simulate the device or not, default is False~</li>
+<li><strong>GetConfig</strong>: Set to True if the device configuration needs to be refreshed during the next get_status() call.</li>
 <li><strong>SimulationFile</strong>: The file to use for simulation. None if not in simulation mode.</li>
+<li><strong>*ExpectOffline</strong>: If True, it's expected that this device may be offline regularly. Don't issue warnings or errors if it is.</li>
 <li><strong>ModelName</strong>: The vendor's model name**</li>
 <li><strong>Label</strong>: Combination of the ClientName and ID used in logging messages</li>
 <li><strong>URL</strong>: URL to the vendor's product page**</li>
@@ -808,11 +829,12 @@
 <li><strong>Inputs</strong>: Number of switch inputs supported by the device, if any**</li>
 <li><strong>Outputs</strong>: Number of relay outputs supported by the device, if any**</li>
 <li><strong>Meters</strong>: Number of energy meters supported by the device, if any**</li>
+<li><strong>TempProbes</strong>: The number of external temperature probes that have been configured for this device.</li>
 <li><strong>MetersSeperate</strong>: Are the energy meters separate from the relay outputs?**</li>
-<li><strong>TemperatureMonitoring</strong>: Is temperature monitoring supported by the device?**</li>
+<li><strong>TemperatureMonitoring</strong>: Is internal temperature monitoring supported by the device?**</li>
 <li><strong>Online</strong>: Is the device online?^</li>
 <li><strong>MacAddress</strong>: The MAC address of the device, if available.^</li>
-<li><strong>Temperature</strong>: The current temperature of the device, if available.^</li>
+<li><strong>Temperature</strong>: The internal temperature of the device in C, if available.^</li>
 <li><strong>Uptime</strong>: The uptime of the device in seconds, if available.^</li>
 <li><strong>RestartRequired</strong>: Whether the device requires a restart to apply changes, if available.^</li>
 <li><strong>SupportedWebhooks</strong>: If this device supports webhooks, this will list the event types supported.</li>
@@ -825,6 +847,7 @@
 <li><strong>Inputs</strong>: An input usually wiring in from a physical light switch. Used to send a hardware signal to the Shelly device (e.g. light switch has been turned on)</li>
 <li><strong>Outputs</strong>: A relay output from the Shelly device. This is how the Shelly controls things like lights, motors, etc.</li>
 <li><strong>Meters</strong>: An energy meter that can measure the voltage, current and power draw on an output or a dedicated external eMeter clamps (depending on the model).</li>
+<li><strong>TempProbes</strong>: A ds18b20 digitial temperature probe connected to a Shelly add-on device.</li>
 </ul>
 <p>Different Shelly models have different numbers of inputs, outputs and meters and some may have only a subset of these features. The print_model_library() function will return a list of all supported Shelly devices and the number and type of components that each model supports. The Inputs, Outputs and Meters attributes of the device object (see above) provides a count of the number of components of each type supported by that particular device.</p>
 <p>All components support the following core attrbutes:</p>
@@ -848,7 +871,7 @@
 <ul>
 <li><strong>HasMeter</strong>: Is there an energy meter associated with this output.</li>
 <li><strong>State</strong>: Is the output currently on (True) or off (False).</li>
-<li><strong>Temperature</strong>: Reported temperature reading for this output relay.</li>
+<li><strong>Temperature</strong>: Reported temperature reading for this output relay in C.</li>
 </ul>
 <h3 id="meter-component">Meter component</h3>
 <p>Meter components will also have these attrbutes:</p>
@@ -859,6 +882,12 @@
 <li><strong>Current</strong>: Current current reading.</li>
 <li><strong>PowerFactor</strong>: The power factor reading.</li>
 <li><strong>Energy</strong>: Total energy consumed in watt / hours. (When a device is an Simulation mode, you can add a MockRate key to the Meter's configuration section to set a Watts/second metering rate.)</li>
+</ul>
+<h3 id="temperature-probe-component">Temperature Probe component</h3>
+<p>Temperature Probe components will also have these attrbutes:</p>
+<ul>
+<li><strong>ProbeID</strong>: The internal ID assigned by the Shelly device to this add-on. Typically an integer starting at 100.</li>
+<li><strong>Temperature</strong>: Reported temperature reading for this probe in C.</li>
 </ul>
 <p>Note, depending on the Shelly models, some of these attrbutes may be empty. For example, some earlier generation 1 models would report power but not voltage or current.</p>
 <h2 id="footnotes">Footnotes</h2>
