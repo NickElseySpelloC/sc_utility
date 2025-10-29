@@ -47,6 +47,9 @@ ShellyDevices:
           Name: "Living Room Relay"
         - ID: 112
           Name: "Kitchen Relay"
+      TempProbes:
+        - Name: "Outside Temp"
+        - Name: "Inside Temp"
     - Name: Outside Lights
       Model: Shelly2PMG3
       Hostname: 192.168.1.25

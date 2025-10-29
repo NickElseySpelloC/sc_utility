@@ -172,6 +172,18 @@ class ConfigSchema:
                                         },
                                     },
                                 },
+                                "TempProbes": {
+                                    "type": "list",
+                                    "required": False,
+                                    "nullable": True,
+                                    "schema": {
+                                        "type": "dict",
+                                        "schema": {
+                                            "Name": {"type": "string", "required": False, "nullable": True},
+                                            "ID": {"type": "number", "required": False, "nullable": True},
+                                        },
+                                    },
+                                },
                             },
                         },
                     },

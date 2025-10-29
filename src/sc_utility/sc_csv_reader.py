@@ -171,11 +171,11 @@ class CSVReader:
                                 elif config["type"] == "datetime":
                                     # Convert datetime strings to datetime objects
                                     datetime_format = config.get("format", "%Y-%m-%d %H:%M:%S")
-                                    row_dict[header] = dt.datetime.strptime(row[i], datetime_format)
+                                    row_dict[header] = dt.datetime.strptime(row[i], datetime_format)  # noqa: DTZ007
                                 elif config["type"] == "time":
                                     # Convert time strings to time objects
                                     time_format = config.get("format", "%H:%M:%S")
-                                    row_dict[header] = dt.datetime.strptime(row[i], time_format).time()
+                                    row_dict[header] = dt.datetime.strptime(row[i], time_format).time()  # noqa: DTZ007
                                 elif config["type"] == "float":
                                     # Convert float strings to float and round if specified
                                     row_dict[header] = float(row[i])

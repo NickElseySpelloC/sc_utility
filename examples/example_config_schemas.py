@@ -42,7 +42,7 @@ class ConfigSchema:
             "AmberAPI": {
                 "type": "dict",
                 "schema": {
-                    "APIKey": {"type": "string", "required": True},
+                    "APIKey": {"type": "string", "required": False, "nullable": True},
                     "BaseUrl": {"type": "string", "required": True},
                     "Timeout": {"type": "number", "required": True, "min": 5, "max": 60},
                 },
@@ -52,7 +52,9 @@ class ConfigSchema:
                 "schema": {
                     "LogfileName": {"type": "string", "required": False, "nullable": True},
                     "LogfileMaxLines": {"type": "number", "required": False, "nullable": True, "min": 0, "max": 100000},
+                    "TimestampFormat": {"type": "string", "required": False, "nullable": True},
                     "LogProcessID": {"type": "boolean", "required": False, "nullable": True},
+                    "LogThreadID": {"type": "boolean", "required": False, "nullable": True},
                     "LogfileVerbosity": {"type": "string", "required": True, "allowed": ["none", "error", "warning", "summary", "detailed", "debug", "all"]},
                     "ConsoleVerbosity": {"type": "string", "required": True, "allowed": ["error", "warning", "summary", "detailed", "debug"]},
                 },
@@ -128,8 +130,8 @@ class ConfigSchema:
                                 "Port": {"type": "number", "required": False, "nullable": True},
                                 "ID": {"type": "number", "required": False, "nullable": True},
                                 "Simulate": {"type": "boolean", "required": False, "nullable": True},
-                                "ExpectOffline": {"type": "boolean", "required": False, "nullable": True},
                                 "Colour": {"type": "string", "required": False, "nullable": True},
+                                "ExpectOffline": {"type": "boolean", "required": False, "nullable": True},
                                 "Inputs": {
                                     "type": "list",
                                     "required": False,
@@ -158,6 +160,19 @@ class ConfigSchema:
                                     },
                                 },
                                 "Meters": {
+                                    "type": "list",
+                                    "required": False,
+                                    "nullable": True,
+                                    "schema": {
+                                        "type": "dict",
+                                        "schema": {
+                                            "Name": {"type": "string", "required": False, "nullable": True},
+                                            "ID": {"type": "number", "required": False, "nullable": True},
+                                            "MockRate": {"type": "number", "required": False, "nullable": True},
+                                        },
+                                    },
+                                },
+                                "TempProbes": {
                                     "type": "list",
                                     "required": False,
                                     "nullable": True,

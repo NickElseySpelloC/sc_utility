@@ -41,7 +41,7 @@ def create_shelly_control(config, logger, wake_event: threading.Event | None = N
     except RuntimeError as e:
         print(f"Shelly control initialization error: {e}", file=sys.stderr)
         return None
-    # print(f"Shelly control initialized successfully: {shelly_control}")
+    print(f"Shelly control initialized successfully: {shelly_control}")
     # print(f"{shelly_control.print_model_library(mode_str='brief')}")
 
     # logger.log_message(f"Device summaries:\n {shelly_control.print_device_status()}", "all")
@@ -51,9 +51,9 @@ def create_shelly_control(config, logger, wake_event: threading.Event | None = N
 
 def test_spello_control(config, logger):
     """Test function for Spello control."""
-    device_identity = "Sydney Dev A"
-    output_identity = "Sydney Dev A O1"
-    # meter_identity = "Sydney Dev A M1"
+    device_identity = "Sydney Solar"
+    output_identity = "Solar Pump Output"
+    # meter_identity = "Solar Pump Meter"
 
     shelly_control = create_shelly_control(config, logger)
     assert shelly_control is not None, "Shelly control should be initialized."

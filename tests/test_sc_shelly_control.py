@@ -184,9 +184,9 @@ def test_change_output():
         assert new_state != current_state, "Output state should be changed"
 
 
-# test_get_device()
-# test_get_device_information()
-# test_get_device_status()
-# test_is_device_online()
-# test_print_model_library()
-# test_change_output()
+test_get_device()
+test_get_device_information()
+test_get_device_status()
+test_is_device_online()
+test_print_model_library()
+test_change_output()

@@ -31,13 +31,12 @@ class ConfigSchema:
         }
 
         self.validation = {
-            "Testing": {
+            "AmberAPI": {
                 "type": "dict",
                 "schema": {
-                    "Value1": {"type": "number", "required": True},
-                    "Value2": {"type": "number", "required": True},
-                    "String1": {"type": "string", "required": True},
-                    "String2": {"type": "string", "required": True},
+                    "APIKey": {"type": "string", "required": False, "nullable": True},
+                    "BaseUrl": {"type": "string", "required": True},
+                    "Timeout": {"type": "number", "required": True, "min": 5, "max": 60},
                 },
             },
             "Files": {
@@ -45,6 +44,7 @@ class ConfigSchema:
                 "schema": {
                     "LogfileName": {"type": "string", "required": False, "nullable": True},
                     "LogfileMaxLines": {"type": "number", "required": False, "nullable": True, "min": 0, "max": 100000},
+                    "TimestampFormat": {"type": "string", "required": False, "nullable": True},
                     "LogProcessID": {"type": "boolean", "required": False, "nullable": True},
                     "LogThreadID": {"type": "boolean", "required": False, "nullable": True},
                     "LogfileVerbosity": {"type": "string", "required": True, "allowed": ["none", "error", "warning", "summary", "detailed", "debug", "all"]},
@@ -66,10 +66,49 @@ class ConfigSchema:
             "ShellyDevices": {
                 "type": "dict",
                 "schema": {
+                    "AllowDebugLogging": {"type": "boolean", "required": False, "nullable": True},
                     "ResponseTimeout": {"type": "number", "required": False, "nullable": True, "min": 1, "max": 120},
                     "RetryCount": {"type": "number", "required": False, "nullable": True, "min": 0, "max": 10},
                     "RetryDelay": {"type": "number", "required": False, "nullable": True, "min": 1, "max": 10},
                     "PingAllowed": {"type": "boolean", "required": False, "nullable": True},
+                    "WebhooksEnabled": {"type": "boolean", "required": False, "nullable": True},
+                    "WebhookHost": {"type": "string", "required": False, "nullable": True},
+                    "WebhookPort": {"type": "number", "required": False, "nullable": True},
+                    "WebhookPath": {"type": "string", "required": False, "nullable": True},
+                    "DefaultWebhooks": {
+                        "type": "dict",
+                        "required": False,
+                        "nullable": True,
+                        "schema": {
+                            "Inputs": {
+                                "type": "list",
+                                "required": False,
+                                "nullable": True,
+                                "schema": {
+                                    "type": "string",
+                                    "required": True,
+                                },
+                            },
+                            "Outputs": {
+                                "type": "list",
+                                "required": False,
+                                "nullable": True,
+                                "schema": {
+                                    "type": "string",
+                                    "required": True,
+                                },
+                            },
+                            "Meters": {
+                                "type": "list",
+                                "required": False,
+                                "nullable": True,
+                                "schema": {
+                                    "type": "string",
+                                    "required": True,
+                                },
+                            },
+                        },
+                    },
                     "Devices": {
                         "type": "list",
                         "required": True,
@@ -83,6 +122,7 @@ class ConfigSchema:
                                 "Port": {"type": "number", "required": False, "nullable": True},
                                 "ID": {"type": "number", "required": False, "nullable": True},
                                 "Simulate": {"type": "boolean", "required": False, "nullable": True},
+                                "Colour": {"type": "string", "required": False, "nullable": True},
                                 "ExpectOffline": {"type": "boolean", "required": False, "nullable": True},
                                 "Inputs": {
                                     "type": "list",
@@ -93,6 +133,7 @@ class ConfigSchema:
                                         "schema": {
                                             "Name": {"type": "string", "required": False, "nullable": True},
                                             "ID": {"type": "number", "required": False, "nullable": True},
+                                            "Webhooks": {"type": "boolean", "required": False, "nullable": True},
                                         },
                                     },
                                 },
@@ -104,7 +145,9 @@ class ConfigSchema:
                                         "type": "dict",
                                         "schema": {
                                             "Name": {"type": "string", "required": False, "nullable": True},
+                                            "Group": {"type": "string", "required": False, "nullable": True},
                                             "ID": {"type": "number", "required": False, "nullable": True},
+                                            "Webhooks": {"type": "boolean", "required": False, "nullable": True},
                                         },
                                     },
                                 },
@@ -118,6 +161,18 @@ class ConfigSchema:
                                             "Name": {"type": "string", "required": False, "nullable": True},
                                             "ID": {"type": "number", "required": False, "nullable": True},
                                             "MockRate": {"type": "number", "required": False, "nullable": True},
+                                        },
+                                    },
+                                },
+                                "TempProbes": {
+                                    "type": "list",
+                                    "required": False,
+                                    "nullable": True,
+                                    "schema": {
+                                        "type": "dict",
+                                        "schema": {
+                                            "Name": {"type": "string", "required": False, "nullable": True},
+                                            "ID": {"type": "number", "required": False, "nullable": True},
                                         },
                                     },
                                 },
