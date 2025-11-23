@@ -4,12 +4,14 @@ Management of a YAML log file.
 """
 import datetime as dt
 from collections.abc import Callable
+from mergedeep import merge
 from pathlib import Path
 
 import yaml
 from cerberus import Validator
 
 from sc_utility.sc_common import SCCommon
+from sc_utility.validation_schema import yaml_config_validation
 
 
 class SCConfigManager:
@@ -31,8 +33,13 @@ class SCConfigManager:
         self._config = {}    # Intialise the actual config object
         self.config_file = config_file
         self.logger_function = None  # Placeholder for a logger function
-        self.validation_schema = validation_schema
         self.placeholders = placeholders
+
+        # Build the full validation schema
+        if validation_schema is None:
+            self.validation_schema = yaml_config_validation
+        else:
+            self.validation_schema = merge({}, yaml_config_validation, validation_schema)
 
         # Determine the file path for the log file
         self.config_path = SCCommon.select_file_location(self.config_file)

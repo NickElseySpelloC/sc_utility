@@ -775,7 +775,6 @@
 <li>A SCLogger object - use the <a href="../../reference/logging/">SCLogger</a> class to get one of these.</li>
 <li>A dict object containing the configuraton of the Shelly devices that you want to manage. </li>
 <li>This information is normally stored in a YAML configuration file and can be read from that file using <a href="../../reference/configmanager/">SCConfigManager.get_shelly_settings()</a>. </li>
-<li>You can import the shelly_validator dict from the library and use this with your Cerebius based YAML validator.</li>
 <li>If webhook support is needed, your application's threading.Event() object. This will be set when any webhook is received. </li>
 </ol>
 <p>Here's an example of a section of yaml file configuration for 3 Shelly devices</p>
@@ -952,7 +951,7 @@
 <li>Either a Device Name or a Device ID must be supplied.</li>
 </ul>
 <h2 id="custom-attrbutes">Custom Attrbutes</h2>
-<p>You can add custom key/values to Devices, Inputs, Outputs and Meters if needed. For example you could add a group name to each output switch:![alt](</p>
+<p>You can add custom key/values to Devices, Inputs, Outputs and Meters if needed. For example you could add a group name to each output switch:(</p>
 <pre><code class="language-yaml">ShellyDevices:
   ...
   Devices:
@@ -984,6 +983,25 @@
         - Name: &quot;Car Port Relay&quot;
     - Name: Testing
       ...
+</code></pre>
+<p>If you add custom attributes, you will need to include them in yoour Ceribus validation dict passed to SCConfigManager(). This will be merged in with the default validation structure:</p>
+<pre><code class="language-python">    &quot;ShellyDevices&quot;: {
+        &quot;schema&quot;: {
+            &quot;Devices&quot;: {
+                &quot;schema&quot;: {
+                    &quot;schema&quot;: {
+                        &quot;Outputs&quot;: {
+                            &quot;schema&quot;: {
+                                &quot;schema&quot;: {
+                                    &quot;Group&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;required&quot;: False, &quot;nullable&quot;: True},
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        }
+    }
 </code></pre>
 <p>These custom attrbutes will be printed by the print_device_status() function and available from the get_**() functions.</p>
 <h2 id="digital-temperature-probes">Digital Temperature Probes</h2>
