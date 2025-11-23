@@ -11,7 +11,7 @@ from .sc_excel_reader import ExcelReader
 from .sc_json_encoder import JSONEncoder
 from .sc_logging import SCLogger
 from .sc_shelly_control import ShellyControl
-from .shelly_validator import shelly_validator
+from .validation_schema import yaml_config_validation
 from .webhook_server import _ShellyWebhookHandler
 
-__all__ = ["CSVReader", "DateHelper", "ExcelReader", "JSONEncoder", "SCCommon", "SCConfigManager", "SCLogger", "ShellyControl", "_ShellyWebhookHandler", "shelly_validator"]
+__all__ = ["CSVReader", "DateHelper", "ExcelReader", "JSONEncoder", "SCCommon", "SCConfigManager", "SCLogger", "ShellyControl", "_ShellyWebhookHandler", "yaml_config_validation"]

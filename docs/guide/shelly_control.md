@@ -22,7 +22,6 @@ To initialise an instance of the ShellyControl class, you need to pass it:
 1. A SCLogger object - use the [SCLogger](../reference/logging.md) class to get one of these.
 2. A dict object containing the configuraton of the Shelly devices that you want to manage. 
   - This information is normally stored in a YAML configuration file and can be read from that file using [SCConfigManager.get_shelly_settings()](../reference/configmanager.md). 
-  - You can import the shelly_validator dict from the library and use this with your Cerebius based YAML validator.
 3. If webhook support is needed, your application's threading.Event() object. This will be set when any webhook is received. 
 
 Here's an example of a section of yaml file configuration for 3 Shelly devices
@@ -131,7 +130,7 @@ Notes:
 
 ## Custom Attrbutes 
 
-You can add custom key/values to Devices, Inputs, Outputs and Meters if needed. For example you could add a group name to each output switch:![alt](
+You can add custom key/values to Devices, Inputs, Outputs and Meters if needed. For example you could add a group name to each output switch:(
 
 ```yaml
 ShellyDevices:
@@ -166,6 +165,29 @@ ShellyDevices:
     - Name: Testing
       ...
 ```
+
+If you add custom attributes, you will need to include them in yoour Ceribus validation dict passed to SCConfigManager(). This will be merged in with the default validation structure:
+
+```python
+    "ShellyDevices": {
+        "schema": {
+            "Devices": {
+                "schema": {
+                    "schema": {
+                        "Outputs": {
+                            "schema": {
+                                "schema": {
+                                    "Group": {"type": "string", "required": False, "nullable": True},
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        }
+    }
+```
+
 
 These custom attrbutes will be printed by the print_device_status() function and available from the get_**() functions.
 
