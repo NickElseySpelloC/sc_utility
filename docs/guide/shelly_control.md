@@ -20,7 +20,9 @@ This library also isolates you from having to deal with the idiosyncrasies of th
 To initialise an instance of the ShellyControl class, you need to pass it:
 
 1. A SCLogger object - use the [SCLogger](../reference/logging.md) class to get one of these.
-2. A dict object containing the configuraton of the Shell devices that you want to manage. This information is normally stored in a YAML configuration file and can be read from that file using [SCConfigManager.get_shelly_settings()](../reference/configmanager.md)
+2. A dict object containing the configuraton of the Shelly devices that you want to manage. 
+  - This information is normally stored in a YAML configuration file and can be read from that file using [SCConfigManager.get_shelly_settings()](../reference/configmanager.md). 
+  - You can import the shelly_validator dict from the library and use this with your Cerebius based YAML validator.
 3. If webhook support is needed, your application's threading.Event() object. This will be set when any webhook is received. 
 
 Here's an example of a section of yaml file configuration for 3 Shelly devices
@@ -118,10 +120,10 @@ The Devices key in the configuration block supports the following keys :
 | ID | Your numeric ID for this device. |
 | Simulate | Set this to True if you don't have access to the device but still want to test your code. When True, this device will be in 'simulation' mode. Rather than make API calls to the device, the state will be written to and read from a local json file (with the same name as your Name entry). You can modify some of the values in this file to test your code. |
 | ExpectOffline | If set to True, we can expect this device to be offline at times. No warnings will be issued when this happens |
-| Inputs | A list of dicts defining the inputs (if any) for this device. This section is optional but if defined, the number of entries must match the number of inputs supported by this model. For each input, define a Name and/or an ID. Optionally, add a Webhooks: True entry here to install the default webhooks on this input. |
-| Outputs | A list of dicts defining the outputs (if any) for this device. This section is optional but if defined, the number of entries must match the number of outputs supported by this model. For each output, define a Name and/or an ID. Optionally, add a Webhooks: True entry here to install the default webhooks on this input. |
-| Meters | A list of dicts defining the meters (if any) for this device. Note that depending on the devices, the actual meters might be part of the output or seperate energy meters (EM1 API calls). Either way, in this class meters are reported seperately from outputs. This section is optional but if defined, the number of entries must match the number of meters supported by this model. For each meter, define a Name and/or an ID.<br>  Optionally, use the MockRate key to set a Watts / second metering rate for this meter when the device is in Simulation mode. |
-| TempProbes | A list of dicts defining the temperature probes connected to a Shelly Add-on that's plugged into this device. For each one you must define a Name key that matches the name given to the probe in the app (see below). |
+| Inputs | A list of dicts defining the inputs (if any) for this device. This section is optional but if defined, the number of entries must match the number of inputs supported by this model. For each input, define a Name and/or an ID. <br><br>Optionally, add a **Webhooks**: True entry here to install the default webhooks on this input. |
+| Outputs | A list of dicts defining the outputs (if any) for this device. This section is optional but if defined, the number of entries must match the number of outputs supported by this model. For each output, define a Name and/or an ID. <br><br>Optionally, add a **Webhooks**: True entry here to install the default webhooks on this input. |
+| Meters | A list of dicts defining the meters (if any) for this device. Note that depending on the devices, the actual meters might be part of the output or seperate energy meters (EM1 API calls). Either way, in this class meters are reported seperately from outputs. This section is optional but if defined, the number of entries must match the number of meters supported by this model. For each meter, define a Name and/or an ID.<br><br>  Optionally, use the **MockRate** key to set a Watts / second metering rate for this meter when the device is in Simulation mode. |
+| TempProbes | A list of dicts defining the temperature probes connected to a Shelly Add-on that's plugged into this device. For each one you must define a Name key that matches the name given to the probe in the app (see below).<br><br>  Optionally, use the **RequiresOutput** key to specify the name of an output device that constrains this temp probe. If set, the temperature reading will only be updated when this output is on.  |
 
 Notes:
 
@@ -171,18 +173,22 @@ These custom attrbutes will be printed by the print_device_status() function and
 
 If you have a [Shelly Add-on](https://shelly-api-docs.shelly.cloud/gen2/Addons/ShellySensorAddon) installed on your Shelly switch, then you can connect up to 5 ds18b20 probes to the add-on. You must setup the probe(s) as follows before adding the probe's name to the ShellyDevices:Device:TempProbes section of your config file:
 
-In the Shelly mobile app:
-1. Go to the Shelly device you have installed the Add-on to.
-2. Click _Add-on peripherals_ section
-3. Change to _Sensor Addon_ and then reboot if prompted
-4. After reboot, go back to same tab and click _Add Add-on Peripheral_
-5. Select _Temperature (DS18B20)_
-6. Select a probe listed from the automatic scan
-	1. Give the probe a name (important) - for example "Roof Temp"
-	2. Optionally enable the 'extract peripheral as device' option (if you want it to appear as a seperate device on your dashboard
-7. Repeat for any other probes if required
-8. Reboot if prompted
-9. Now add this probe using the same name to your config
+Once you have connected the Shelly Add-on to your Shelly smart switch and connected your DS18B20 temperature probes to the add on, you need to configure the probes in the mobile app:
+
+1. Go to the Shelly device you have installed the Add-on to and configure the add-on
+	- Click Add-on peripherals section
+	- Change to Sensor Addon and then reboot if prompted
+2. After reboot, go back to same tab and click Add Add-on Peripheral
+	- Select Temperature (DS18B20)
+	- Select a probe listed from the automatic scan and click Add Peripheral
+	- Reboot when prompted
+3. After reboot, go back to same tab and click the settings gear icon next to the newly added probe
+	- Give the probe a name (important) - for example "Roof Temp"
+	- Optionally enable the 'extract peripheral as device' option (if you want it to appear as a seperate device on your dashboard
+4. Repeat steps 2 and 3 for any other connected probes
+
+Now add these probe(s) to ShellyDevices:Device:TempProbes section of your config file, being sure to use exactly the same names as you used in the Shelly app.
+
 ```yaml
 ShellyDevices:
   ...
