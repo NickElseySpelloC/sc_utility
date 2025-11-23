@@ -24,6 +24,7 @@ FIRST_TEMP_PROBE_ID = 100
 class ShellyControl:
     """Control interface for Shelly Smart Switch devices."""
 
+# PUBLIC FUNCTIONS ============================================================
     def __init__(self, logger: SCLogger, device_settings: dict, app_wake_event: threading.Event | None = None):
         """Initializes the ShellySwitch object.
 
@@ -68,39 +69,6 @@ class ShellyControl:
         # Start the webhook server if needed
         self._start_webhook_server()
 
-    def _log_debug_message(self, message: str) -> None:
-        """Logs a debug message.
-
-        Args:
-            message (str): The message to log.
-        """
-        if self.allow_debug_logging:
-            self.logger.log_message(message, "debug")
-
-    def _import_models(self) -> bool:
-        """Imports the Shelly models from the shelly_models.json file.
-
-        Raises:
-            RuntimeError: If the JSON file cannot be loaded or is invalid.
-
-        Returns:
-            bool: True if the models were imported successfully, False otherwise.
-        """
-        try:
-            files = resources.files("sc_utility")
-            model_file = files / SHELLY_MODEL_FILE
-            with model_file.open("r", encoding="utf-8") as file:
-                self.models = json.load(file)
-        except FileNotFoundError as e:
-            error_msg = f"Could not find Shelly model file {SHELLY_MODEL_FILE} in the package."
-            raise RuntimeError(error_msg) from e
-        except json.JSONDecodeError as e:
-            error_msg = f"JSON error loading Shelly models: {e}"
-            raise RuntimeError(error_msg) from e
-        else:
-            self._log_debug_message(f"Imported Shelly models data from {model_file}.")
-            return True
-
     def initialize_settings(self, device_settings: dict, refresh_status: bool | None = True):  # noqa: FBT001, FBT002
         """Initializes the Shelly devices using the provided settings.
 
@@ -133,6 +101,826 @@ class ShellyControl:
 
         # Finished
         self._log_debug_message("ShellyControl initialized successfully.")
+
+    def install_webhook(self, event: str, component: dict, url: str | None = None, additional_payload: dict | None = None) -> None:  # noqa: PLR0912
+        """Install a webhook for the specified device and component.
+
+        The function is used internally to install input and/or output webhooks that will be handled by the ShellyControl webhook
+        handler server, but it can also be used to install additional webhooks that point to your own enpoint. If you use this
+        function for custom webhooks, make sure your device supports the webhook event.
+
+        The SupportedWebhooks attrbute of the device object lists the webhook events that each device supports (if any). See this page for documentation:
+        https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Webhook#webhookcreate
+
+        You must have set the ShellyDevices: WebhooksEnabled configuration parameter to True for this function to install a webhook.
+
+        The following arguments will automatically be added to the url string if not already provided:
+          Event: The event type that triggered the webhook
+          DeviceID: The ID attribute of the device that this webhook came from.
+          ObjectType: The type of the component that this webhook came from. One of "input", "output", "meter"
+          ComponentID: The ID attribute of the component that this webhook came from.
+        For example:
+           http://192.16.81.23:8787/shelly/webhook?Event=input.toggle_on&DeviceID=1&ObjectType=input&ComponentID=2
+
+        Args:
+            event (str): The event type to install the webhook for. This is case sensitive and must match the event type supported by the device
+                         and componnent. For example "input.toggle_on". A RunTime error will be thrown is the event type is not supported.
+            component (dict): The component object for the device component that you want to install the webhook on.
+            url (str | None): The URL to send the webhook to. If None, the URL will be constructed using the webhook host, port, and path.
+            additional_payload (dict | None): Additional key/value pairs to include in the webhook payload, for example active_between.
+
+        Raises:
+            RuntimeError: If the webhook installation fails.
+        """
+        # Get the device object
+        device = self.get_device(component)
+
+        # Look at the name keys in the device["SupportedWebhooks"] list of dicts and return if not found
+        if not any(webhook.get("name") == event for webhook in device.get("SupportedWebhooks", [])):
+            error_msg = f"Event {event} is not supported for component {component.get('Name')}"
+            raise RuntimeError(error_msg)
+
+        # Skip if device is offline
+        if not device.get("Online", False):
+            self.logger.log_message(f"Device {device.get('Name')} is offline, unable to install webhook {event}.", "warning")
+            device["WebhookInstallPending"] = True
+            return
+
+        # Formulate the payload URL
+        if url is None:
+            payload_url = f"http://{self.webhook_host}:{self.webhook_port}{self.webhook_path}?Event={event}&DeviceID={device.get('ID')}&ObjectType={component.get('ObjectType')}&ComponentID={component.get('ID')}"
+        else:
+            payload_url = url
+            # Now add the Event, DeviceIndex and ComponentIndex if not already present in the passed url
+
+            def add_arg(url, arg):
+                # If there are no URL arguments, start with '?', else use '&'
+                if "?" not in url:
+                    return url + "?" + arg
+                return url + "&" + arg
+
+            if "Event" not in url:
+                payload_url = add_arg(payload_url, f"Event={event}")
+            if "DeviceID" not in url:
+                payload_url = add_arg(payload_url, f"DeviceID={device.get('ID')}")
+            if "ObjectType" not in url:
+                payload_url = add_arg(payload_url, f"ObjectType={component.get('ObjectType')}")
+            if "ComponentID" not in url:
+                payload_url = add_arg(payload_url, f"ComponentID={component.get('ID')}")
+
+            # Now add any additional payload parameters
+            if additional_payload:
+                for key, value in additional_payload.items():
+                    payload_url = add_arg(payload_url, f"{key}={value}")
+
+        # Install the webhook
+        try:
+            error_msg = None
+            payload = {
+                "id": 0,
+                "method": "Webhook.Create",
+                "params": {
+                    "cid": component.get("ComponentIndex"),
+                    "enable": True,
+                    "event": event,
+                    "name": f"{component.get('Name')}: {event}",
+                    "urls": [str(payload_url)]
+                }
+            }
+            result, result_data = self._rpc_request(device, payload)
+            if result:
+                self._log_debug_message(f"Installed {event} webhook rev {result_data.get('rev')} for on component {component.get('Name')}")
+            else:
+                error_msg = f"Failed to create {event} webhook for component {component.get('Name')}: {result_data}"
+                self.logger.log_message(error_msg, "error")
+                # We will raise a RunTime error below
+
+        except TimeoutError as e:
+            error_msg = f"Timeout error installing web hooks for device {device.get('Name')}: {e}"
+            self.logger.log_message(error_msg, "error")
+            raise RuntimeError(error_msg) from e
+        except RuntimeError as e:
+            error_msg = f"Error installing web hooks for device {device.get('Name')}: {e}"
+            self.logger.log_message(error_msg, "error")
+            raise RuntimeError(error_msg) from e
+        else:
+            if error_msg:
+                raise RuntimeError(error_msg)
+            # Finally record what webhooks we have installed
+            self._list_installed_webhooks(device)
+
+    def pull_webhook_event(self) -> dict | None:
+        """Pulls a webhook event from the queue.
+
+        Use this if your app has been interrupted by a webhook event (your app_wake_event was set).
+        This will return the earliest webhook event that was received and remove it from the queue.
+
+        Returns:
+            dict | None: The next webhook event from the queue, or None if the queue is empty.
+        """
+        if self.webhook_event_queue:
+            return self.webhook_event_queue.pop(0)
+        return None
+
+    def get_device(self, device_identity: dict | int | str) -> dict:
+        """Returns the device index for a given device ID or name.
+
+        For device_identity you can pass:
+        - A device object (dict) to retrieve it directly.
+        - The device ID (int) to look it up by ID.
+        - The device name (str) to look it up by name.
+        - A component object (dict), which will return the parent device.
+
+        Args:
+            device_identity (dict | int | str): The identifier for the device.
+
+        Raises:
+            RuntimeError: If the device is not found in the list of devices.
+
+        Returns:
+            device (dict): The device object if found.
+        """
+        if isinstance(device_identity, dict):
+            if device_identity.get("ObjectType") == "device":
+                return device_identity  # If a dict is passed, return it directly
+            return self.get_device(device_identity["DeviceID"])  # If a component dict is passed, return the parent device
+        for device in self.devices:
+            if device["ID"] == device_identity or device["ClientName"] == device_identity:
+                return device
+
+        error_msg = f"Device {device_identity} not found."
+        raise RuntimeError(error_msg)
+
+    def get_device_component(self, component_type: str, component_identity: int | str, use_index: bool | None = None) -> dict:  # noqa: FBT001
+        """Returns a device component's index for a given component ID or name.
+
+        Args:
+            component_type (str): The type of component to retrieve ('input', 'output', 'meter' or 'temp_probe').
+            component_identity (int | str): The ID or name of the component to retrieve.
+            use_index (bool | None): If True, lookup by index instead of ID or name.
+
+        Raises:
+            RuntimeError: If the component is not found in the list.
+
+        Returns:
+            component(dict): The component index if found.
+        """
+        # Select the appropriate list based on the component type
+        if component_type == "input":
+            component_list = self.inputs
+        elif component_type == "output":
+            component_list = self.outputs
+        elif component_type == "meter":
+            component_list = self.meters
+        elif component_type == "temp_probe":
+            component_list = self.temp_probes
+        else:
+            error_msg = f"Invalid component type '{component_type}'. Must be one of: 'input', 'output', or 'meter'."
+            raise RuntimeError(error_msg)
+
+        for component in component_list:
+            if use_index and component["ComponentIndex"] == component_identity:
+                return component
+            if component["ID"] == component_identity or component["Name"] == component_identity:
+                return component
+
+        error_msg = f"Device component {component_type} with identity {component_identity} not found."
+        raise RuntimeError(error_msg)
+
+    def is_device_online(self, device_identity: dict | int | str | None = None) -> bool:
+        """See if a device is alive by pinging it.
+
+        Returns the result and updates the device's online status. If we are in simulation mode, always returns True.
+
+        Args:
+            device_identity (Optional (dict | int | str | None), optional): The actual device object, device component object, device ID or device name of the device to check. If None, checks all device.
+
+        Raises:
+            RuntimeError: If the device is not found in the list of devices.
+
+        Returns:
+            result (bool): True if the device is online, False otherwise. If all devices are checked, returns True if all device are online.
+        """
+        found_offline_device = False
+        try:
+            selected_device = None
+            if device_identity is not None:
+                selected_device = self.get_device(device_identity)
+
+            for index, device in enumerate(self.devices):
+                if device["Simulate"] or not self.ping_allowed:
+                    device["Online"] = True
+
+                elif selected_device is None or selected_device["Index"] == index:
+                    device_online = SCCommon.ping_host(device["Hostname"], self.response_timeout)
+                    device["Online"] = device_online
+                    if not device_online:
+                        device["GetConfig"] = True   # Flag for a refresh of the config when we come back online
+                        found_offline_device = True
+
+                    self._log_debug_message(f"Shelly device {device['Label']} is {'online' if device_online else 'offline'}")
+
+        except RuntimeError as e:
+            raise RuntimeError(e) from e
+
+        return not found_offline_device
+
+    def print_device_status(self, device_identity: int | str | None = None) -> str:  # noqa: PLR0912, PLR0915
+        """Prints the status of a device or all devices.
+
+        Args:
+            device_identity (Optional (int | str | None), optional): The ID or name of the device to check. If None, checks all devices.
+
+        Raises:
+            RuntimeError: If the device is not found in the list of devices.
+
+        Returns:
+            device_info (str): A string representation of the device status.
+        """
+        device_index = None
+        return_str = ""
+        try:  # noqa: PLR1702
+            if device_identity is not None:
+                selected_device = self.get_device(device_identity)
+                device_index = selected_device["Index"]
+
+            for index, device in enumerate(self.devices):
+                if device_index is None or device_index == index:
+                    return_str += f"{device['ClientName']} (ID: {device['ID']}) is {'online' if device['Online'] else 'offline'}.\n"
+                    return_str += f"  Model: {device['ModelName']}\n"
+                    return_str += f"  Simulation Mode: {device['Simulate']}\n"
+                    return_str += f"  Hostname: {device['Hostname']}:{device['Port']}\n"
+                    return_str += f"  Expect Offline: {device['ExpectOffline']}\n"
+                    return_str += f"  Generation: {device['Generation']}\n"
+                    return_str += f"  Protocol: {device['Protocol']}\n"
+
+                    # Print custom device attributes
+                    for custom_key in device.get("customkeylist", []):
+                        return_str += f"  {custom_key}: {device[custom_key]}\n"
+
+                    return_str += f"  Number of Inputs: {device['Inputs']}\n"
+                    # Iterate through the inputs for this device
+                    for device_input in self.inputs:
+                        if device_input["DeviceIndex"] == index:
+                            return_str += f"    - Index: {device_input['ComponentIndex']}, ID: {device_input['ID']}, Name: {device_input['Name']}, State: {device_input['State']}"
+
+                            # Print custom input attributes
+                            custom_attrs = []
+                            for custom_key in device_input.get("customkeylist", []):
+                                custom_attrs.append(f"{custom_key}: {device_input[custom_key]}")
+                            if custom_attrs:
+                                return_str += f", {', '.join(custom_attrs)}"
+                            return_str += "\n"
+
+                    return_str += f"  Number of Output Relays: {device['Outputs']}\n"
+                    # Iterate through the outputs for this device
+                    for device_output in self.outputs:
+                        if device_output["DeviceIndex"] == index:
+                            return_str += f"    - Index: {device_output['ComponentIndex']}, ID: {device_output['ID']}, Name: {device_output['Name']}, Has Metering: {device_output['HasMeter']}, State: {device_output['State']}, Temp.: {device_output['Temperature']}"
+
+                            # Print custom output attributes
+                            custom_attrs = []
+                            for custom_key in device_output.get("customkeylist", []):
+                                custom_attrs.append(f"{custom_key}: {device_output[custom_key]}")
+                            if custom_attrs:
+                                return_str += f", {', '.join(custom_attrs)}"
+                            return_str += "\n"
+
+                    return_str += f"  Number of Meters: {device['Meters']}\n"
+                    # Iterate through the meters for this device
+                    for device_meter in self.meters:
+                        if device_meter["DeviceIndex"] == index:
+                            return_str += f"    - Index: {device_meter['ComponentIndex']}, ID: {device_meter['ID']}, Name: {device_meter['Name']}, On Output: {device_meter['OnOutput']}, Power: {device_meter['Power']}, Voltage: {device_meter['Voltage']}, Current: {device_meter['Current']}, Power Factor: {device_meter['PowerFactor']}, Energy: {device_meter['Energy']}"
+
+                            # Print custom meter attributes
+                            custom_attrs = []
+                            for custom_key in device_meter.get("customkeylist", []):
+                                custom_attrs.append(f"{custom_key}: {device_meter[custom_key]}")
+                            if custom_attrs:
+                                return_str += f", {', '.join(custom_attrs)}"
+                            return_str += "\n"
+
+                    return_str += f"  Number of configured TempProbes: {device['TempProbes']}\n"
+                    # Iterate through the temp probes for this device
+                    for device_temp_probe in self.temp_probes:
+                        if device_temp_probe["DeviceIndex"] == index:
+                            return_str += f"    - Index: {device_temp_probe['ComponentIndex']}, Temp.: {device_temp_probe['Temperature']}"
+
+                            # Print custom meter attributes
+                            custom_attrs = []
+                            for custom_key in device_meter.get("customkeylist", []):
+                                custom_attrs.append(f"{custom_key}: {device_meter[custom_key]}")
+                            if custom_attrs:
+                                return_str += f", {', '.join(custom_attrs)}"
+                            return_str += "\n"
+
+                    return_str += f"  Meters Separate: {device['MetersSeperate']}\n"
+                    return_str += f"  Temperature Monitoring: {device['TemperatureMonitoring']}\n"
+                    return_str += f"  Online: {device['Online']}\n"
+                    return_str += f"  MAC Address: {device['MacAddress']}\n"
+                    return_str += f"  Temperature: {device['Temperature']}°C\n"
+                    return_str += f"  Total Power: {device['TotalPower']} W\n"
+                    return_str += f"  Total Energy: {device['TotalEnergy']} kWh\n"
+                    return_str += f"  Uptime: {device['Uptime']} seconds\n"
+
+                    # Iterate through the supported webhooks
+                    if device["SupportedWebhooks"]:
+                        return_str += f"  Supported Webhooks: {len(device['SupportedWebhooks'])}\n"
+                        for webhook in device["SupportedWebhooks"]:
+                            return_str += f"    - {webhook.get('name')}\n"
+
+                        # Iterate through the installed webhooks
+                        if device["InstalledWebhooks"]:
+                            return_str += f"  Installed Webhooks: {len(device['InstalledWebhooks'])}\n"
+                            for webhook in device["InstalledWebhooks"]:
+                                return_str += f"    - {webhook.get('name')}\n"
+                        else:
+                            return_str += "  No installed webhooks found.\n"
+                    else:
+                        return_str += "  Webhooks are not supported on this device.\n"
+
+            return_str = return_str.strip()  # Remove trailing newline
+        except RuntimeError as e:
+            raise RuntimeError(e) from e
+        return return_str
+
+    def print_model_library(self, mode_str: str = "brief", model_id: str | None = None) -> str:
+        """Prints the Shelly model library.
+
+        Args:
+            mode_str (str, optional): The mode of printing. Can be "brief" or "detailed". Defaults to "brief".
+            model_id (Optional (str), optional): If provided, filters the models by this model name. If None, prints all models.
+
+        Returns:
+            library_info (str): A string representation of the Shelly model library.
+        """
+        if not self.models:
+            return "No models loaded."
+
+        return_str = "Shelly Model Library:\n"
+        for model in self.models:
+            if model_id is None or model["model"] == model_id:
+                if mode_str == "brief":
+                    return_str += f"Model: {model['model']}, Name: {model['name']}, URL: {model.get('url', 'N/A')}\n"
+                elif mode_str == "detailed":
+                    return_str += f"Model: {model['model']}\n"
+                    return_str += f"  Name: {model['name']}\n"
+                    return_str += f"  URL: {model.get('url', 'N/A')}\n"
+                    return_str += f"  Generation: {model.get('generation', 'N/A')}\n"
+                    return_str += f"  Protocol: {model.get('protocol', 'N/A')}\n"
+                    return_str += f"  Inputs: {model.get('inputs', 'N/A')}\n"
+                    return_str += f"  Outputs: {model.get('outputs', 'N/A')}\n"
+                    return_str += f"  Meters: {model.get('meters', 'N/A')}\n"
+                    return_str += f"  Meters Separate: {model.get('meters_seperate', 'N/A')}\n"
+                    return_str += f"  Temperature Monitoring: {model.get('temperature_monitoring', 'N/A')}\n"
+                else:
+                    return_str += f"Unknown mode: {mode_str}. Please use 'brief' or 'detailed'.\n"
+        return return_str.strip()
+
+    def get_device_status(self, device_identity: dict | int | str) -> bool:  # noqa: PLR0912, PLR0914, PLR0915
+        """Gets the status of a Shelly device.
+
+        Args:
+            device_identity (dict | int | str): A device dict, or the ID or name of the device to check.
+
+        Raises:
+            RuntimeError: If the device is not found in the list of devices or if there is an error getting the status.
+            TimeoutError: If the device is online (ping) but the request times out while getting the device status.
+
+        Returns:
+            result (bool): True if the device is online, False otherwise.
+        """
+        # Get the device object
+        if isinstance(device_identity, dict):
+            # If we are passed a device dictionary, use that directly
+            device = device_identity
+        else:
+            try:
+                device = self.get_device(device_identity)
+                if not device:
+                    self.logger.log_message(f"Device {device_identity} not found.", "error")
+                    return False
+            except RuntimeError as e:
+                self.logger.log_message(f"Error getting device status for {device_identity}: {e}", "error")
+                raise RuntimeError(e) from e
+
+        # If device is in simulation mode, read from the json file
+        if device["Simulate"]:
+            self._import_device_information_from_json(device, create_if_no_file=True)
+            return True  # Simulation mode always returns True
+
+        # Get the config first if needed
+        self._process_device_config(device)
+
+        # Now try to get the status information
+        try:
+            em_result_data = []
+            emdata_result_data = []
+            if device["Protocol"] == "RPC":
+                # Get the device status via RPC
+                payload = {"id": 0, "method": "Shelly.GetStatus"}
+                result, result_data = self._rpc_request(device, payload)
+
+                # And if the meters are separate, we need to get the status of each of the meters as well
+                # EM1.GetStatus gives use power, voltage, current
+                # EM1Data.GetStatus gives us energy
+                if device["MetersSeperate"]:
+                    for meter_index in range(device["Meters"]):
+                        payload = {"id": 0,
+                                "method": "EM1.GetStatus",
+                                "params": {"id": meter_index}
+                                }
+                        em_result, meter_data = self._rpc_request(device, payload)
+                        if em_result:
+                            em_result_data.append(meter_data)
+
+                        payload = {"id": 0,
+                                "method": "EM1Data.GetStatus",
+                                "params": {"id": meter_index}
+                                }
+                        em_result, meter_data = self._rpc_request(device, payload)
+                        if em_result:
+                            emdata_result_data.append(meter_data)
+            elif device["Protocol"] == "REST":
+                # Get the device status via REST
+                url_args = "status"
+                result, result_data = self._rest_request(device, url_args)
+
+                # For gen 1 we always expect the meters to be separate from the outputs
+                if not device["MetersSeperate"]:
+                    error_msg = f"Shelly model {device['Model']} (device {device['Label']}) is configured with combined meters & switches. No support for this combination yet. Please check the models file."
+                    self.logger.log_message(error_msg, "error")
+                    raise RuntimeError(error_msg)  # noqa: TRY301
+            else:
+                error_msg = f"Unsupported protocol {device['Protocol']} for device {device['Label']}. Only RPC and REST are supported."
+                self.logger.log_message(error_msg, "error")
+                raise RuntimeError(error_msg)  # noqa: TRY301
+        except TimeoutError as e:
+            self.logger.log_message(f"Timeout error getting device status for {device['Label']}: {e}", "error")
+            raise TimeoutError(e) from e
+        except RuntimeError as e:
+            self.logger.log_message(f"Error getting status for device {device['Label']}: {e}", "error")
+            raise RuntimeError(e) from e
+
+        # Process the response payload
+        if not result:  # Warning has already been logged if the device is offline
+            return result
+
+        try:  # noqa: PLR1702
+            if device["Protocol"] == "RPC":
+                # Process the response payload for RPC protocol
+                device["MacAddress"] = result_data.get("sys", {}).get("mac", None)  # MAC address
+                device["Uptime"] = result_data.get("sys", {}).get("uptime", None)  # Uptime in seconds
+                device["RestartRequired"] = result_data.get("sys", {}).get("restart_required", False)  # Restart required flag
+
+                # # Itterate through the inputs, outputs, meters and temp probes for this device
+                for device_input in self.inputs:
+                    if device_input["DeviceIndex"] == device["Index"]:
+                        component_index = device_input["ComponentIndex"]
+                        device_input["State"] = result_data.get(f"input:{component_index}", {}).get("state", False)  # Input state
+                for device_output in self.outputs:
+                    if device_output["DeviceIndex"] == device["Index"]:
+                        component_index = device_output["ComponentIndex"]
+                        device_output["State"] = result_data.get(f"switch:{component_index}", {}).get("output", False)  # Output state
+                        if device["TemperatureMonitoring"]:
+                            device_output["Temperature"] = result_data.get(f"switch:{component_index}", {}).get("temperature", {}).get("tC", None)  # Temperature
+                for device_meter in self.meters:
+                    if device_meter["DeviceIndex"] == device["Index"]:
+                        component_index = device_meter["ComponentIndex"]
+                        if device["MetersSeperate"]:
+                            if len(em_result_data) <= device["Meters"] or len(emdata_result_data) <= device["Meters"]:
+                                error_msg = f"Device {device['Label']} is online, but meters are separate and at least one EM1.GetStatus RPC call failed. Cannot get meter status. Check models file."
+                                self.logger.log_message(error_msg, "error")
+                                raise RuntimeError(error_msg)  # noqa: TRY301
+                            device_meter["Power"] = result_data.get("params", {}).get("act_power", None)
+                            device_meter["Voltage"] = result_data.get("params", {}).get("voltage", None)
+                            device_meter["Current"] = result_data.get("params", {}).get("current", None)
+                            device_meter["PowerFactor"] = result_data.get("params", {}).get("pf", None)
+                            device_meter["Energy"] = emdata_result_data[component_index].get("params", {}).get("total_act_energy", None)
+                        else:
+                            # Meters are on the switch. Make sure our component index matches the switch index
+                            device_meter["Power"] = result_data.get(f"switch:{component_index}", {}).get("apower", None)  # Power in watts
+                            device_meter["Voltage"] = result_data.get(f"switch:{component_index}", {}).get("voltage", None)
+                            device_meter["Current"] = result_data.get(f"switch:{component_index}", {}).get("current", None)
+                            device_meter["PowerFactor"] = result_data.get(f"switch:{component_index}", {}).get("pf", None)
+                            device_meter["Energy"] = result_data.get(f"switch:{component_index}", {}).get("aenergy", {}).get("total", None)
+                for device_temp_probe in self.temp_probes:
+                    if device_temp_probe["DeviceIndex"] == device["Index"]:
+                        read_temp_probe = True
+                        # See if this probe is linked to an output
+                        required_output_name = device_temp_probe.get("RequiresOutput")
+                        if required_output_name:
+                            required_output = next((output for output in self.outputs if output["Name"] == required_output_name), None)
+                            if required_output and not required_output["State"]:
+                                read_temp_probe = False   # Output is off, so we don't read the temp probe
+
+                        if read_temp_probe:
+                            probe_id = device_temp_probe["ProbeID"]
+                            device_temp_probe["Temperature"] = result_data.get(f"temperature:{probe_id}", {}).get("tC", None)  # Probe temperature
+            else:
+                # Process the response payload for REST protocol
+                device["MacAddress"] = result_data.get("mac", None)  # MAC address
+                device["Uptime"] = result_data.get("uptime", None)  # Uptime in seconds
+                device["RestartRequired"] = result_data.get("update", {}).get("has_update", False)  # Restart required flag
+                if device["TemperatureMonitoring"]:
+                    device["Temperature"] = result_data.get("temperature", None)  # May not be available
+
+                # Itterate through the inputs, outputs, and meters for this device
+                for device_input in self.inputs:
+                    if device_input["DeviceIndex"] == device["Index"]:
+                        component_index = device_input["ComponentIndex"]
+                        device_input["State"] = result_data.get("inputs", []).get(component_index, {}).get("input", False)  # Input state
+                for device_output in self.outputs:
+                    if device_output["DeviceIndex"] == device["Index"]:
+                        component_index = device_output["ComponentIndex"]
+                        device_output["State"] = result_data.get("relays", [])[component_index].get("ison", False)  # Output state
+                        if device["TemperatureMonitoring"]:
+                            device_output["Temperature"] = device["Temperature"]    # Add to output for consistency
+                for device_meter in self.meters:
+                    if device_meter["DeviceIndex"] == device["Index"]:
+                        component_index = device_meter["ComponentIndex"]
+                        # In gen 1 the meter entries on switch devices list Shelly1PM are "meters" and on the EM1 devices they are "emeters"!
+                        meter_key = "emeters" if len(result_data.get("emeters", [])) > 0 else "meters"
+
+                        device_meter["Power"] = result_data.get(meter_key, [])[component_index].get("power", None)
+                        device_meter["Voltage"] = result_data.get(meter_key, [])[component_index].get("voltage", None)
+                        device_meter["Energy"] = result_data.get(meter_key, [])[component_index].get("total", None)
+
+                        # Note that current and power factor are not available in the REST API for gen 1 devices, so we set them to None
+                        device_meter["Current"] = None
+                        device_meter["PowerFactor"] = None
+        except (AttributeError, KeyError, RuntimeError) as e:
+            error_msg = f"Error extracting status data for device {device['Label']}: {e}"
+            self.logger.log_message(error_msg, "error")
+            raise RuntimeError(error_msg) from e
+
+        # If we have any energy meters, sum the power and energy readings for each meter and add them to the device
+        self._calculate_device_totals(device)
+
+        # Finally, install the default webhooks if we were offline and are now back
+        if device["Online"] and device["WebhookInstallPending"]:
+            self._set_supported_webhooks(device)
+
+            # Install all the webhooks if not already done
+            if self.does_device_have_webhooks(device) and not device["InstalledWebhooks"]:
+                self._log_debug_message(f"{device['Label']} came back online, installing default webhooks")
+                self._install_webhooks(device)
+
+        self._log_debug_message(f"Device {device['Label']} status retrieved successfully.")
+
+        return True
+
+    def does_device_have_webhooks(self, device: dict) -> bool:
+        """Returns True if the device has any webhooks installed, False otherwise.
+
+        Args:
+            device (dict): The Shelly device dictionary to check for webhooks.
+
+        Returns:
+            bool: True if the device has webhooks installed, False otherwise.
+        """
+        for component in self.inputs + self.outputs + self.meters:
+            if component["DeviceIndex"] != device["Index"]:
+                continue
+
+            # If the component does not have the Webhooks attribute, skip it
+            if "Webhooks" not in component or not component["Webhooks"]:
+                continue
+
+            return True  # This is our device and at least one of its components has Webhooks set to True
+
+        return False
+
+    def refresh_all_device_statuses(self) -> None:
+        """Refreshes the status of all Shelly devices.
+
+        This function iterates through all devices and updates their status by calling get_device_status.
+        It also calculates the total power and energy consumption for each device.
+
+        Raises:
+            RuntimeError: If there is an error getting the status of any device.
+        """
+        for device in self.devices:
+            try:
+                self.get_device_status(device)
+            except RuntimeError as e:
+                self.logger.log_message(f"Error refreshing status for device {device['Label']}: {e}", "error")
+                raise RuntimeError(e) from e
+
+    def change_output(self, output_identity: dict | int | str, new_state: bool) -> tuple[bool, bool]:  # noqa: FBT001
+        """Change the state of a Shelly device output to on or off.
+
+        Args:
+            output_identity (dict | int | str): An output dict, or the ID or name of the device to check.
+            new_state (bool): The new state to set the output to (True for on, False for off).
+
+        Raises:
+            RuntimeError: There was an error changing the device output state.
+            TimeoutError: If the device is online (ping) but the state change request times out.
+
+        Returns:
+            result (bool): True if the output state was changed successfully, False if the device is offline.
+            did_change (bool): True if the output state is different than before, False if it was already in the desired state.
+        """
+        # Get the device object
+        if isinstance(output_identity, dict):
+            # If we are passed a device dictionary, use that directly
+            device_output = output_identity
+        else:
+            try:
+                device_output = self.get_device_component("output", output_identity)
+            except RuntimeError as e:
+                self.logger.log_message(f"Error getting changing device output {output_identity}: {e}", "error")
+                raise RuntimeError(e) from e
+
+        # Get the device object
+        device = self.devices[device_output["DeviceIndex"]]
+
+        # Make a note of the current state before changing it
+        current_state = device_output["State"]
+
+        # If we are not in simulation mode
+        if not device["Simulate"]:
+            try:
+                # First get the device status to ensure it is online
+                if not self.get_device_status(device):
+                    if not device.get("ExpectOffline", False):
+                        self.logger.log_message(f"Device {device['Label']} is offline. Cannot change output state.", "warning")
+                    return False, False
+
+                if device["Protocol"] == "RPC":
+                    # Change the output via RPC
+                    payload = {
+                                "id": 0,
+                                "method": "Switch.Set",
+                                "params": {"id": device_output["ComponentIndex"],
+                                        "on": new_state}
+                                }
+                    result, _result_data = self._rpc_request(device, payload)
+
+                elif device["Protocol"] == "REST":
+                    # Get the device status via REST
+                    url_args = f"relay/{device_output['ComponentIndex']}?turn={'on' if new_state else 'off'}"
+                    result, _result_data = self._rest_request(device, url_args)
+
+                else:
+                    error_msg = f"Unsupported protocol {device['Protocol']} for device {device['Label']}. Only RPC and REST are supported."
+                    self.logger.log_message(error_msg, "error")
+                    raise RuntimeError(error_msg)  # noqa: TRY301
+            except TimeoutError as e:
+                self.logger.log_message(f"Timeout error changing device output {output_identity} for device {device['Label']}: {e}", "error")
+                raise TimeoutError(e) from e
+            except RuntimeError as e:
+                self.logger.log_message(f"Error changing device output {output_identity} for device {device['Label']}: {e}", "error")
+                raise RuntimeError(e) from e
+
+            # Process the response payload
+            if not result:  # Warning has already been logged if the device is offline
+                return result, False
+
+        # If we get here, we were successful in changing the output state
+        # Update the output state in the outputs list
+        device_output["State"] = new_state
+
+        # If in simulation mode, save the json file
+        if device["Simulate"]:
+            self._export_device_information_to_json(device)
+
+        if new_state != current_state:
+            self._log_debug_message(f"Device output {output_identity} on device {device['Label']} was changed to {'on' if new_state else 'off'}.")
+            return True, True
+
+        self._log_debug_message(f"Device output {output_identity} on device {device['Label']} is already {'on' if new_state else 'off'}. No change made.")
+        return True, False
+
+    def get_device_location(self, device_identity: dict | int | str) -> dict | None:
+        """Gets the timezone and location of a Shelly device if available.
+
+        Returns a dict in the following format:
+           "tz": "Europe/Sofia",
+           "lat": 42.67236,
+           "lon": 23.38738
+
+        Args:
+            device_identity (dict | int | str): A device dict, or the ID or name of the device to check.
+
+        Raises:
+            RuntimeError: If the device is not found in the list of devices or if there is an error getting the status.
+            TimeoutError: If the device is online (ping) but the request times out while getting the device status.
+
+        Returns:
+            location (dict | None): A dictionary containing the timezone and location of the device, or None if not available.
+        """
+        # Get the device object
+        if isinstance(device_identity, dict):
+            # If we are passed a device dictionary, use that directly
+            device = device_identity
+        else:
+            try:
+                device = self.get_device(device_identity)
+                if not device:
+                    self.logger.log_message(f"Device {device_identity} not found.", "error")
+                    return None
+            except RuntimeError as e:
+                self.logger.log_message(f"Error getting device status for {device_identity}: {e}", "error")
+                raise RuntimeError(e) from e
+
+        # If device is in simulation mode, read from the json file
+        if device["Simulate"]:
+            # Return a fake location
+            location = {
+                "tz": "Europe/Sofia",
+                "lat": 42.67236,
+                "lon": 23.38738
+            }
+            return location
+
+        if not device["Online"]:
+            return None
+
+        if device["Protocol"] != "RPC":
+            return None
+
+        try:
+            payload = {"id": 0, "method": "Shelly.DetectLocation"}
+            result, result_data = self._rpc_request(device, payload)
+            if not result:
+                self.logger.log_message(f"Failed to gett device location for device {device.get('Name')}: {result_data}", "error")
+                return None
+        except TimeoutError as e:
+            self.logger.log_message(f"Timeout error getting device location for {device['Label']}: {e}", "error")
+            raise TimeoutError(e) from e
+        except RuntimeError as e:
+            self.logger.log_message(f"Error getting location for device {device['Label']}: {e}", "error")
+            raise RuntimeError(e) from e
+        else:
+            return result_data
+
+    def get_device_information(self, device_identity: dict | int | str, refresh_status: bool = False) -> dict:  # noqa: FBT001, FBT002
+        """Returns a consolidated copy of a Shelly device information as a single dictionary, including its inputs, outputs, and meters.
+
+        Args:
+            device_identity (dict | int | str): The device itself or an ID or name of the device to retrieve information for.
+            refresh_status (bool, optional): If True, refreshes the device status before retrieving information. Defaults to False.
+
+        Raises:
+            RuntimeError: If the device is not found in the list of devices or if there is an error getting the status.
+
+        Returns:
+            device_info (dict): A dictionary containing the device's attributes, inputs, outputs, and meters.
+        """
+        try:
+            device = self.get_device(device_identity)
+            device_index = device["Index"]  # Get the index of the device
+            if refresh_status:  # If refresh_status is True, get the latest status of the device
+                self.get_device_status(device_identity)  # Ensure we have the latest status
+        except RuntimeError as e:
+            self.logger.log_message(f"Error getting device information for {device_identity}: {e}", "error")
+            raise RuntimeError(e) from e
+
+        # Create a consolidated view of the device's attributes
+        device_info = device.copy()  # Create a copy of the device dictionary
+        device_info["Inputs"] = [component_input for component_input in self.inputs if component_input["DeviceIndex"] == device_index]
+        device_info["Outputs"] = [component_output for component_output in self.outputs if component_output["DeviceIndex"] == device_index]
+        device_info["Meters"] = [component_output for component_output in self.meters if component_output["DeviceIndex"] == device_index]
+        device_info["TempProbes"] = [component_temp_probe for component_temp_probe in self.temp_probes if component_temp_probe["DeviceIndex"] == device_index]
+
+        return device_info
+
+# PRIVATE FUNCTIONS ===========================================================
+
+    def _log_debug_message(self, message: str) -> None:
+        """Logs a debug message.
+
+        Args:
+            message (str): The message to log.
+        """
+        if self.allow_debug_logging:
+            self.logger.log_message(message, "debug")
+
+    def _import_models(self) -> bool:
+        """Imports the Shelly models from the shelly_models.json file.
+
+        Raises:
+            RuntimeError: If the JSON file cannot be loaded or is invalid.
+
+        Returns:
+            bool: True if the models were imported successfully, False otherwise.
+        """
+        try:
+            files = resources.files("sc_utility")
+            model_file = files / SHELLY_MODEL_FILE
+            with model_file.open("r", encoding="utf-8") as file:
+                self.models = json.load(file)
+        except FileNotFoundError as e:
+            error_msg = f"Could not find Shelly model file {SHELLY_MODEL_FILE} in the package."
+            raise RuntimeError(error_msg) from e
+        except json.JSONDecodeError as e:
+            error_msg = f"JSON error loading Shelly models: {e}"
+            raise RuntimeError(error_msg) from e
+        else:
+            self._log_debug_message(f"Imported Shelly models data from {model_file}.")
+            return True
 
     def _set_supported_webhooks(self, selected_device: dict | None = None) -> None:
         """Set the SupportedWebhooks attrbute for each device using the Webhook.ListSupported API call.
@@ -275,113 +1063,6 @@ class ShellyControl:
             return []
         return []
 
-    def install_webhook(self, event: str, component: dict, url: str | None = None, additional_payload: dict | None = None) -> None:  # noqa: PLR0912
-        """Install a webhook for the specified device and component.
-
-        The function is used internally to install input and/or output webhooks that will be handled by the ShellyControl webhook
-        handler server, but it can also be used to install additional webhooks that point to your own enpoint. If you use this
-        function for custom webhooks, make sure your device supports the webhook event.
-
-        The SupportedWebhooks attrbute of the device object lists the webhook events that each device supports (if any). See this page for documentation:
-        https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Webhook#webhookcreate
-
-        You must have set the ShellyDevices: WebhooksEnabled configuration parameter to True for this function to install a webhook.
-
-        The following arguments will automatically be added to the url string if not already provided:
-          Event: The event type that triggered the webhook
-          DeviceID: The ID attribute of the device that this webhook came from.
-          ObjectType: The type of the component that this webhook came from. One of "input", "output", "meter"
-          ComponentID: The ID attribute of the component that this webhook came from.
-        For example:
-           http://192.16.81.23:8787/shelly/webhook?Event=input.toggle_on&DeviceID=1&ObjectType=input&ComponentID=2
-
-        Args:
-            event (str): The event type to install the webhook for. This is case sensitive and must match the event type supported by the device
-                         and componnent. For example "input.toggle_on". A RunTime error will be thrown is the event type is not supported.
-            component (dict): The component object for the device component that you want to install the webhook on.
-            url (str | None): The URL to send the webhook to. If None, the URL will be constructed using the webhook host, port, and path.
-            additional_payload (dict | None): Additional key/value pairs to include in the webhook payload, for example active_between.
-
-        Raises:
-            RuntimeError: If the webhook installation fails.
-        """
-        # Get the device object
-        device = self.get_device(component)
-
-        # Look at the name keys in the device["SupportedWebhooks"] list of dicts and return if not found
-        if not any(webhook.get("name") == event for webhook in device.get("SupportedWebhooks", [])):
-            error_msg = f"Event {event} is not supported for component {component.get('Name')}"
-            raise RuntimeError(error_msg)
-
-        # Skip if device is offline
-        if not device.get("Online", False):
-            self.logger.log_message(f"Device {device.get('Name')} is offline, unable to install webhook {event}.", "warning")
-            device["WebhookInstallPending"] = True
-            return
-
-        # Formulate the payload URL
-        if url is None:
-            payload_url = f"http://{self.webhook_host}:{self.webhook_port}{self.webhook_path}?Event={event}&DeviceID={device.get('ID')}&ObjectType={component.get('ObjectType')}&ComponentID={component.get('ID')}"
-        else:
-            payload_url = url
-            # Now add the Event, DeviceIndex and ComponentIndex if not already present in the passed url
-
-            def add_arg(url, arg):
-                # If there are no URL arguments, start with '?', else use '&'
-                if "?" not in url:
-                    return url + "?" + arg
-                return url + "&" + arg
-
-            if "Event" not in url:
-                payload_url = add_arg(payload_url, f"Event={event}")
-            if "DeviceID" not in url:
-                payload_url = add_arg(payload_url, f"DeviceID={device.get('ID')}")
-            if "ObjectType" not in url:
-                payload_url = add_arg(payload_url, f"ObjectType={component.get('ObjectType')}")
-            if "ComponentID" not in url:
-                payload_url = add_arg(payload_url, f"ComponentID={component.get('ID')}")
-
-            # Now add any additional payload parameters
-            if additional_payload:
-                for key, value in additional_payload.items():
-                    payload_url = add_arg(payload_url, f"{key}={value}")
-
-        # Install the webhook
-        try:
-            error_msg = None
-            payload = {
-                "id": 0,
-                "method": "Webhook.Create",
-                "params": {
-                    "cid": component.get("ComponentIndex"),
-                    "enable": True,
-                    "event": event,
-                    "name": f"{component.get('Name')}: {event}",
-                    "urls": [str(payload_url)]
-                }
-            }
-            result, result_data = self._rpc_request(device, payload)
-            if result:
-                self._log_debug_message(f"Installed {event} webhook rev {result_data.get('rev')} for on component {component.get('Name')}")
-            else:
-                error_msg = f"Failed to create {event} webhook for component {component.get('Name')}: {result_data}"
-                self.logger.log_message(error_msg, "error")
-                # We will raise a RunTime error below
-
-        except TimeoutError as e:
-            error_msg = f"Timeout error installing web hooks for device {device.get('Name')}: {e}"
-            self.logger.log_message(error_msg, "error")
-            raise RuntimeError(error_msg) from e
-        except RuntimeError as e:
-            error_msg = f"Error installing web hooks for device {device.get('Name')}: {e}"
-            self.logger.log_message(error_msg, "error")
-            raise RuntimeError(error_msg) from e
-        else:
-            if error_msg:
-                raise RuntimeError(error_msg)
-            # Finally record what webhooks we have installed
-            self._list_installed_webhooks(device)
-
     def _list_installed_webhooks(self, selected_device: dict | None = None) -> None:
         """List all installed webhooks for each device.
 
@@ -494,19 +1175,6 @@ class ShellyControl:
                 event_entry["Component"] = component  # pyright: ignore[reportArgumentType]
 
         self.webhook_event_queue.append(event_entry)
-
-    def pull_webhook_event(self) -> dict | None:
-        """Pulls a webhook event from the queue.
-
-        Use this if your app has been interrupted by a webhook event (your app_wake_event was set).
-        This will return the earliest webhook event that was received and remove it from the queue.
-
-        Returns:
-            dict | None: The next webhook event from the queue, or None if the queue is empty.
-        """
-        if self.webhook_event_queue:
-            return self.webhook_event_queue.pop(0)
-        return None
 
     def _add_devices_from_config(self, settings: dict) -> None:
         """Adds one or more Shelly devices from the provided configuration dictionary.
@@ -788,6 +1456,8 @@ class ShellyControl:
                 new_component["OnOutput"] = not device["MetersSeperate"]
                 new_component["MockRate"] = 0
                 new_component["MockRate"] = component_config[component_idx].get("MockRate", 0) if component_config else 0
+            elif component_type == "temp_probe":
+                new_component["RequiresOutput"] = component_config[component_idx].get("RequiresOutput", None) if component_config else None
 
             # Add any additional custom key / value pairs defined in component_config that don't already exist in new_component
             new_component["customkeylist"] = []  # Initialize custom key list
@@ -873,260 +1543,8 @@ class ShellyControl:
         elif component_type == "temp_probe":
             new_component["ProbeID"] = None   # The numeric ID assigned by the system, generally starts at 100
             new_component["Temperature"] = None
+            new_component["RequiresOutput"] = None
         return new_component
-
-    def get_device(self, device_identity: dict | int | str) -> dict:
-        """Returns the device index for a given device ID or name.
-
-        For device_identity you can pass:
-        - A device object (dict) to retrieve it directly.
-        - The device ID (int) to look it up by ID.
-        - The device name (str) to look it up by name.
-        - A component object (dict), which will return the parent device.
-
-        Args:
-            device_identity (dict | int | str): The identifier for the device.
-
-        Raises:
-            RuntimeError: If the device is not found in the list of devices.
-
-        Returns:
-            device (dict): The device object if found.
-        """
-        if isinstance(device_identity, dict):
-            if device_identity.get("ObjectType") == "device":
-                return device_identity  # If a dict is passed, return it directly
-            return self.get_device(device_identity["DeviceID"])  # If a component dict is passed, return the parent device
-        for device in self.devices:
-            if device["ID"] == device_identity or device["ClientName"] == device_identity:
-                return device
-
-        error_msg = f"Device {device_identity} not found."
-        raise RuntimeError(error_msg)
-
-    def get_device_component(self, component_type: str, component_identity: int | str, use_index: bool | None = None) -> dict:  # noqa: FBT001
-        """Returns a device component's index for a given component ID or name.
-
-        Args:
-            component_type (str): The type of component to retrieve ('input', 'output', or 'meter').
-            component_identity (int | str): The ID or name of the component to retrieve.
-            use_index (bool | None): If True, lookup by index instead of ID or name.
-
-        Raises:
-            RuntimeError: If the component is not found in the list.
-
-        Returns:
-            component(dict): The component index if found.
-        """
-        # Select the appropriate list based on the component type
-        if component_type == "input":
-            component_list = self.inputs
-        elif component_type == "output":
-            component_list = self.outputs
-        elif component_type == "meter":
-            component_list = self.meters
-        else:
-            error_msg = f"Invalid component type '{component_type}'. Must be one of: 'input', 'output', or 'meter'."
-            raise RuntimeError(error_msg)
-
-        for component in component_list:
-            if use_index and component["ComponentIndex"] == component_identity:
-                return component
-            if component["ID"] == component_identity or component["Name"] == component_identity:
-                return component
-
-        error_msg = f"Device component {component_type} with identity {component_identity} not found."
-        raise RuntimeError(error_msg)
-
-    def is_device_online(self, device_identity: dict | int | str | None = None) -> bool:
-        """See if a device is alive by pinging it.
-
-        Returns the result and updates the device's online status. If we are in simulation mode, always returns True.
-
-        Args:
-            device_identity (Optional (dict | int | str | None), optional): The actual device object, device component object, device ID or device name of the device to check. If None, checks all device.
-
-        Raises:
-            RuntimeError: If the device is not found in the list of devices.
-
-        Returns:
-            result (bool): True if the device is online, False otherwise. If all devices are checked, returns True if all device are online.
-        """
-        found_offline_device = False
-        try:
-            selected_device = None
-            if device_identity is not None:
-                selected_device = self.get_device(device_identity)
-
-            for index, device in enumerate(self.devices):
-                if device["Simulate"] or not self.ping_allowed:
-                    device["Online"] = True
-
-                elif selected_device is None or selected_device["Index"] == index:
-                    device_online = SCCommon.ping_host(device["Hostname"], self.response_timeout)
-                    device["Online"] = device_online
-                    if not device_online:
-                        device["GetConfig"] = True   # Flag for a refresh of the config when we come back online
-                        found_offline_device = True
-
-                    self._log_debug_message(f"Shelly device {device['Label']} is {'online' if device_online else 'offline'}")
-
-        except RuntimeError as e:
-            raise RuntimeError(e) from e
-
-        return not found_offline_device
-
-    def print_device_status(self, device_identity: int | str | None = None) -> str:  # noqa: PLR0912, PLR0915
-        """Prints the status of a device or all devices.
-
-        Args:
-            device_identity (Optional (int | str | None), optional): The ID or name of the device to check. If None, checks all devices.
-
-        Raises:
-            RuntimeError: If the device is not found in the list of devices.
-
-        Returns:
-            device_info (str): A string representation of the device status.
-        """
-        device_index = None
-        return_str = ""
-        try:  # noqa: PLR1702
-            if device_identity is not None:
-                selected_device = self.get_device(device_identity)
-                device_index = selected_device["Index"]
-
-            for index, device in enumerate(self.devices):
-                if device_index is None or device_index == index:
-                    return_str += f"{device['ClientName']} (ID: {device['ID']}) is {'online' if device['Online'] else 'offline'}.\n"
-                    return_str += f"  Model: {device['ModelName']}\n"
-                    return_str += f"  Simulation Mode: {device['Simulate']}\n"
-                    return_str += f"  Hostname: {device['Hostname']}:{device['Port']}\n"
-                    return_str += f"  Expect Offline: {device['ExpectOffline']}\n"
-                    return_str += f"  Generation: {device['Generation']}\n"
-                    return_str += f"  Protocol: {device['Protocol']}\n"
-
-                    # Print custom device attributes
-                    for custom_key in device.get("customkeylist", []):
-                        return_str += f"  {custom_key}: {device[custom_key]}\n"
-
-                    return_str += f"  Number of Inputs: {device['Inputs']}\n"
-                    # Iterate through the inputs for this device
-                    for device_input in self.inputs:
-                        if device_input["DeviceIndex"] == index:
-                            return_str += f"    - Index: {device_input['ComponentIndex']}, ID: {device_input['ID']}, Name: {device_input['Name']}, State: {device_input['State']}"
-
-                            # Print custom input attributes
-                            custom_attrs = []
-                            for custom_key in device_input.get("customkeylist", []):
-                                custom_attrs.append(f"{custom_key}: {device_input[custom_key]}")
-                            if custom_attrs:
-                                return_str += f", {', '.join(custom_attrs)}"
-                            return_str += "\n"
-
-                    return_str += f"  Number of Output Relays: {device['Outputs']}\n"
-                    # Iterate through the outputs for this device
-                    for device_output in self.outputs:
-                        if device_output["DeviceIndex"] == index:
-                            return_str += f"    - Index: {device_output['ComponentIndex']}, ID: {device_output['ID']}, Name: {device_output['Name']}, Has Metering: {device_output['HasMeter']}, State: {device_output['State']}, Temp.: {device_output['Temperature']}"
-
-                            # Print custom output attributes
-                            custom_attrs = []
-                            for custom_key in device_output.get("customkeylist", []):
-                                custom_attrs.append(f"{custom_key}: {device_output[custom_key]}")
-                            if custom_attrs:
-                                return_str += f", {', '.join(custom_attrs)}"
-                            return_str += "\n"
-
-                    return_str += f"  Number of Meters: {device['Meters']}\n"
-                    # Iterate through the meters for this device
-                    for device_meter in self.meters:
-                        if device_meter["DeviceIndex"] == index:
-                            return_str += f"    - Index: {device_meter['ComponentIndex']}, ID: {device_meter['ID']}, Name: {device_meter['Name']}, On Output: {device_meter['OnOutput']}, Power: {device_meter['Power']}, Voltage: {device_meter['Voltage']}, Current: {device_meter['Current']}, Power Factor: {device_meter['PowerFactor']}, Energy: {device_meter['Energy']}"
-
-                            # Print custom meter attributes
-                            custom_attrs = []
-                            for custom_key in device_meter.get("customkeylist", []):
-                                custom_attrs.append(f"{custom_key}: {device_meter[custom_key]}")
-                            if custom_attrs:
-                                return_str += f", {', '.join(custom_attrs)}"
-                            return_str += "\n"
-
-                    return_str += f"  Number of configured TempProbes: {device['TempProbes']}\n"
-                    # Iterate through the temp probes for this device
-                    for device_temp_probe in self.temp_probes:
-                        if device_temp_probe["DeviceIndex"] == index:
-                            return_str += f"    - Index: {device_temp_probe['ComponentIndex']}, Temp.: {device_temp_probe['Temperature']}"
-
-                            # Print custom meter attributes
-                            custom_attrs = []
-                            for custom_key in device_meter.get("customkeylist", []):
-                                custom_attrs.append(f"{custom_key}: {device_meter[custom_key]}")
-                            if custom_attrs:
-                                return_str += f", {', '.join(custom_attrs)}"
-                            return_str += "\n"
-
-                    return_str += f"  Meters Separate: {device['MetersSeperate']}\n"
-                    return_str += f"  Temperature Monitoring: {device['TemperatureMonitoring']}\n"
-                    return_str += f"  Online: {device['Online']}\n"
-                    return_str += f"  MAC Address: {device['MacAddress']}\n"
-                    return_str += f"  Temperature: {device['Temperature']}°C\n"
-                    return_str += f"  Total Power: {device['TotalPower']} W\n"
-                    return_str += f"  Total Energy: {device['TotalEnergy']} kWh\n"
-                    return_str += f"  Uptime: {device['Uptime']} seconds\n"
-
-                    # Iterate through the supported webhooks
-                    if device["SupportedWebhooks"]:
-                        return_str += f"  Supported Webhooks: {len(device['SupportedWebhooks'])}\n"
-                        for webhook in device["SupportedWebhooks"]:
-                            return_str += f"    - {webhook.get('name')}\n"
-
-                        # Iterate through the installed webhooks
-                        if device["InstalledWebhooks"]:
-                            return_str += f"  Installed Webhooks: {len(device['InstalledWebhooks'])}\n"
-                            for webhook in device["InstalledWebhooks"]:
-                                return_str += f"    - {webhook.get('name')}\n"
-                        else:
-                            return_str += "  No installed webhooks found.\n"
-                    else:
-                        return_str += "  Webhooks are not supported on this device.\n"
-
-            return_str = return_str.strip()  # Remove trailing newline
-        except RuntimeError as e:
-            raise RuntimeError(e) from e
-        return return_str
-
-    def print_model_library(self, mode_str: str = "brief", model_id: str | None = None) -> str:
-        """Prints the Shelly model library.
-
-        Args:
-            mode_str (str, optional): The mode of printing. Can be "brief" or "detailed". Defaults to "brief".
-            model_id (Optional (str), optional): If provided, filters the models by this model name. If None, prints all models.
-
-        Returns:
-            library_info (str): A string representation of the Shelly model library.
-        """
-        if not self.models:
-            return "No models loaded."
-
-        return_str = "Shelly Model Library:\n"
-        for model in self.models:
-            if model_id is None or model["model"] == model_id:
-                if mode_str == "brief":
-                    return_str += f"Model: {model['model']}, Name: {model['name']}, URL: {model.get('url', 'N/A')}\n"
-                elif mode_str == "detailed":
-                    return_str += f"Model: {model['model']}\n"
-                    return_str += f"  Name: {model['name']}\n"
-                    return_str += f"  URL: {model.get('url', 'N/A')}\n"
-                    return_str += f"  Generation: {model.get('generation', 'N/A')}\n"
-                    return_str += f"  Protocol: {model.get('protocol', 'N/A')}\n"
-                    return_str += f"  Inputs: {model.get('inputs', 'N/A')}\n"
-                    return_str += f"  Outputs: {model.get('outputs', 'N/A')}\n"
-                    return_str += f"  Meters: {model.get('meters', 'N/A')}\n"
-                    return_str += f"  Meters Separate: {model.get('meters_seperate', 'N/A')}\n"
-                    return_str += f"  Temperature Monitoring: {model.get('temperature_monitoring', 'N/A')}\n"
-                else:
-                    return_str += f"Unknown mode: {mode_str}. Please use 'brief' or 'detailed'.\n"
-        return return_str.strip()
 
     def _rest_request(self, device: dict, url_args: str) -> tuple[bool, dict]:
         """Sends an REST GET request to a Shelly gen 1 device.
@@ -1383,227 +1801,6 @@ class ShellyControl:
             if (probe_id - FIRST_TEMP_PROBE_ID) > 20:
                 break
 
-    def get_device_status(self, device_identity: dict | int | str) -> bool:  # noqa: PLR0912, PLR0915
-        """Gets the status of a Shelly device.
-
-        Args:
-            device_identity (dict | int | str): A device dict, or the ID or name of the device to check.
-
-        Raises:
-            RuntimeError: If the device is not found in the list of devices or if there is an error getting the status.
-            TimeoutError: If the device is online (ping) but the request times out while getting the device status.
-
-        Returns:
-            result (bool): True if the device is online, False otherwise.
-        """
-        # Get the device object
-        if isinstance(device_identity, dict):
-            # If we are passed a device dictionary, use that directly
-            device = device_identity
-        else:
-            try:
-                device = self.get_device(device_identity)
-                if not device:
-                    self.logger.log_message(f"Device {device_identity} not found.", "error")
-                    return False
-            except RuntimeError as e:
-                self.logger.log_message(f"Error getting device status for {device_identity}: {e}", "error")
-                raise RuntimeError(e) from e
-
-        # If device is in simulation mode, read from the json file
-        if device["Simulate"]:
-            self._import_device_information_from_json(device, create_if_no_file=True)
-            return True  # Simulation mode always returns True
-
-        # Get the config first if needed
-        self._process_device_config(device)
-
-        # Now try to get the status information
-        try:
-            em_result_data = []
-            emdata_result_data = []
-            if device["Protocol"] == "RPC":
-                # Get the device status via RPC
-                payload = {"id": 0, "method": "Shelly.GetStatus"}
-                result, result_data = self._rpc_request(device, payload)
-
-                # And if the meters are separate, we need to get the status of each of the meters as well
-                # EM1.GetStatus gives use power, voltage, current
-                # EM1Data.GetStatus gives us energy
-                if device["MetersSeperate"]:
-                    for meter_index in range(device["Meters"]):
-                        payload = {"id": 0,
-                                "method": "EM1.GetStatus",
-                                "params": {"id": meter_index}
-                                }
-                        em_result, meter_data = self._rpc_request(device, payload)
-                        if em_result:
-                            em_result_data.append(meter_data)
-
-                        payload = {"id": 0,
-                                "method": "EM1Data.GetStatus",
-                                "params": {"id": meter_index}
-                                }
-                        em_result, meter_data = self._rpc_request(device, payload)
-                        if em_result:
-                            emdata_result_data.append(meter_data)
-            elif device["Protocol"] == "REST":
-                # Get the device status via REST
-                url_args = "status"
-                result, result_data = self._rest_request(device, url_args)
-
-                # For gen 1 we always expect the meters to be separate from the outputs
-                if not device["MetersSeperate"]:
-                    error_msg = f"Shelly model {device['Model']} (device {device['Label']}) is configured with combined meters & switches. No support for this combination yet. Please check the models file."
-                    self.logger.log_message(error_msg, "error")
-                    raise RuntimeError(error_msg)  # noqa: TRY301
-            else:
-                error_msg = f"Unsupported protocol {device['Protocol']} for device {device['Label']}. Only RPC and REST are supported."
-                self.logger.log_message(error_msg, "error")
-                raise RuntimeError(error_msg)  # noqa: TRY301
-        except TimeoutError as e:
-            self.logger.log_message(f"Timeout error getting device status for {device['Label']}: {e}", "error")
-            raise TimeoutError(e) from e
-        except RuntimeError as e:
-            self.logger.log_message(f"Error getting status for device {device['Label']}: {e}", "error")
-            raise RuntimeError(e) from e
-
-        # Process the response payload
-        if not result:  # Warning has already been logged if the device is offline
-            return result
-
-        try:  # noqa: PLR1702
-            if device["Protocol"] == "RPC":
-                # Process the response payload for RPC protocol
-                device["MacAddress"] = result_data.get("sys", {}).get("mac", None)  # MAC address
-                device["Uptime"] = result_data.get("sys", {}).get("uptime", None)  # Uptime in seconds
-                device["RestartRequired"] = result_data.get("sys", {}).get("restart_required", False)  # Restart required flag
-
-                # # Itterate through the inputs, outputs, meters and temp probes for this device
-                for device_input in self.inputs:
-                    if device_input["DeviceIndex"] == device["Index"]:
-                        component_index = device_input["ComponentIndex"]
-                        device_input["State"] = result_data.get(f"input:{component_index}", {}).get("state", False)  # Input state
-                for device_output in self.outputs:
-                    if device_output["DeviceIndex"] == device["Index"]:
-                        component_index = device_output["ComponentIndex"]
-                        device_output["State"] = result_data.get(f"switch:{component_index}", {}).get("output", False)  # Output state
-                        if device["TemperatureMonitoring"]:
-                            device_output["Temperature"] = result_data.get(f"switch:{component_index}", {}).get("temperature", {}).get("tC", None)  # Temperature
-                for device_meter in self.meters:
-                    if device_meter["DeviceIndex"] == device["Index"]:
-                        component_index = device_meter["ComponentIndex"]
-                        if device["MetersSeperate"]:
-                            if len(em_result_data) <= device["Meters"] or len(emdata_result_data) <= device["Meters"]:
-                                error_msg = f"Device {device['Label']} is online, but meters are separate and at least one EM1.GetStatus RPC call failed. Cannot get meter status. Check models file."
-                                self.logger.log_message(error_msg, "error")
-                                raise RuntimeError(error_msg)  # noqa: TRY301
-                            device_meter["Power"] = result_data.get("params", {}).get("act_power", None)
-                            device_meter["Voltage"] = result_data.get("params", {}).get("voltage", None)
-                            device_meter["Current"] = result_data.get("params", {}).get("current", None)
-                            device_meter["PowerFactor"] = result_data.get("params", {}).get("pf", None)
-                            device_meter["Energy"] = emdata_result_data[component_index].get("params", {}).get("total_act_energy", None)
-                        else:
-                            # Meters are on the switch. Make sure our component index matches the switch index
-                            device_meter["Power"] = result_data.get(f"switch:{component_index}", {}).get("apower", None)  # Power in watts
-                            device_meter["Voltage"] = result_data.get(f"switch:{component_index}", {}).get("voltage", None)
-                            device_meter["Current"] = result_data.get(f"switch:{component_index}", {}).get("current", None)
-                            device_meter["PowerFactor"] = result_data.get(f"switch:{component_index}", {}).get("pf", None)
-                            device_meter["Energy"] = result_data.get(f"switch:{component_index}", {}).get("aenergy", {}).get("total", None)
-                for device_temp_probe in self.temp_probes:
-                    if device_temp_probe["DeviceIndex"] == device["Index"]:
-                        probe_id = device_temp_probe["ProbeID"]
-                        device_temp_probe["Temperature"] = result_data.get(f"temperature:{probe_id}", {}).get("tC", None)  # Probe temperature
-            else:
-                # Process the response payload for REST protocol
-                device["MacAddress"] = result_data.get("mac", None)  # MAC address
-                device["Uptime"] = result_data.get("uptime", None)  # Uptime in seconds
-                device["RestartRequired"] = result_data.get("update", {}).get("has_update", False)  # Restart required flag
-                if device["TemperatureMonitoring"]:
-                    device["Temperature"] = result_data.get("temperature", None)  # May not be available
-
-                # Itterate through the inputs, outputs, and meters for this device
-                for device_input in self.inputs:
-                    if device_input["DeviceIndex"] == device["Index"]:
-                        component_index = device_input["ComponentIndex"]
-                        device_input["State"] = result_data.get("inputs", []).get(component_index, {}).get("input", False)  # Input state
-                for device_output in self.outputs:
-                    if device_output["DeviceIndex"] == device["Index"]:
-                        component_index = device_output["ComponentIndex"]
-                        device_output["State"] = result_data.get("relays", [])[component_index].get("ison", False)  # Output state
-                        if device["TemperatureMonitoring"]:
-                            device_output["Temperature"] = device["Temperature"]    # Add to output for consistency
-                for device_meter in self.meters:
-                    if device_meter["DeviceIndex"] == device["Index"]:
-                        component_index = device_meter["ComponentIndex"]
-                        # In gen 1 the meter entries on switch devices list Shelly1PM are "meters" and on the EM1 devices they are "emeters"!
-                        meter_key = "emeters" if len(result_data.get("emeters", [])) > 0 else "meters"
-
-                        device_meter["Power"] = result_data.get(meter_key, [])[component_index].get("power", None)
-                        device_meter["Voltage"] = result_data.get(meter_key, [])[component_index].get("voltage", None)
-                        device_meter["Energy"] = result_data.get(meter_key, [])[component_index].get("total", None)
-
-                        # Note that current and power factor are not available in the REST API for gen 1 devices, so we set them to None
-                        device_meter["Current"] = None
-                        device_meter["PowerFactor"] = None
-        except (AttributeError, KeyError, RuntimeError) as e:
-            error_msg = f"Error extracting status data for device {device['Label']}: {e}"
-            self.logger.log_message(error_msg, "error")
-            raise RuntimeError(error_msg) from e
-
-        # If we have any energy meters, sum the power and energy readings for each meter and add them to the device
-        self._calculate_device_totals(device)
-
-        # Finally, install the default webhooks if we were offline and are now back
-        if device["Online"] and device["WebhookInstallPending"]:
-            self._set_supported_webhooks(device)
-
-            # Install all the webhooks if not already done
-            if self.does_device_have_webhooks(device) and not device["InstalledWebhooks"]:
-                self._log_debug_message(f"{device['Label']} came back online, installing default webhooks")
-                self._install_webhooks(device)
-
-        self._log_debug_message(f"Device {device['Label']} status retrieved successfully.")
-
-        return True
-
-    def does_device_have_webhooks(self, device: dict) -> bool:
-        """Returns True if the device has any webhooks installed, False otherwise.
-
-        Args:
-            device (dict): The Shelly device dictionary to check for webhooks.
-
-        Returns:
-            bool: True if the device has webhooks installed, False otherwise.
-        """
-        for component in self.inputs + self.outputs + self.meters:
-            if component["DeviceIndex"] != device["Index"]:
-                continue
-
-            # If the component does not have the Webhooks attribute, skip it
-            if "Webhooks" not in component or not component["Webhooks"]:
-                continue
-
-            return True  # This is our device and at least one of its components has Webhooks set to True
-
-        return False
-
-    def refresh_all_device_statuses(self) -> None:
-        """Refreshes the status of all Shelly devices.
-
-        This function iterates through all devices and updates their status by calling get_device_status.
-        It also calculates the total power and energy consumption for each device.
-
-        Raises:
-            RuntimeError: If there is an error getting the status of any device.
-        """
-        for device in self.devices:
-            try:
-                self.get_device_status(device)
-            except RuntimeError as e:
-                self.logger.log_message(f"Error refreshing status for device {device['Label']}: {e}", "error")
-                raise RuntimeError(e) from e
-
     def _calculate_device_totals(self, device: dict) -> None:
         """Calculates the total power and energy consumption for a device.
 
@@ -1634,186 +1831,6 @@ class ShellyControl:
                     average_temperature += device_output["Temperature"]
             if output_count > 0:
                 device["Temperature"] = average_temperature / output_count  # Average temperature across all outputs
-
-    def change_output(self, output_identity: dict | int | str, new_state: bool) -> tuple[bool, bool]:  # noqa: FBT001
-        """Change the state of a Shelly device output to on or off.
-
-        Args:
-            output_identity (dict | int | str): An output dict, or the ID or name of the device to check.
-            new_state (bool): The new state to set the output to (True for on, False for off).
-
-        Raises:
-            RuntimeError: There was an error changing the device output state.
-            TimeoutError: If the device is online (ping) but the state change request times out.
-
-        Returns:
-            result (bool): True if the output state was changed successfully, False if the device is offline.
-            did_change (bool): True if the output state is different than before, False if it was already in the desired state.
-        """
-        # Get the device object
-        if isinstance(output_identity, dict):
-            # If we are passed a device dictionary, use that directly
-            device_output = output_identity
-        else:
-            try:
-                device_output = self.get_device_component("output", output_identity)
-            except RuntimeError as e:
-                self.logger.log_message(f"Error getting changing device output {output_identity}: {e}", "error")
-                raise RuntimeError(e) from e
-
-        # Get the device object
-        device = self.devices[device_output["DeviceIndex"]]
-
-        # Make a note of the current state before changing it
-        current_state = device_output["State"]
-
-        # If we are not in simulation mode
-        if not device["Simulate"]:
-            try:
-                # First get the device status to ensure it is online
-                if not self.get_device_status(device):
-                    if not device.get("ExpectOffline", False):
-                        self.logger.log_message(f"Device {device['Label']} is offline. Cannot change output state.", "warning")
-                    return False, False
-
-                if device["Protocol"] == "RPC":
-                    # Change the output via RPC
-                    payload = {
-                                "id": 0,
-                                "method": "Switch.Set",
-                                "params": {"id": device_output["ComponentIndex"],
-                                        "on": new_state}
-                                }
-                    result, _result_data = self._rpc_request(device, payload)
-
-                elif device["Protocol"] == "REST":
-                    # Get the device status via REST
-                    url_args = f"relay/{device_output['ComponentIndex']}?turn={'on' if new_state else 'off'}"
-                    result, _result_data = self._rest_request(device, url_args)
-
-                else:
-                    error_msg = f"Unsupported protocol {device['Protocol']} for device {device['Label']}. Only RPC and REST are supported."
-                    self.logger.log_message(error_msg, "error")
-                    raise RuntimeError(error_msg)  # noqa: TRY301
-            except TimeoutError as e:
-                self.logger.log_message(f"Timeout error changing device output {output_identity} for device {device['Label']}: {e}", "error")
-                raise TimeoutError(e) from e
-            except RuntimeError as e:
-                self.logger.log_message(f"Error changing device output {output_identity} for device {device['Label']}: {e}", "error")
-                raise RuntimeError(e) from e
-
-            # Process the response payload
-            if not result:  # Warning has already been logged if the device is offline
-                return result, False
-
-        # If we get here, we were successful in changing the output state
-        # Update the output state in the outputs list
-        device_output["State"] = new_state
-
-        # If in simulation mode, save the json file
-        if device["Simulate"]:
-            self._export_device_information_to_json(device)
-
-        if new_state != current_state:
-            self._log_debug_message(f"Device output {output_identity} on device {device['Label']} was changed to {'on' if new_state else 'off'}.")
-            return True, True
-
-        self._log_debug_message(f"Device output {output_identity} on device {device['Label']} is already {'on' if new_state else 'off'}. No change made.")
-        return True, False
-
-    def get_device_location(self, device_identity: dict | int | str) -> dict | None:
-        """Gets the timezone and location of a Shelly device if available.
-
-        Returns a dict in the following format:
-           "tz": "Europe/Sofia",
-           "lat": 42.67236,
-           "lon": 23.38738
-
-        Args:
-            device_identity (dict | int | str): A device dict, or the ID or name of the device to check.
-
-        Raises:
-            RuntimeError: If the device is not found in the list of devices or if there is an error getting the status.
-            TimeoutError: If the device is online (ping) but the request times out while getting the device status.
-
-        Returns:
-            location (dict | None): A dictionary containing the timezone and location of the device, or None if not available.
-        """
-        # Get the device object
-        if isinstance(device_identity, dict):
-            # If we are passed a device dictionary, use that directly
-            device = device_identity
-        else:
-            try:
-                device = self.get_device(device_identity)
-                if not device:
-                    self.logger.log_message(f"Device {device_identity} not found.", "error")
-                    return None
-            except RuntimeError as e:
-                self.logger.log_message(f"Error getting device status for {device_identity}: {e}", "error")
-                raise RuntimeError(e) from e
-
-        # If device is in simulation mode, read from the json file
-        if device["Simulate"]:
-            # Return a fake location
-            location = {
-                "tz": "Europe/Sofia",
-                "lat": 42.67236,
-                "lon": 23.38738
-            }
-            return location
-
-        if not device["Online"]:
-            return None
-
-        if device["Protocol"] != "RPC":
-            return None
-
-        try:
-            payload = {"id": 0, "method": "Shelly.DetectLocation"}
-            result, result_data = self._rpc_request(device, payload)
-            if not result:
-                self.logger.log_message(f"Failed to gett device location for device {device.get('Name')}: {result_data}", "error")
-                return None
-        except TimeoutError as e:
-            self.logger.log_message(f"Timeout error getting device location for {device['Label']}: {e}", "error")
-            raise TimeoutError(e) from e
-        except RuntimeError as e:
-            self.logger.log_message(f"Error getting location for device {device['Label']}: {e}", "error")
-            raise RuntimeError(e) from e
-        else:
-            return result_data
-
-    def get_device_information(self, device_identity: dict | int | str, refresh_status: bool = False) -> dict:  # noqa: FBT001, FBT002
-        """Returns a consolidated copy of a Shelly device information as a single dictionary, including its inputs, outputs, and meters.
-
-        Args:
-            device_identity (dict | int | str): The device itself or an ID or name of the device to retrieve information for.
-            refresh_status (bool, optional): If True, refreshes the device status before retrieving information. Defaults to False.
-
-        Raises:
-            RuntimeError: If the device is not found in the list of devices or if there is an error getting the status.
-
-        Returns:
-            device_info (dict): A dictionary containing the device's attributes, inputs, outputs, and meters.
-        """
-        try:
-            device = self.get_device(device_identity)
-            device_index = device["Index"]  # Get the index of the device
-            if refresh_status:  # If refresh_status is True, get the latest status of the device
-                self.get_device_status(device_identity)  # Ensure we have the latest status
-        except RuntimeError as e:
-            self.logger.log_message(f"Error getting device information for {device_identity}: {e}", "error")
-            raise RuntimeError(e) from e
-
-        # Create a consolidated view of the device's attributes
-        device_info = device.copy()  # Create a copy of the device dictionary
-        device_info["Inputs"] = [component_input for component_input in self.inputs if component_input["DeviceIndex"] == device_index]
-        device_info["Outputs"] = [component_output for component_output in self.outputs if component_output["DeviceIndex"] == device_index]
-        device_info["Meters"] = [component_output for component_output in self.meters if component_output["DeviceIndex"] == device_index]
-        device_info["TempProbes"] = [component_temp_probe for component_temp_probe in self.temp_probes if component_temp_probe["DeviceIndex"] == device_index]
-
-        return device_info
 
     def _export_device_information_to_json(self, device: dict) -> bool:
         """Exports device information to a JSON file.

@@ -100,6 +100,48 @@ def test_spello_control(config, logger):
         # print(shelly_control.print_device_status(device_identity))
 
 
+def test_get_status(config, logger):
+    """Test function for refresh status."""
+    loop_delay = 5
+    loop_count = 0
+    max_loops = 20
+
+    pump_output_name = "Sydney Dev A O1"
+    roof_probe_name = "Temp Roof"
+    pool_probe_name = "Temp Pool Water"
+
+    shelly_control = create_shelly_control(config, logger)
+    assert shelly_control is not None, "Shelly control should be initialized."
+    try:
+        pump_output = shelly_control.get_device_component("output", pump_output_name)
+        roof_probe = shelly_control.get_device_component("temp_probe", roof_probe_name)
+        pool_probe = shelly_control.get_device_component("temp_probe", pool_probe_name)
+    except RuntimeError as e:
+        print(f"Error getting device: {e}", file=sys.stderr)
+        sys.exit(1)
+    except TimeoutError as e:
+        print(f"Timeout error getting device: {e}", file=sys.stderr)
+        sys.exit(1)
+    else:
+        while loop_count < max_loops:
+            # Refresh the status of all devices
+            shelly_control.refresh_all_device_statuses()
+
+            pump_state = pump_output.get("State", False)
+            roof_probe_id = roof_probe.get("ProbeID", None)
+            roof_probe_reading = roof_probe.get("Temperature", None)
+
+            pool_probe_id = pool_probe.get("ProbeID", None)
+            pool_probe_reading = pool_probe.get("Temperature", None)
+
+            print(f"{pump_output_name} State: {pump_state}.")
+            print(f"    {roof_probe_name} (ID: {roof_probe_id}) reading: {roof_probe_reading}°C")
+            print(f"    {pool_probe_name} (ID: {pool_probe_id}) reading: {pool_probe_reading}°C")
+
+            time.sleep(loop_delay)
+            loop_count += 1
+
+
 def test_shelly_loop(config: SCConfigManager, logger: SCLogger):
     """Test function for configuration file changes."""
     loop_delay = 5
@@ -178,7 +220,9 @@ def main():
     if not SCCommon.check_internet_connection():
         logger.log_message("No internet connection detected.", "summary")
 
-    test_spello_control(config, logger)
+    # test_spello_control(config, logger)
+
+    test_get_status(config, logger)
 
     # test_shelly_loop(config, logger)  # type: ignore[arg-type]
 
