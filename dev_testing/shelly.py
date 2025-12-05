@@ -15,7 +15,7 @@ from sc_utility import (
     ShellyControl,
 )
 
-CONFIG_FILE = "dev_testing_config.yaml"
+CONFIG_FILE = "dev_testing/dev_testing_config.yaml"
 
 
 def create_shelly_control(config, logger, wake_event: threading.Event | None = None):
@@ -101,6 +101,37 @@ def test_spello_control(config, logger):
 
 
 def test_get_status(config, logger):
+    """Test function for refresh status."""
+    loop_delay = 5
+    loop_count = 0
+    max_loops = 20
+
+    output_name = "Sydney Dev A O1"
+
+    shelly_control = create_shelly_control(config, logger)
+    assert shelly_control is not None, "Shelly control should be initialized."
+    try:
+        output = shelly_control.get_device_component("output", output_name)
+    except RuntimeError as e:
+        print(f"Error getting device: {e}", file=sys.stderr)
+        sys.exit(1)
+    except TimeoutError as e:
+        print(f"Timeout error getting device: {e}", file=sys.stderr)
+        sys.exit(1)
+    else:
+        while loop_count < max_loops:
+            # Refresh the status of all devices
+            shelly_control.refresh_all_device_statuses()
+
+            output_state = output.get("State", False)
+
+            print(f"{output_name} State: {output_state}.")
+
+            time.sleep(loop_delay)
+            loop_count += 1
+
+
+def test_get_status_and_temp(config, logger):
     """Test function for refresh status."""
     loop_delay = 5
     loop_count = 0

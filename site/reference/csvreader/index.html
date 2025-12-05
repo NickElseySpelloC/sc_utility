@@ -826,7 +826,7 @@ ACM0006AU,2025-04-28,AB Managed Volatility Equities,AUD,1.82
 CSA0038AU,2025-04-28,Bentham Global Income,AUD,1.00
 ETL0018AU,2025-04-28,PIMCO Global Bond Wholesale,AUD,0.90
 </code></pre>
-<p>The header configuration might look liek this:</p>
+<p>The header configuration might look like this:</p>
 <pre><code>header_config = [
     {
         "name": "Symbol",
@@ -1250,7 +1250,7 @@ ETL0018AU,2025-04-28,PIMCO Global Bond Wholesale,AUD,0.90
 
 
 <h2 id="sc_utility.sc_csv_reader.CSVReader.trim_csv_data" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">trim_csv_data</span><span class="p">(</span><span class="n">csv_data</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">trim_csv_data</span><span class="p">(</span><span class="n">csv_data</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_days</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1304,6 +1304,22 @@ If this is &gt;0 then it will return the first max_lines lines, if &lt;0 then it
                   <code>None</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_days</code>
+            </td>
+            <td>
+                  <code><span title="Optional">Optional</span>(<span title="int">int</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If provided, the maximum number of days to keep in the data based on date headers with 'minimum' set as an int. This overrides any 'minimum' values in the header configuration.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -1339,7 +1355,7 @@ If this is &gt;0 then it will return the first max_lines lines, if &lt;0 then it
 
 
 <h2 id="sc_utility.sc_csv_reader.CSVReader.update_csv_file" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">update_csv_file</span><span class="p">(</span><span class="n">new_data</span><span class="p">,</span> <span class="n">new_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">update_csv_file</span><span class="p">(</span><span class="n">new_data</span><span class="p">,</span> <span class="n">new_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_days</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1387,6 +1403,39 @@ If this is &gt;0 then it will return the first max_lines lines, if &lt;0 then it
             <td>
               <div class="doc-md-description">
                 <p>If provided, the data will be written to this file instead of the original file.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_lines</code>
+            </td>
+            <td>
+                  <code><span title="Optional">Optional</span>(<span title="int">int</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If provided, the maximum number of lines to return from csv_data.
+If this is &gt;0 then it will return the first max_lines lines, if &lt;0 then it will return all but the last abs(max_lines) lines. If None, no trimming is done.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_days</code>
+            </td>
+            <td>
+                  <code><span title="Optional">Optional</span>(<span title="int">int</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If provided, the maximum number of days to keep in the data based on date headers with 'minimum' set as an int. This overrides any 'minimum' values in the header configuration.</p>
               </div>
             </td>
             <td>

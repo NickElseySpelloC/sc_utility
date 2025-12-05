@@ -19,7 +19,7 @@ For example, consider this CSV file:
     CSA0038AU,2025-04-28,Bentham Global Income,AUD,1.00
     ETL0018AU,2025-04-28,PIMCO Global Bond Wholesale,AUD,0.90
 
-The header configuration might look liek this:
+The header configuration might look like this:
 
     header_config = [
         {

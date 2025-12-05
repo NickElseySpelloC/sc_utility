@@ -1,0 +1,69 @@
+"""Manual testing code for the sc_utility libraries. Should not be included in the distrbution."""
+
+import datetime as dt
+import sys
+
+from sc_utility import CSVReader, DateHelper
+
+csv_file_name = "dev_testing/test_csv.csv"
+
+header_config = [
+    {
+        "name": "Symbol",
+        "type": "str",
+        "match": True,
+        "sort": 2,
+    },
+    {
+        "name": "Date",
+        "type": "date",
+        "format": "%Y-%m-%d",
+        "match": True,
+        "sort": 1,
+        "minimum": 30,
+    },
+    {
+        "name": "Name",
+        "type": "str",
+    },
+    {
+        "name": "Currency",
+        "type": "str",
+    },
+    {
+        "name": "Price",
+        "type": "float",
+        "format": ".2f",
+    },
+    {
+        "name": "Time",
+        "type": "time",
+        "format": "%H:%M",
+    },
+]
+
+
+def main():
+    extra_data = [
+        {
+            "Symbol": "AAPL",
+            "Date": DateHelper.today(),
+            "Name": "Apple Inc.",
+            "Currency": "USD",
+            "Price": 150.00,
+            "Time": dt.time(9, 45),
+        },
+        ]
+
+    # Create an instance of the CSVReader class
+    try:
+        csv_reader = CSVReader(csv_file_name, header_config)
+    except (ImportError, TypeError, ValueError) as e:
+        print(e, file=sys.stderr)
+        return
+
+    csv_reader.update_csv_file(extra_data, max_days=30)
+
+
+if __name__ == "__main__":
+    main()

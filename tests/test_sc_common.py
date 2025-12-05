@@ -164,7 +164,6 @@ def test_is_probable_path_too_long(mock_pathconf, mock_get_os):
 
 
 @patch("sc_utility.sc_common.Path.cwd")
-@patch("sc_utility.sc_common.sys.argv", ["/usr/bin/script.py"])
 def test_select_file_location_absolute_path(mock_cwd):  # noqa: ARG001
     """Test select_file_location with absolute path."""
     result = SCCommon.select_file_location("/etc/config.yaml")
@@ -172,7 +171,6 @@ def test_select_file_location_absolute_path(mock_cwd):  # noqa: ARG001
 
 
 @patch("sc_utility.sc_common.Path.cwd")
-@patch("sc_utility.sc_common.sys.argv", ["/usr/bin/script.py"])
 def test_select_file_location_relative_path(mock_cwd):
     """Test select_file_location with relative path."""
     mock_cwd.return_value = Path("/home/user")
@@ -194,3 +192,7 @@ def test_get_process_id_integration():
     pid = SCCommon.get_process_id()
     assert isinstance(pid, int)
     assert pid > 0
+
+
+# test_select_file_location_absolute_path()
+# test_select_file_location_relative_path()
