@@ -290,7 +290,7 @@ class CSVReader:
 
         return merged
 
-    def trim_csv_data(self, csv_data: list[dict], max_lines: int | None = None, max_days: int | None = None) -> list[dict]:
+    def trim_csv_data(self, csv_data: list[dict], max_lines: int | None = None, max_days: int | None = None) -> list[dict]:  # noqa: PLR0912
         """Trim the CSV data based on the header configuration and optionally the max_lines arg.
 
         Args:
@@ -319,23 +319,33 @@ class CSVReader:
         trimmed_data = csv_data
         for header in minimum_headers:
             field_name = header["name"]
+            field_type = header["type"]
             minimum_value = header["minimum"]
 
             # Calculate the cutoff date
             if max_days is not None:
-                cutoff_date = DateHelper.today_add_days(-max_days)
-            elif isinstance(minimum_value, dt.date):
-                cutoff_date = minimum_value
+                if field_type == "date":
+                    cutoff = DateHelper.today_add_days(-max_days)
+                elif field_type == "datetime":
+                    cutoff = DateHelper.now().replace(tzinfo=None) + dt.timedelta(days=-max_days)
+                else:
+                    continue  # Skip if field type is not date or datetime
+            elif isinstance(minimum_value, (dt.date, dt.datetime)):
+                cutoff = minimum_value
             elif isinstance(minimum_value, int):
-                # Calculate date that is minimum_value days before today
-                cutoff_date = DateHelper.today_add_days(-minimum_value)
+                if field_type == "date":
+                    cutoff = DateHelper.today_add_days(-minimum_value)
+                elif field_type == "datetime":
+                    cutoff = DateHelper.now().replace(tzinfo=None) + dt.timedelta(days=-minimum_value)
+                else:
+                    continue  # Skip if field type is not date or datetime
             else:
                 continue  # Skip if minimum is neither date nor int
 
             # Filter out records with dates prior to cutoff_date
             trimmed_data = [
                 row for row in trimmed_data
-                if field_name in row and isinstance(row[field_name], dt.date) and row[field_name] >= cutoff_date
+                if field_name in row and isinstance(row[field_name], (dt.date, dt.datetime)) and row[field_name] >= cutoff
             ]
 
         # If max_lines is specified, trim the data to that many lines

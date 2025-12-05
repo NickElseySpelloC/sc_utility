@@ -189,7 +189,7 @@ class SCCommon:
         """Return the root folder of the Python project.
 
         Args:
-            marker_files: A tuple of file names that indicate the project root.
+            marker_files (tuple): A tuple of file names that indicate the project root.
 
         Raises:
             RuntimeError: If the project root cannot be found.

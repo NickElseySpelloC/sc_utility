@@ -23,6 +23,14 @@ header_config = [
         "minimum": 30,
     },
     {
+        "name": "Timestamp",
+        "type": "datetime",
+        "format": "%Y-%m-%d %H:%M:%S",
+        # "match": True,
+        # "sort": 1,
+        # "minimum": 30,
+    },
+    {
         "name": "Name",
         "type": "str",
     },
@@ -48,6 +56,7 @@ def main():
         {
             "Symbol": "AAPL",
             "Date": DateHelper.today(),
+            "Timestamp": DateHelper.now().replace(tzinfo=None),
             "Name": "Apple Inc.",
             "Currency": "USD",
             "Price": 150.00,
