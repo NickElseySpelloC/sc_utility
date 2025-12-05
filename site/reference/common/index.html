@@ -1141,7 +1141,7 @@
 
 
 <h2 id="sc_utility.sc_common.SCCommon.get_project_root" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_project_root</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">get_project_root</span><span class="p">(</span><span class="n">marker_files</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;pyproject.toml&#39;</span><span class="p">,</span> <span class="s1">&#39;.project_root&#39;</span><span class="p">,</span> <span class="s1">&#39;uv.lock&#39;</span><span class="p">,</span> <span class="s1">&#39;.git&#39;</span><span class="p">))</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
@@ -1153,6 +1153,59 @@
     <div class="doc doc-contents ">
 
         <p>Return the root folder of the Python project.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>marker_files</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A tuple of file names that indicate the project root.</p>
+              </div>
+            </td>
+            <td>
+                  <code>(&#39;pyproject.toml&#39;, &#39;.project_root&#39;, &#39;uv.lock&#39;, &#39;.git&#39;)</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the project root cannot be found.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1474,6 +1527,29 @@
 <p>The root directly is defined as the directory containing the main script being executed (the module containing <strong>main</strong>).</p>
 
 
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the project root cannot be determined.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
       <thead>
@@ -1520,7 +1596,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The full path to the file as a Path object.</p>
+                <p>The full path to the file as a Path object. None if the file_name does not appear to be a path.</p>
               </div>
             </td>
           </tr>

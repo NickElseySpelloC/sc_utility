@@ -290,13 +290,14 @@ class CSVReader:
 
         return merged
 
-    def trim_csv_data(self, csv_data: list[dict], max_lines: int | None = None) -> list[dict]:
+    def trim_csv_data(self, csv_data: list[dict], max_lines: int | None = None, max_days: int | None = None) -> list[dict]:
         """Trim the CSV data based on the header configuration and optionally the max_lines arg.
 
         Args:
             csv_data (list[dict]): The data read from the CSV file.
             max_lines (Optional(int), optional): If provided, the maximum number of lines to return from csv_data.
                 If this is >0 then it will return the first max_lines lines, if <0 then it will return all but the last abs(max_lines) lines. If None, no trimming is done.
+            max_days (Optional(int), optional): If provided, the maximum number of days to keep in the data based on date headers with 'minimum' set as an int. This overrides any 'minimum' values in the header configuration.
 
         Returns:
             list[dict]: The trimmed data.
@@ -321,7 +322,9 @@ class CSVReader:
             minimum_value = header["minimum"]
 
             # Calculate the cutoff date
-            if isinstance(minimum_value, dt.date):
+            if max_days is not None:
+                cutoff_date = DateHelper.today_add_days(-max_days)
+            elif isinstance(minimum_value, dt.date):
                 cutoff_date = minimum_value
             elif isinstance(minimum_value, int):
                 # Calculate date that is minimum_value days before today
@@ -344,7 +347,7 @@ class CSVReader:
 
         return trimmed_data
 
-    def write_csv(self, data: list[dict], new_filename: Path | str | None = None) -> bool:
+    def write_csv(self, data: list[dict], new_filename: Path | str | None = None) -> bool:  # noqa: PLR0912
         """Write data to the CSV file.
 
         1. If the file does not exist, it will be created.
@@ -373,7 +376,11 @@ class CSVReader:
             # Check if the file exists
             self.file_exists = bool(self.file_path.is_file())
 
-        if not self.file_exists:
+        use_temp_file = False
+        if self.file_exists:
+            # If file already exists, create a temporary file to write to
+            use_temp_file = True
+        else:
             # Create the file if it does not exist
             self.file_path.parent.mkdir(parents=True, exist_ok=True)
             self.file_path.touch()
@@ -416,14 +423,24 @@ class CSVReader:
             formatted_data.append(formatted_row)
 
         # Write the CSV file
-        with self.file_path.open("w", newline="", encoding="utf-8") as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=[header["name"] for header in self.header_config])
-            writer.writeheader()
-            writer.writerows(formatted_data)
+        if use_temp_file:
+            temporary_path = self.file_path.with_suffix(".tmp")
+
+            with temporary_path.open("w", newline="", encoding="utf-8") as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=[header["name"] for header in self.header_config])
+                writer.writeheader()
+                writer.writerows(formatted_data)
+            # Replace the original file with the temporary file
+            temporary_path.replace(self.file_path)
+        else:
+            with self.file_path.open("w", newline="", encoding="utf-8") as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=[header["name"] for header in self.header_config])
+                writer.writeheader()
+                writer.writerows(formatted_data)
 
         return True
 
-    def update_csv_file(self, new_data: list[dict], new_filename: Path | str | None = None) -> list[dict]:
+    def update_csv_file(self, new_data: list[dict], new_filename: Path | str | None = None, max_lines: int | None = None, max_days: int | None = None) -> list[dict]:
         """Appends or merges the new_data into an existing CSV file. If the file does not exist, it will be created.
 
         This function will also sort and trim the combined data according to the header configuration.
@@ -431,6 +448,9 @@ class CSVReader:
         Args:
             new_data (list[dict]): The new data to append or merge.
             new_filename (Optional(Path | str), optional)): If provided, the data will be written to this file instead of the original file.
+            max_lines (Optional(int), optional): If provided, the maximum number of lines to return from csv_data.
+                If this is >0 then it will return the first max_lines lines, if <0 then it will return all but the last abs(max_lines) lines. If None, no trimming is done.
+            max_days (Optional(int), optional): If provided, the maximum number of days to keep in the data based on date headers with 'minimum' set as an int. This overrides any 'minimum' values in the header configuration.
 
         Raises:
             RuntimeError: If there is a problem processign the data.
@@ -455,7 +475,7 @@ class CSVReader:
             merged_data = self.sort_csv_data(merged_data)
 
             # Trim the CSV data
-            merged_data = self.trim_csv_data(merged_data)
+            merged_data = self.trim_csv_data(merged_data, max_lines=max_lines, max_days=max_days)
         else:
             # If no current data, just use the new_data
             merged_data = new_data

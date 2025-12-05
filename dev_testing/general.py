@@ -1,6 +1,6 @@
 """Manual testing code for the sc_utility libraries. Should not be included in the distrbution."""
 
-import datetime as dt
+import datetime as dt  # noqa: F401
 import platform
 import sys
 from time import sleep
@@ -8,13 +8,13 @@ from time import sleep
 from config_schemas import ConfigSchema
 
 from sc_utility import (
-    DateHelper,
-    SCCommon,  # noqa: F401
+    DateHelper,  # noqa: F401
+    SCCommon,
     SCConfigManager,
     SCLogger,
 )
 
-CONFIG_FILE = "dev_testing_config.yaml"
+CONFIG_FILE = "dev_testing/dev_testing_config.yaml"
 
 
 def test_reportable_issue(logger: SCLogger):
@@ -64,15 +64,21 @@ def main():
         return
     logger.log_message("This is a test message at the summary level.", "summary")
 
+    # SCCOmmon tests
+    print(f"Project root: {SCCommon.get_project_root()}")
+    print(f"Locate file './dev_testing_config.yaml': {SCCommon.select_file_location('dev_testing_config.yaml')}")
+    print(f"Locate file 'src/shelly_models.json': {SCCommon.select_file_location('src/shelly_models.json')}")
+    print(f"Locate file 'logs/nolog.log': {SCCommon.select_file_location('logs/nolog.log')}")
+
     # Test internet connection
     # if not SCCommon.check_internet_connection():
     #     logger.log_message("No internet connection detected.", "summary")
 
     # Setup email
-    email_settings = config.get_email_settings()
-    if email_settings is not None:
-        logger.register_email_settings(email_settings)
-        logger.send_email("sc_utility test - main()", "This is a test email.")
+    # email_settings = config.get_email_settings()
+    # if email_settings is not None:
+    #     logger.register_email_settings(email_settings)
+    #     logger.send_email("sc_utility test - main()", "This is a test email.")
 
     # See if we have a fatal error from a previous run
     if logger.get_fatal_error():

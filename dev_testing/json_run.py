@@ -9,8 +9,8 @@ from sc_utility import (
     JSONEncoder,
 )
 
-CONFIG_FILE = "dev_testing_config.yaml"
-JSON_FILE = "test_data.json"
+CONFIG_FILE = "dev_testing/dev_testing_config.yaml"
+JSON_FILE = "dev_testing/test_data.json"
 
 
 class APIMode(StrEnum):

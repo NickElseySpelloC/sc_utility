@@ -5,7 +5,6 @@ import os
 import platform
 import re
 import subprocess  # noqa: S404
-import sys
 from pathlib import Path
 
 import httpx
@@ -186,18 +185,28 @@ class SCCommon:
         return bool(path_obj.suffix and path_obj.suffix.lower() is not None)
 
     @staticmethod
-    def get_project_root() -> Path:
+    def get_project_root(marker_files=("pyproject.toml", ".project_root", "uv.lock", ".git")) -> Path:
         """Return the root folder of the Python project.
+
+        Args:
+            marker_files: A tuple of file names that indicate the project root.
+
+        Raises:
+            RuntimeError: If the project root cannot be found.
 
         Returns:
             root_dir (Path): The root folder of the Python project as a Path object.
         """
-        main_file = getattr(sys.modules["__main__"], "__file__", None)
-        if main_file:
-            return Path(main_file).parent.resolve()
+        path = Path(__file__).resolve()
 
-        # Fallback to current scripts working directory
-        return Path(sys.argv[0]).parent.resolve()
+        # Walk upwards until we find a marker file
+        for parent in [path, *list(path.parents)]:
+            for marker in marker_files:
+                if (parent / marker).exists():
+                    return parent
+
+        error_msg = f"Project root not found. Looked for markers: {marker_files}"
+        raise RuntimeError(error_msg)
 
     @staticmethod
     def select_file_location(file_name: str) -> Path | None:
@@ -209,11 +218,14 @@ class SCCommon:
 
         The root directly is defined as the directory containing the main script being executed (the module containing __main__).
 
+        Raises:
+            RuntimeError: If the project root cannot be determined.
+
         Args:
             file_name: The name of the file to locate. Can be just a file name, or a relative or absolute path.
 
         Returns:
-            file_path (Path): The full path to the file as a Path object.
+            file_path (Path): The full path to the file as a Path object. None if the file_name does not appear to be a path.
         """
         # Look at the file_name and see if it looks like a path
         if not SCCommon.is_probable_path(file_name):
@@ -236,8 +248,12 @@ class SCCommon:
         current_dir = Path.cwd()
         file_path = current_dir / file_name
         if not file_path.exists():
-            project_root_dir = SCCommon.get_project_root()
-            file_path = project_root_dir / file_name
+            try:
+                project_root_dir = SCCommon.get_project_root()
+                file_path = project_root_dir / file_name
+            except RuntimeError as e:
+                error_msg = f"Cannot determine project root to locate file '{file_name}': {e}"
+                raise RuntimeError(error_msg) from e
         return file_path
 
     @staticmethod

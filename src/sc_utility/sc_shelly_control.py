@@ -564,6 +564,7 @@ class ShellyControl:
 
         # Process the response payload
         if not result:  # Warning has already been logged if the device is offline
+            self._set_device_outputs_off(device)    # Issue #5
             return result
 
         try:  # noqa: PLR1702
@@ -2004,3 +2005,13 @@ class ShellyControl:
         else:
             self._log_debug_message(f"Device simulation information imported from {file_path} for device {device['Label']}")
             return True
+
+    def _set_device_outputs_off(self, device: dict) -> None:
+        """Sets all outputs of a device to off.
+
+        Args:
+            device (dict): The Shelly device dictionary containing outputs.
+        """
+        for device_output in self.outputs:
+            if device_output["DeviceIndex"] == device["Index"]:
+                device_output["State"] = False

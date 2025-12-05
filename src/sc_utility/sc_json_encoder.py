@@ -101,10 +101,14 @@ class JSONEncoder:
             result (bool): True if the pricing data was saved, False if not.
         """
         try:
-            with file_path.open("w", encoding="utf-8") as json_file:
+            temporary_path = file_path.with_suffix(".tmp")
+
+            with temporary_path.open("w", encoding="utf-8") as json_file:
                 save_data = copy.deepcopy(data)
                 save_data = JSONEncoder._add_datatype_hints(save_data)
                 json.dump(save_data, json_file, indent=4, default=JSONEncoder._encode_object)
+
+            temporary_path.replace(file_path)
         except (TypeError, ValueError, OSError) as e:
             raise RuntimeError from e
         return True
