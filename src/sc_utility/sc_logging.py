@@ -474,6 +474,8 @@ class SCLogger:
         """
         Clear a notifiable issue.
 
+        If an email was previously sent for this issue, this function will send a "cleared" notification email.
+
         Args:
             entity (str): The entity reporting the issue (e.g., "Device 123", "Module", etc.)
             issue_type (str): A brief description of the issue (e.g. "Offline").
@@ -484,6 +486,12 @@ class SCLogger:
         # Search self.notifiable_issues to see if we have a match by entity and issue_type
         for issue in self.notifiable_issues:
             if issue.entity == entity and issue.issue_type == issue_type:
+                # Send a cleared email if one was previously sent
+                if issue.email_sent:
+                    email_subject = f"{self.app_dir.name} - {entity} {issue_type} issue resolved"
+                    email_body = f"{entity}: The {issue_type} issue reported on {issue.first_reported.strftime('%Y-%m-%d %H:%M')} has been resolved."
+                    self.send_email(email_subject, email_body)
+
                 self.notifiable_issues.remove(issue)
                 return True
 
