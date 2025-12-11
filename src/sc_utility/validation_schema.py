@@ -33,6 +33,7 @@ yaml_config_validation = {
             "RetryCount": {"type": "number", "required": False, "nullable": True, "min": 0, "max": 10},
             "RetryDelay": {"type": "number", "required": False, "nullable": True, "min": 1, "max": 10},
             "PingAllowed": {"type": "boolean", "required": False, "nullable": True},
+            "SimulationFileFolder": {"type": "string", "required": False, "nullable": True},
             "WebhooksEnabled": {"type": "boolean", "required": False, "nullable": True},
             "WebhookHost": {"type": "string", "required": False, "nullable": True},
             "WebhookPort": {"type": "number", "required": False, "nullable": True},

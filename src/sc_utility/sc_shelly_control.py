@@ -1195,6 +1195,10 @@ class ShellyControl:
         self.retry_delay = settings.get("RetryDelay", self.retry_delay)  # Number of seconds to wait between retries
         self.ping_allowed = settings.get("PingAllowed", True)  # Whether to allow pinging the devices
 
+        # Folder for simulation files. Defaults to project root
+        relative_folder = settings.get("SimulationFileFolder")
+        self.simulation_file_folder = SCCommon.select_folder_location(relative_folder, create_folder=True)
+
         # Now the webhook settings
         self.webhook_enabled = settings.get("WebhooksEnabled", False) and self.app_wake_event is not None
         self.webhook_host = settings.get("WebhookHost", "0.0.0.0")  # noqa: S104
@@ -1278,7 +1282,7 @@ class ShellyControl:
             # Replace spaces with underscores and remove any non-alphanumeric characters
             file_name = "".join(c if c.isalnum() else "_" for c in file_name)
             file_name += ".json"  # Add the .json extension
-            new_device["SimulationFile"] = SCCommon.select_file_location(file_name)
+            new_device["SimulationFile"] = self.simulation_file_folder / file_name
 
         # Add any additional custom key / value pairs defined in component_config that don't already exist in new_component
         new_device["customkeylist"] = []  # Initialize custom key list
