@@ -257,6 +257,47 @@ class SCCommon:
         return file_path
 
     @staticmethod
+    def select_folder_location(folder_path: str | None = None, create_folder: bool = False) -> Path | None:  # noqa: FBT001, FBT002
+        """Return an absolute folder path for the given (relative) folder path.
+
+        If folder_path is None, return the project root folder.
+        If folder_path is an absolute path, return it as a Path object.
+        If folder_path is a relative path, return the absolute path based on the project root directory.
+
+        Args:
+            folder_path: The folder path to locate. Can be None, or a relative or absolute path.
+            create_folder: If True, create the folder if it does not exist. Default is False.
+
+        Raises:
+            RuntimeError: If the project root cannot be determined or if folder creation fails.
+
+        Returns:
+            The full path to the folder as a Path object. None if folder_path is None and project root cannot be determined.
+        """
+        try:
+            project_root = SCCommon.get_project_root()
+        except RuntimeError as e:
+            raise RuntimeError(e) from e
+
+        if folder_path is None:
+            return project_root
+
+        selected_folder = Path(folder_path)
+
+        # Check if folder_path is an absolute path, return this even if it does not exist
+        if not selected_folder.is_absolute():
+            selected_folder = (project_root / selected_folder).resolve()
+
+        if create_folder and not selected_folder.exists():
+            try:
+                selected_folder.mkdir(parents=True, exist_ok=True)
+            except OSError as e:
+                error_msg = f"Error creating folder '{selected_folder}': {e}"
+                raise RuntimeError(error_msg) from e
+
+        return selected_folder
+
+    @staticmethod
     def get_process_id() -> int:
         """Return the process ID of the current process.
 
