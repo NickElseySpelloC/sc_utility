@@ -50,6 +50,7 @@ class ShellyControl:
         self.app_wake_event = app_wake_event
         self.webhook_enabled = device_settings.get("WebhooksEnabled", False) and self.app_wake_event is not None
         self.webhook_event_queue = []
+        self.webhook_server = None  # Add this to store the server instance
 
         self.devices = []           # List to hold multiple Shelly devices
         self.inputs = []            # List to hold multiple switch inputs, each one associated with a Shelly device
@@ -67,7 +68,7 @@ class ShellyControl:
         self.initialize_settings(device_settings)
 
         # Start the webhook server if needed
-        self._start_webhook_server()
+        self.webhook_server = self._start_webhook_server()
 
     def initialize_settings(self, device_settings: dict, refresh_status: bool | None = True):  # noqa: FBT001, FBT002
         """Initializes the Shelly devices using the provided settings.
@@ -888,6 +889,18 @@ class ShellyControl:
 
         return device_info
 
+    def shutdown(self):
+        """Cleanly shutdown the ShellyControl instance and stop the webhook server.
+
+        This method should be called when the parent application is terminating
+        to ensure proper cleanup of resources.
+        """
+        if self.webhook_server:
+            self.logger.log_message("Shutting down webhook server...", "debug")
+            self.webhook_server.shutdown()
+            self.webhook_server.server_close()
+            self.webhook_server = None
+
 # PRIVATE FUNCTIONS ===========================================================
 
     def _log_debug_message(self, message: str) -> None:
@@ -1282,7 +1295,7 @@ class ShellyControl:
             # Replace spaces with underscores and remove any non-alphanumeric characters
             file_name = "".join(c if c.isalnum() else "_" for c in file_name)
             file_name += ".json"  # Add the .json extension
-            new_device["SimulationFile"] = self.simulation_file_folder / file_name
+            new_device["SimulationFile"] = self.simulation_file_folder / file_name  # pyright: ignore[reportOptionalOperand]
 
         # Add any additional custom key / value pairs defined in component_config that don't already exist in new_component
         new_device["customkeylist"] = []  # Initialize custom key list
