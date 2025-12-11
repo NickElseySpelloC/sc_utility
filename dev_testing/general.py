@@ -36,6 +36,20 @@ def test_reportable_issue(logger: SCLogger):
             logger.clear_notifiable_issue(entity, issue)
 
 
+def test_select_file_location():
+    print(f"Project root: {SCCommon.get_project_root()}")
+    print(f"Locate file './dev_testing_config.yaml': {SCCommon.select_file_location('dev_testing_config.yaml')}")
+    print(f"Locate file 'src/shelly_models.json': {SCCommon.select_file_location('src/shelly_models.json')}")
+    print(f"Locate file 'logs/nolog.log': {SCCommon.select_file_location('logs/nolog.log')}")
+
+
+def test_select_folder_location():
+    print("\n\n")
+    print(f"Located project folder at: {SCCommon.select_folder_location()}")
+    print(f"Located folder 'logs' at: {SCCommon.select_folder_location('logs')}")
+    print(f"Located abs folder at: {SCCommon.select_folder_location('/Users/nick/tmp/123', create_folder=True)}")
+
+
 def main():
     """Main function to run the example code."""
     print(f"Hello from sc-utility running on {platform.system()}")
@@ -64,11 +78,8 @@ def main():
         return
     logger.log_message("This is a test message at the summary level.", "summary")
 
-    # SCCOmmon tests
-    print(f"Project root: {SCCommon.get_project_root()}")
-    print(f"Locate file './dev_testing_config.yaml': {SCCommon.select_file_location('dev_testing_config.yaml')}")
-    print(f"Locate file 'src/shelly_models.json': {SCCommon.select_file_location('src/shelly_models.json')}")
-    print(f"Locate file 'logs/nolog.log': {SCCommon.select_file_location('logs/nolog.log')}")
+    # SCCommon tests
+    test_select_folder_location()
 
     # Test internet connection
     # if not SCCommon.check_internet_connection():
