@@ -102,9 +102,9 @@ def test_spello_control(config, logger):
 
 def test_get_status(config, logger):
     """Test function for refresh status."""
-    loop_delay = 5
+    loop_delay = 1
     loop_count = 0
-    max_loops = 20
+    max_loops = 4
 
     output_name = "Sydney Dev A O1"
 
@@ -175,9 +175,9 @@ def test_get_status_and_temp(config, logger):
 
 def test_shelly_loop(config: SCConfigManager, logger: SCLogger):
     """Test function for configuration file changes."""
-    loop_delay = 5
+    loop_delay = 1
     loop_count = 0
-    max_loops = 20
+    max_loops = 4
     wake_event = threading.Event()
 
     shelly_control = create_shelly_control(config, logger, wake_event)
@@ -219,6 +219,9 @@ def test_shelly_loop(config: SCConfigManager, logger: SCLogger):
             wake_event.clear()
         loop_count += 1
 
+    # Shut down the Shelly control to clean up resources
+    shelly_control.shutdown()
+
 
 def main():
     """Main function to run the example code."""
@@ -253,9 +256,9 @@ def main():
 
     # test_spello_control(config, logger)
 
-    test_get_status(config, logger)
+    # test_get_status(config, logger)
 
-    # test_shelly_loop(config, logger)  # type: ignore[arg-type]
+    test_shelly_loop(config, logger)  # type: ignore[arg-type]
 
     # See if we have a fatal error from a previous run
     if logger.get_fatal_error():
