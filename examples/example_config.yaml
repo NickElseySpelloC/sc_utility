@@ -13,6 +13,7 @@ ShellyDevices:
   RetryCount: 1
   RetryDelay: 2
   PingAllowed: True
+  SimulationFileFolder: simulation_files
   # Enable or disable the webhook listener
   WebhooksEnabled: True
   # IP to listen for webhooks on. This should be the IP address of the machine running the app. Defaults to 0.0.0.0
