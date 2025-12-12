@@ -22,6 +22,7 @@ class APIMode(StrEnum):
 def test_json_encoder():
     # Create an object with various data types
     data_obj = {
+        "DaysOfWeek": "Sat,Sun,Tue",
         "string": "Hello, World!",
         "integer": 42,
         "float": 123.456,
