@@ -265,15 +265,18 @@ class JSONEncoder:
                             # fall through to the full parse attempt
                             pass
 
-                    try:
-                        dt_obj = parse(v)
-                        # If time part is zero, treat as date
-                        if dt_obj.time() == dt.time(0, 0):
-                            obj[k] = dt_obj.date()
-                        else:
-                            obj[k] = dt_obj
-                    except ValueError:
-                        pass    # Just ignore
+                    # Only try to parse if the string contains date/time-like patterns
+                    # This prevents parsing strings like "Sat,Sun,Tue" as dates
+                    if re.search(r"\d", v) and re.search(r"[:/\-]", v):
+                        try:
+                            dt_obj = parse(v, fuzzy=False)
+                            # If time part is zero, treat as date
+                            if dt_obj.time() == dt.time(0, 0):
+                                obj[k] = dt_obj.date()
+                            else:
+                                obj[k] = dt_obj
+                        except (ValueError, TypeError):
+                            pass    # Just ignore
                 elif isinstance(v, (dict, list)):
                     obj[k] = JSONEncoder.decode_object(v)
         elif isinstance(obj, list):
