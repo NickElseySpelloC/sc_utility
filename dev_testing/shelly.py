@@ -131,7 +131,7 @@ def test_get_status(config, logger):
             loop_count += 1
 
 
-def test_get_status_and_temp(config, logger):
+def test_get_status_and_temp(config, logger):  # noqa: PLR0914
     """Test function for refresh status."""
     loop_delay = 5
     loop_count = 0
@@ -158,16 +158,18 @@ def test_get_status_and_temp(config, logger):
             # Refresh the status of all devices
             shelly_control.refresh_all_device_statuses()
 
-            pump_state = pump_output.get("State", False)
+            pump_state = pump_output.get("State")
             roof_probe_id = roof_probe.get("ProbeID", None)
             roof_probe_reading = roof_probe.get("Temperature", None)
+            roof_time = roof_probe.get("LastReadingTime", None)
 
             pool_probe_id = pool_probe.get("ProbeID", None)
             pool_probe_reading = pool_probe.get("Temperature", None)
+            pool_time = pool_probe.get("LastReadingTime", None)
 
             print(f"{pump_output_name} State: {pump_state}.")
-            print(f"    {roof_probe_name} (ID: {roof_probe_id}) reading: {roof_probe_reading}°C")
-            print(f"    {pool_probe_name} (ID: {pool_probe_id}) reading: {pool_probe_reading}°C")
+            print(f"    {roof_probe_name} (ID: {roof_probe_id}) reading: {roof_probe_reading}°C last updated at {roof_time}")
+            print(f"    {pool_probe_name} (ID: {pool_probe_id}) reading: {pool_probe_reading}°C last updated at {pool_time}")
 
             time.sleep(loop_delay)
             loop_count += 1
@@ -258,7 +260,9 @@ def main():
 
     # test_get_status(config, logger)
 
-    test_shelly_loop(config, logger)  # type: ignore[arg-type]
+    # test_shelly_loop(config, logger)  # type: ignore[arg-type]
+
+    test_get_status_and_temp(config, logger)
 
     # See if we have a fatal error from a previous run
     if logger.get_fatal_error():
