@@ -405,7 +405,7 @@ class ShellyControl:
                     # Iterate through the temp probes for this device
                     for device_temp_probe in self.temp_probes:
                         if device_temp_probe["DeviceIndex"] == index:
-                            return_str += f"    - Index: {device_temp_probe['ComponentIndex']}, Temp.: {device_temp_probe['Temperature']}"
+                            return_str += f"    - Index: {device_temp_probe['ComponentIndex']}, Temp.: {device_temp_probe['Temperature']}. Last Reading: {device_temp_probe['LastReadingTime']}"
 
                             # Print custom meter attributes
                             custom_attrs = []
@@ -619,6 +619,7 @@ class ShellyControl:
                         if read_temp_probe:
                             probe_id = device_temp_probe["ProbeID"]
                             device_temp_probe["Temperature"] = result_data.get(f"temperature:{probe_id}", {}).get("tC", None)  # Probe temperature
+                            device_temp_probe["LastReadingTime"] = DateHelper.now()
             else:
                 # Process the response payload for REST protocol
                 device["MacAddress"] = result_data.get("mac", None)  # MAC address
@@ -1561,6 +1562,7 @@ class ShellyControl:
         elif component_type == "temp_probe":
             new_component["ProbeID"] = None   # The numeric ID assigned by the system, generally starts at 100
             new_component["Temperature"] = None
+            new_component["LastReadingTime"] = None
             new_component["RequiresOutput"] = None
         return new_component
 
@@ -2000,6 +2002,7 @@ class ShellyControl:
                             device_temp_probe["ComponentIndex"] == imported_temp_probe.get("ComponentIndex")):
                             # Update just the Temperature if available
                             device_temp_probe["Temperature"] = imported_temp_probe.get("Temperature", device_temp_probe.get("Temperature"))
+                            device_temp_probe["LastReadingTime"] = DateHelper.now()
 
             # Update the device's total power and energy readings
             self._calculate_device_totals(device)
