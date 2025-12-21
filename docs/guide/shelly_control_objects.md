@@ -93,6 +93,7 @@ Temperature Probe components will also have these attrbutes:
 
 - **ProbeID**: The internal ID assigned by the Shelly device to this add-on. Typically an integer starting at 100.
 - **Temperature**: Reported temperature reading for this probe in C.
+- **LastReadingTime**: Last time this probe was read.
 
 Note, depending on the Shelly models, some of these attrbutes may be empty. For example, some earlier generation 1 models would report power but not voltage or current.
 

@@ -27,11 +27,22 @@ To initialise an instance of the ShellyControl class, you need to pass it:
 Here's an example of a section of yaml file configuration for 3 Shelly devices
 
 ```yaml
+# This is an example configuration file for the Spello Consulting utility library
+
+# Just an example section to show how to set up a section
+AmberAPI:
+  APIKey: This is not the real API key
+  BaseUrl: https://api.amber.com.au/v1
+  Timeout: 15
+
+# Settings for oen or more Shelly smart switches. See documentation for more details.
 ShellyDevices:
+  AllowDebugLogging: True
   ResponseTimeout: 5
   RetryCount: 1
   RetryDelay: 2
   PingAllowed: True
+  SimulationFileFolder: simulation_files
   # Enable or disable the webhook listener
   WebhooksEnabled: True
   # IP to listen for webhooks on. This should be the IP address of the machine running the app. Defaults to 0.0.0.0
@@ -72,7 +83,6 @@ ShellyDevices:
     - Name: Outside Lights
       Model: Shelly2PMG3
       Hostname: 192.168.1.25
-      ExpectOffline: True
       ID: 200
       Inputs:
         - ID: 201
@@ -91,7 +101,27 @@ ShellyDevices:
         - Name: "Test Switch"
       Meters:
         - Name: "Test Meter"
-          MockRate: 0.23
+
+
+Files:
+  # Name of the log file. Set to blak of None to disable logging
+  LogfileName: logfile.log
+  # How many lines of log file to keep. Set to 0 to disable log file truncation. Defaults to 10,000 if not specified 
+  LogfileMaxLines: 500
+  # How much information do we write to the log file. One of: none; error; warning; summary; detailed; debug, all. Defaults to detailed if not specified.
+  LogfileVerbosity: all
+  # How much information do we write to the console. One of: error; warning; summary; detailed; debug, all. Defaults to summary if not specified.
+  ConsoleVerbosity: detailed
+
+# Enter your settings here if you want to be emailed when there's a critical error 
+Email:
+  EnableEmail: True
+  SendEmailsTo: 
+  SMTPServer: smtp.gmail.com
+  SMTPPort: 587
+  SMTPUsername: 
+  SMTPPassword: 
+  SubjectPrefix: 
 ```
 
 The entries are used as follows:
@@ -102,6 +132,7 @@ The entries are used as follows:
 | RetryCount | How many retries to make if an API call times out. | 
 | RetryDelay | How long to wait (in seconds) between retry attempts. | 
 | PingAllowed | Set to False if ICMP isn't suppported by the route to your devices. |
+| SimulationFileFolder | The folder to save JSON simulation files in. | 
 | WebhooksEnabled | Enable or disable the webhook listener |
 | WebhookHost | IP to listen for webhooks on. This should be the IP address of the machine running the app. Defaults to 0.0.0.0. |
 | WebhookPort | Port to listen for webhooks on. Defaults to 8787. |

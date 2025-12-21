@@ -3,12 +3,13 @@
 Management of a YAML log file.
 """
 import datetime as dt
+import os
 from collections.abc import Callable
-from mergedeep import merge
 from pathlib import Path
 
 import yaml
 from cerberus import Validator
+from mergedeep import merge
 
 from sc_utility.sc_common import SCCommon
 from sc_utility.validation_schema import yaml_config_validation
@@ -262,12 +263,18 @@ class SCConfigManager:
         enable_email = self.get(config_section, "EnableEmail", default=True)
         if not enable_email:
             return None
+        smtp_username = os.environ.get("SMTP_USERNAME")
+        if not smtp_username:
+            smtp_username = self.get(config_section, "SMTPUsername")
+        smtp_password = os.environ.get("SMTP_PASSWORD")
+        if not smtp_password:
+            smtp_password = self.get(config_section, "SMTPPassword")
 
         email_settings = {
             "SendEmailsTo": self.get(config_section, "SendEmailsTo"),
             "SMTPServer": self.get(config_section, "SMTPServer"),
-            "SMTPUsername": self.get(config_section, "SMTPUsername"),
-            "SMTPPassword": self.get(config_section, "SMTPPassword"),
+            "SMTPUsername": smtp_username,
+            "SMTPPassword": smtp_password,
             "SubjectPrefix": self.get(config_section, "SubjectPrefix"),
         }
 
