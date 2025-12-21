@@ -8,13 +8,14 @@ wheels/
 .DS_Store
 .venv
 .vscode
+.env
+.cache_ggshield
 
 # Virtual environments
 examples/*.log
 examples/*.json
 tests/config.yaml
 tests/*.log
-uv.lock
 /*.py
 /*.log
 /*.json

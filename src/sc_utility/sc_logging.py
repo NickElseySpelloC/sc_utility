@@ -414,8 +414,7 @@ class SCLogger:
         Args:
             message (str): The error message to write to the fatal error file.
         """
-        with Path(self.fatal_error_file_path).open("w", encoding="utf-8") as file:
-            file.write(message)
+        Path(self.fatal_error_file_path).write_text(message, encoding="utf-8")
 
     def report_notifiable_issue(self, entity: str, issue_type: str, send_delay: int, message: str) -> bool:
         """
