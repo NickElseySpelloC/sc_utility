@@ -1,6 +1,7 @@
+"""WeatherClient provider for OpenWeatherMap (OWM) API."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import requests
@@ -29,7 +30,7 @@ class OWMProvider:
             error_msg = f"OpenWeatherMap request failed: {e}"
             raise RuntimeError(error_msg) from e
 
-        utc_now = datetime.now(timezone.utc)
+        utc_now = datetime.now(UTC)
         current = one_call.current
 
         current_reading = WeatherReading(
@@ -44,9 +45,9 @@ class OWMProvider:
         for h in one_call.forecast_hourly or []:
             ref = h.reference_time("unix")
             if isinstance(ref, datetime):
-                utc_ts = ref if ref.tzinfo is not None else ref.replace(tzinfo=timezone.utc)
+                utc_ts = ref if ref.tzinfo is not None else ref.replace(tzinfo=UTC)
             else:
-                utc_ts = datetime.fromtimestamp(int(ref), tz=timezone.utc)
+                utc_ts = datetime.fromtimestamp(int(ref), tz=UTC)
             if utc_ts.date() != utc_now.date() or utc_ts < utc_now:
                 continue
             hourly.append(
@@ -90,10 +91,10 @@ class OWMProvider:
         current_resp.raise_for_status()
         current_data: dict[str, Any] = current_resp.json()
 
-        utc_now = datetime.now(timezone.utc)
+        utc_now = datetime.now(UTC)
         dt_raw = current_data.get("dt")
         dt_unix = int(dt_raw) if isinstance(dt_raw, (int, float)) else int(utc_now.timestamp())
-        utc_current_time = datetime.fromtimestamp(dt_unix, tz=timezone.utc)
+        utc_current_time = datetime.fromtimestamp(dt_unix, tz=UTC)
         current_weather = (current_data.get("weather") or [{}])[0] or {}
         current_wind = current_data.get("wind") or {}
         # Convert the wind speed from m/s to km/h
@@ -118,7 +119,7 @@ class OWMProvider:
 
         hourly: list[WeatherReading] = []
         for item in forecast_data.get("list", []):
-            utc_ts = datetime.fromtimestamp(int(item.get("dt", 0)), tz=timezone.utc)
+            utc_ts = datetime.fromtimestamp(int(item.get("dt", 0)), tz=UTC)
             if utc_ts.date() != utc_now.date() or utc_ts < utc_now:
                 continue
 
