@@ -1,6 +1,7 @@
+"""WeatherClient provider for Open Meteo weather provider."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import requests
@@ -33,12 +34,12 @@ class OpenMeteoProvider:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data: dict[str, Any] = response.json()
-        utc_now = datetime.now(timezone.utc)
+        utc_now = datetime.now(UTC)
 
         c = data["current_weather"]
         current_time_raw = c.get("time")
         utc_time = (
-            datetime.fromisoformat(current_time_raw).replace(tzinfo=timezone.utc)
+            datetime.fromisoformat(current_time_raw).replace(tzinfo=UTC)
             if isinstance(current_time_raw, str)
             else utc_now
         )
@@ -53,7 +54,7 @@ class OpenMeteoProvider:
 
         hourly = []
         for i, ts in enumerate(data["hourly"]["time"]):
-            utc_ts_dt = datetime.fromisoformat(ts).replace(tzinfo=timezone.utc)
+            utc_ts_dt = datetime.fromisoformat(ts).replace(tzinfo=UTC)
             local_ts_dt = utc_ts_dt.astimezone()
             if utc_ts_dt.date() != utc_time.date() or utc_ts_dt < utc_time:
                 continue

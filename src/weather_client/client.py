@@ -1,3 +1,4 @@
+"""WeatherClient main client module."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -11,6 +12,13 @@ if TYPE_CHECKING:
 
 class WeatherClient:
     def __init__(self, latitude: float, longitude: float, owm_api_key: str | None = None):
+        """Initialize the WeatherClient.
+
+        Args:
+            latitude: Latitude of the location to fetch weather for.
+            longitude: Longitude of the location to fetch weather for.
+            owm_api_key: Optional OpenWeatherMap API key for enhanced data.
+        """
         self.latitude = latitude
         self.longitude = longitude
         self._owm = OWMProvider(owm_api_key) if owm_api_key else None
