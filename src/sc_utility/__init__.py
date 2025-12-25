@@ -3,6 +3,8 @@ sc_utility package.
 
 This package provides utility functions and classes for the SC project.
 """
+from weather_client import WeatherClient
+
 from .sc_common import SCCommon
 from .sc_config_mgr import SCConfigManager
 from .sc_csv_reader import CSVReader
@@ -14,4 +16,4 @@ from .sc_shelly_control import ShellyControl
 from .validation_schema import yaml_config_validation
 from .webhook_server import _ShellyWebhookHandler
 
-__all__ = ["CSVReader", "DateHelper", "ExcelReader", "JSONEncoder", "SCCommon", "SCConfigManager", "SCLogger", "ShellyControl", "_ShellyWebhookHandler", "yaml_config_validation"]
+__all__ = ["CSVReader", "DateHelper", "ExcelReader", "JSONEncoder", "SCCommon", "SCConfigManager", "SCLogger", "ShellyControl", "WeatherClient", "_ShellyWebhookHandler", "yaml_config_validation"]
