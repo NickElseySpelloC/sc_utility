@@ -80,6 +80,10 @@ class SCLogger:
         self.file_logging_enabled = False
         self.notifiable_issues: list[NotifiableIssue] = []
 
+        # Serialize logfile I/O across threads (trim/write must not interleave)
+        self._logfile_lock = threading.RLock()
+        self._fatal_error_file_lock = threading.RLock()
+
         self.initialise_settings(logger_settings)
 
     def initialise_settings(self, logger_settings: dict):
@@ -119,10 +123,11 @@ class SCLogger:
             return
 
         assert self.logfile_path is not None, "Log file path must be set before trimming the log file."
-        if self.logfile_path.exists() and self.max_lines is not None and self.max_lines > 0:
-            # Monitoring log file exists - truncate excess lines if needed.
-            with self.logfile_path.open(encoding="utf-8") as file:
-                lines = file.readlines()
+
+        with self._logfile_lock:
+            if self.logfile_path.exists() and self.max_lines is not None and self.max_lines > 0:
+                with self.logfile_path.open(encoding="utf-8") as file:
+                    lines = file.readlines()
 
                 if len(lines) > self.max_lines:
                     # Keep the last max_lines rows
@@ -175,12 +180,14 @@ class SCLogger:
             assert self.logfile_path is not None, "Log file path must be set before trimming the log file."
             error_str = " ERROR" if verbosity == "error" else " WARNING" if verbosity == "warning" else ""
             if logfile_level >= message_level and logfile_level > 0:
-                with self.logfile_path.open("a", encoding="utf-8") as file:
+                with self._logfile_lock, self.logfile_path.open("a", encoding="utf-8") as file:
                     if not message:
                         file.write("\n")
                     else:
                         # Use the local timezone for the log timestamp
-                        file.write(f"{DateHelper.now().strftime(self.timestamp_format)}{error_str}: {process_str}{message}\n")
+                        file.write(
+                            f"{DateHelper.now().strftime(self.timestamp_format)}{error_str}: {process_str}{message}\n"
+                        )
 
     def register_email_settings(self, email_settings: dict | None) -> None:
         """
@@ -402,9 +409,10 @@ class SCLogger:
         Returns:
             result (bool): True if the file was deleted, False if it did not exist.
         """
-        if Path(self.fatal_error_file_path).exists():
-            Path(self.fatal_error_file_path).unlink()
-            return True
+        with self._fatal_error_file_lock:
+            if Path(self.fatal_error_file_path).exists():
+                Path(self.fatal_error_file_path).unlink()
+                return True
         return False
 
     def set_fatal_error(self, message: str) -> None:
@@ -414,7 +422,8 @@ class SCLogger:
         Args:
             message (str): The error message to write to the fatal error file.
         """
-        Path(self.fatal_error_file_path).write_text(message, encoding="utf-8")
+        with self._fatal_error_file_lock:
+            Path(self.fatal_error_file_path).write_text(message, encoding="utf-8")
 
     def report_notifiable_issue(self, entity: str, issue_type: str, send_delay: int, message: str) -> bool:
         """

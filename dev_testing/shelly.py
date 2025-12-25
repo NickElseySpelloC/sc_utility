@@ -137,6 +137,7 @@ def test_get_status_and_temp(config, logger):  # noqa: PLR0914
     loop_count = 0
     max_loops = 20
 
+    device_name = "Sydney Solar"
     pump_output_name = "Sydney Dev A O1"
     roof_probe_name = "Temp Roof"
     pool_probe_name = "Temp Pool Water"
@@ -144,9 +145,11 @@ def test_get_status_and_temp(config, logger):  # noqa: PLR0914
     shelly_control = create_shelly_control(config, logger)
     assert shelly_control is not None, "Shelly control should be initialized."
     try:
+        device = shelly_control.get_device(device_name)
         pump_output = shelly_control.get_device_component("output", pump_output_name)
         roof_probe = shelly_control.get_device_component("temp_probe", roof_probe_name)
         pool_probe = shelly_control.get_device_component("temp_probe", pool_probe_name)
+        internal_probe = shelly_control.get_device_component("temp_probe", device_name)
     except RuntimeError as e:
         print(f"Error getting device: {e}", file=sys.stderr)
         sys.exit(1)
@@ -158,6 +161,7 @@ def test_get_status_and_temp(config, logger):  # noqa: PLR0914
             # Refresh the status of all devices
             shelly_control.refresh_all_device_statuses()
 
+            device_temp = device.get("Temperature", None)
             pump_state = pump_output.get("State")
             roof_probe_id = roof_probe.get("ProbeID", None)
             roof_probe_reading = roof_probe.get("Temperature", None)
@@ -167,9 +171,13 @@ def test_get_status_and_temp(config, logger):  # noqa: PLR0914
             pool_probe_reading = pool_probe.get("Temperature", None)
             pool_time = pool_probe.get("LastReadingTime", None)
 
+            internal_probe_reading = internal_probe.get("Temperature", None)
+
+            print(f"{device_name} Temperature: {device_temp}°C.")
             print(f"{pump_output_name} State: {pump_state}.")
             print(f"    {roof_probe_name} (ID: {roof_probe_id}) reading: {roof_probe_reading}°C last updated at {roof_time}")
             print(f"    {pool_probe_name} (ID: {pool_probe_id}) reading: {pool_probe_reading}°C last updated at {pool_time}")
+            print(f"    {device_name} Internal Probe reading: {internal_probe_reading}°C")
 
             time.sleep(loop_delay)
             loop_count += 1

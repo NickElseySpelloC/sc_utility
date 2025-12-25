@@ -606,6 +606,10 @@ class ShellyControl:
                             device_meter["Current"] = result_data.get(f"switch:{component_index}", {}).get("current", None)
                             device_meter["PowerFactor"] = result_data.get(f"switch:{component_index}", {}).get("pf", None)
                             device_meter["Energy"] = result_data.get(f"switch:{component_index}", {}).get("aenergy", {}).get("total", None)
+
+                # Calculate the device temperature for gen 2 devices - based on average of the output temperatures
+                self._calculate_gen2_device_temp(device)
+
                 for device_temp_probe in self.temp_probes:
                     if device_temp_probe["DeviceIndex"] == device["Index"]:
                         read_temp_probe = True
@@ -618,7 +622,10 @@ class ShellyControl:
 
                         if read_temp_probe:
                             probe_id = device_temp_probe["ProbeID"]
-                            device_temp_probe["Temperature"] = result_data.get(f"temperature:{probe_id}", {}).get("tC", None)  # Probe temperature
+                            if probe_id == -1:  # Special case - treat the device temp as a probe
+                                device_temp_probe["Temperature"] = device["Temperature"]
+                            else:
+                                device_temp_probe["Temperature"] = result_data.get(f"temperature:{probe_id}", {}).get("tC", None)  # Probe temperature
                             device_temp_probe["LastReadingTime"] = DateHelper.now()
             else:
                 # Process the response payload for REST protocol
@@ -658,7 +665,7 @@ class ShellyControl:
             raise RuntimeError(error_msg) from e
 
         # If we have any energy meters, sum the power and energy readings for each meter and add them to the device
-        self._calculate_device_totals(device)
+        self._calculate_device_energy_totals(device)
 
         # Finally, install the default webhooks if we were offline and are now back
         if device["Online"] and device["WebhookInstallPending"]:
@@ -1478,6 +1485,10 @@ class ShellyControl:
             elif component_type == "temp_probe":
                 new_component["RequiresOutput"] = component_config[component_idx].get("RequiresOutput", None) if component_config else None
 
+                # Issue 19 - if the probe name matches the device name, set the ProbeID to -1 to indicate it's the internal probe
+                if new_component["Name"] == device["ClientName"]:
+                    new_component["ProbeID"] = -1
+
             # Add any additional custom key / value pairs defined in component_config that don't already exist in new_component
             new_component["customkeylist"] = []  # Initialize custom key list
             if component_config:
@@ -1798,7 +1809,7 @@ class ShellyControl:
                 self._extract_temp_probe_config(device, config_response)
 
     def _extract_temp_probe_config(self, device: dict, payload: dict):
-        """Extracts temp probe data from anRPC GetConfig payload.
+        """Extracts temp probe data from an RPC GetConfig payload.
 
         Args:
             device (dict): A device dict.
@@ -1821,7 +1832,7 @@ class ShellyControl:
             if (probe_id - FIRST_TEMP_PROBE_ID) > 20:
                 break
 
-    def _calculate_device_totals(self, device: dict) -> None:
+    def _calculate_device_energy_totals(self, device: dict) -> None:
         """Calculates the total power and energy consumption for a device.
 
         This function iterates through the outputs and meters of the device to calculate the total power and energy consumption.
@@ -1841,7 +1852,12 @@ class ShellyControl:
             device["TotalPower"] = total_power
             device["TotalEnergy"] = total_energy
 
-        # Set the Gen2+ device temperature if output temperature monitoring is available
+    def _calculate_gen2_device_temp(self, device: dict) -> None:
+        """Set the Gen2+ device temperature if output temperature monitoring is available.
+
+        Args:
+            device (dict): The Shelly device dictionary containing outputs and meters.
+        """
         if device["TemperatureMonitoring"] and device["Outputs"] > 0:
             average_temperature = 0
             output_count = 0
@@ -2005,7 +2021,8 @@ class ShellyControl:
                             device_temp_probe["LastReadingTime"] = DateHelper.now()
 
             # Update the device's total power and energy readings
-            self._calculate_device_totals(device)
+            self._calculate_device_energy_totals(device)
+            self._calculate_gen2_device_temp(device)
 
         except OSError as e:
             error_msg = f"Error reading JSON file {file_path}: {e}"
