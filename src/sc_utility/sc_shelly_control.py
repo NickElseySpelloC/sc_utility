@@ -70,7 +70,7 @@ class ShellyControl:
         # Start the webhook server if needed
         self.webhook_server = self._start_webhook_server()
 
-    def initialize_settings(self, device_settings: dict, refresh_status: bool | None = True):  # noqa: FBT001, FBT002
+    def initialize_settings(self, device_settings: dict, refresh_status: bool | None = True):
         """Initializes the Shelly devices using the provided settings.
 
         Args:
@@ -252,7 +252,7 @@ class ShellyControl:
         error_msg = f"Device {device_identity} not found."
         raise RuntimeError(error_msg)
 
-    def get_device_component(self, component_type: str, component_identity: int | str, use_index: bool | None = None) -> dict:  # noqa: FBT001
+    def get_device_component(self, component_type: str, component_identity: int | str, use_index: bool | None = None) -> dict:
         """Returns a device component's index for a given component ID or name.
 
         Args:
@@ -493,6 +493,11 @@ class ShellyControl:
         """
         # Get the device object
         if isinstance(device_identity, dict):
+            object_type = device_identity.get("ObjectType")
+            if object_type != "device":
+                error_msg = f"Object passed to get_device_status is not a device. Object type was {object_type}"
+                self.logger.log_message(error_msg, "error")
+                raise RuntimeError(error_msg)
             # If we are passed a device dictionary, use that directly
             device = device_identity
         else:
@@ -590,15 +595,15 @@ class ShellyControl:
                     if device_meter["DeviceIndex"] == device["Index"]:
                         component_index = device_meter["ComponentIndex"]
                         if device["MetersSeperate"]:
-                            if len(em_result_data) <= device["Meters"] or len(emdata_result_data) <= device["Meters"]:
+                            if len(em_result_data) != device["Meters"] or len(emdata_result_data) != device["Meters"]:
                                 error_msg = f"Device {device['Label']} is online, but meters are separate and at least one EM1.GetStatus RPC call failed. Cannot get meter status. Check models file."
                                 self.logger.log_message(error_msg, "error")
                                 raise RuntimeError(error_msg)  # noqa: TRY301
-                            device_meter["Power"] = result_data.get("params", {}).get("act_power", None)
-                            device_meter["Voltage"] = result_data.get("params", {}).get("voltage", None)
-                            device_meter["Current"] = result_data.get("params", {}).get("current", None)
-                            device_meter["PowerFactor"] = result_data.get("params", {}).get("pf", None)
-                            device_meter["Energy"] = emdata_result_data[component_index].get("params", {}).get("total_act_energy", None)
+                            device_meter["Power"] = em_result_data[component_index].get("act_power", None)
+                            device_meter["Voltage"] = em_result_data[component_index].get("voltage", None)
+                            device_meter["Current"] = em_result_data[component_index].get("current", None)
+                            device_meter["PowerFactor"] = em_result_data[component_index].get("pf", None)
+                            device_meter["Energy"] = emdata_result_data[component_index].get("total_act_energy", None)
                         else:
                             # Meters are on the switch. Make sure our component index matches the switch index
                             device_meter["Power"] = result_data.get(f"switch:{component_index}", {}).get("apower", None)  # Power in watts
@@ -717,7 +722,7 @@ class ShellyControl:
                 self.logger.log_message(f"Error refreshing status for device {device['Label']}: {e}", "error")
                 raise RuntimeError(e) from e
 
-    def change_output(self, output_identity: dict | int | str, new_state: bool) -> tuple[bool, bool]:  # noqa: FBT001
+    def change_output(self, output_identity: dict | int | str, new_state: bool) -> tuple[bool, bool]:
         """Change the state of a Shelly device output to on or off.
 
         Args:
@@ -866,7 +871,7 @@ class ShellyControl:
         else:
             return result_data
 
-    def get_device_information(self, device_identity: dict | int | str, refresh_status: bool = False) -> dict:  # noqa: FBT001, FBT002
+    def get_device_information(self, device_identity: dict | int | str, refresh_status: bool = False) -> dict:
         """Returns a consolidated copy of a Shelly device information as a single dictionary, including its inputs, outputs, and meters.
 
         Args:
@@ -1914,7 +1919,7 @@ class ShellyControl:
             self._log_debug_message(f"Device information for {device['Label']} exported to {file_path}")
             return True
 
-    def _import_device_information_from_json(self, device: dict, create_if_no_file: bool) -> bool:  # noqa: FBT001, PLR0912, PLR0915
+    def _import_device_information_from_json(self, device: dict, create_if_no_file: bool) -> bool:  # noqa: PLR0912, PLR0915
         """Imports device information from a JSON file and updates the device attributes.
 
         While the JSON file will store everything provided by get_device_information(), this function
