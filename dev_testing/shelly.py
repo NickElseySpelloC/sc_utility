@@ -131,6 +131,50 @@ def test_get_status(config, logger):
             loop_count += 1
 
 
+def test_new_meter(config, logger):  # noqa: PLR0914
+    """Test function for refresh status."""
+    loop_delay = 1
+    loop_count = 0
+    max_loops = 10
+
+    meter_device_name = "Sydney Panel EM1"
+    meter1_name = "Sydney Panel EM1 M1"
+    meter2_name = "Sydney Panel EM1 M2"
+    output_name = "Sydney Panel EM1 O1"
+
+    shelly_control = create_shelly_control(config, logger)
+    assert shelly_control is not None, "Shelly control should be initialized."
+    try:
+        meter_device = shelly_control.get_device(meter_device_name)
+        output = shelly_control.get_device_component("output", output_name)
+        meter1 = shelly_control.get_device_component("meter", meter1_name)
+        meter2 = shelly_control.get_device_component("meter", meter2_name)
+    except RuntimeError as e:
+        print(f"Error getting device: {e}", file=sys.stderr)
+        sys.exit(1)
+    except TimeoutError as e:
+        print(f"Timeout error getting device: {e}", file=sys.stderr)
+        sys.exit(1)
+    else:
+        while loop_count < max_loops:
+            # Refresh the status of all devices
+            shelly_control.get_device_status(meter_device)
+
+            meter1_volts = meter1.get("Voltage", False)
+            meter1_power = meter1.get("Power", False)
+            meter1_energy = meter1.get("Energy", False)
+            meter2_volts = meter2.get("Voltage", False)
+            meter2_power = meter2.get("Power", False)
+            meter2_energy = meter1.get("Energy", False)
+
+            print(f"{meter1_name} Volts: {meter1_volts}, Power: {meter1_power}, Energy: {meter1_energy}.")
+            print(f"{meter2_name} Volts: {meter2_volts}, Power: {meter2_power}, Energy: {meter2_energy}.")
+            print(f"{output_name} State: {output.get('State', False)}.")
+
+            time.sleep(loop_delay)
+            loop_count += 1
+
+
 def test_get_status_and_temp(config, logger):  # noqa: PLR0914
     """Test function for refresh status."""
     loop_delay = 5
@@ -270,7 +314,9 @@ def main():
 
     # test_shelly_loop(config, logger)  # type: ignore[arg-type]
 
-    test_get_status_and_temp(config, logger)
+    # test_get_status_and_temp(config, logger)
+
+    test_new_meter(config, logger)
 
     # See if we have a fatal error from a previous run
     if logger.get_fatal_error():
