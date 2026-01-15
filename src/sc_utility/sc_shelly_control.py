@@ -600,13 +600,15 @@ class ShellyControl:
                                 self.logger.log_message(error_msg, "error")
                                 raise RuntimeError(error_msg)  # noqa: TRY301
                             device_meter["Power"] = em_result_data[component_index].get("act_power", None)
+                            device_meter["Power"] = abs(device_meter["Power"]) if device_meter["Power"] is not None else None  # Power in watts
                             device_meter["Voltage"] = em_result_data[component_index].get("voltage", None)
                             device_meter["Current"] = em_result_data[component_index].get("current", None)
                             device_meter["PowerFactor"] = em_result_data[component_index].get("pf", None)
                             device_meter["Energy"] = emdata_result_data[component_index].get("total_act_energy", None)
                         else:
                             # Meters are on the switch. Make sure our component index matches the switch index
-                            device_meter["Power"] = result_data.get(f"switch:{component_index}", {}).get("apower", None)  # Power in watts
+                            device_meter["Power"] = result_data.get(f"switch:{component_index}", {}).get("apower", None)
+                            device_meter["Power"] = abs(device_meter["Power"]) if device_meter["Power"] is not None else None
                             device_meter["Voltage"] = result_data.get(f"switch:{component_index}", {}).get("voltage", None)
                             device_meter["Current"] = result_data.get(f"switch:{component_index}", {}).get("current", None)
                             device_meter["PowerFactor"] = result_data.get(f"switch:{component_index}", {}).get("pf", None)
@@ -658,6 +660,7 @@ class ShellyControl:
                         meter_key = "emeters" if len(result_data.get("emeters", [])) > 0 else "meters"
 
                         device_meter["Power"] = result_data.get(meter_key, [])[component_index].get("power", None)
+                        device_meter["Power"] = abs(device_meter["Power"]) if device_meter["Power"] is not None else None
                         device_meter["Voltage"] = result_data.get(meter_key, [])[component_index].get("voltage", None)
                         device_meter["Energy"] = result_data.get(meter_key, [])[component_index].get("total", None)
 
@@ -2056,4 +2059,5 @@ class ShellyControl:
         """
         for device_output in self.outputs:
             if device_output["DeviceIndex"] == device["Index"]:
+
                 device_output["State"] = False

@@ -135,7 +135,7 @@ def test_new_meter(config, logger):  # noqa: PLR0914
     """Test function for refresh status."""
     loop_delay = 1
     loop_count = 0
-    max_loops = 10
+    max_loops = 5
 
     meter_device_name = "Sydney Panel EM1"
     meter1_name = "Sydney Panel EM1 M1"
