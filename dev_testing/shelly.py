@@ -165,7 +165,7 @@ def test_new_meter(config, logger):  # noqa: PLR0914
             meter1_energy = meter1.get("Energy", False)
             meter2_volts = meter2.get("Voltage", False)
             meter2_power = meter2.get("Power", False)
-            meter2_energy = meter1.get("Energy", False)
+            meter2_energy = meter2.get("Energy", False)
 
             print(f"{meter1_name} Volts: {meter1_volts}, Power: {meter1_power}, Energy: {meter1_energy}.")
             print(f"{meter2_name} Volts: {meter2_volts}, Power: {meter2_power}, Energy: {meter2_energy}.")
