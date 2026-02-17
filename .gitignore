@@ -26,3 +26,82 @@ dev_testing/*.log
 dev_testing/*.json
 dev_testing/test_api.sh
 dev_testing/api_hack.sh
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+
+# Added by ggshield
+.cache_ggshield
+tests/.env.test

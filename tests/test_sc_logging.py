@@ -56,6 +56,8 @@ def test_register_email_settings():
     """Test registering email settings."""
     email_settings = config.get_email_settings()
 
+    print(f"Email settings retrieved from configuration: {email_settings}")
+
     assert isinstance(email_settings, dict), "Email settings should be a dictionary"
     assert "SendEmailsTo" in email_settings, "Email settings should contain 'SendEmailsTo'"
 
@@ -79,3 +81,6 @@ def test_send_email():
         assert logger.send_email("Hello world", text_content_path, test_mode=True), "Sending text file email."
     else:
         print("No email settings found in the configuration, skipping email test.")
+
+
+# test_register_email_settings()

@@ -28,6 +28,7 @@ dev = [
     "pytest>=8.3.5",
     "pytest-mock>=3.15.1",
     "pre-commit>=3.5.0",
+    "pytest-dotenv>=0.5.2",
 ]
 docs = [
     "mkdocs>=1.6.1",
@@ -58,3 +59,18 @@ where = ["src"]
 
 [tool.pylint.messages_control]
 disable = ["C0302"]
+
+[tool.pytest.ini_options]
+env_files = [".env.test"]
+
+[dev.env.sync]
+remote="~/Library/CloudStorage/Dropbox/Development/dev_setup/app_config/sc_utility"
+patterns = [
+    ".env",
+    "state_data/*",
+    "logs/*",
+    "dev_testing/*.yaml",
+    "dev_testing/*.log",
+    "dev_testing/*.json",
+    "tests/config.yaml",
+]
