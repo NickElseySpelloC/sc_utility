@@ -100,6 +100,8 @@ class JSONEncoder:
         Returns:
             result (bool): True if the pricing data was saved, False if not.
         """
+        # Make sure the parent folder exists before trying to write the file
+        file_path.parent.mkdir(parents=True, exist_ok=True)     # Issue 27
         try:
             temporary_path = file_path.with_suffix(".tmp")
 
