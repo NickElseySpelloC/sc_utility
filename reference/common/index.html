@@ -1549,7 +1549,7 @@
 
 
 <h2 id="sc_utility.sc_common.SCCommon.select_file_location" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">select_file_location</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">select_file_location</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">create_folder</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
@@ -1617,6 +1617,22 @@
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>create_folder</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, create the parent folder if it does not exist. Default is False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
             </td>
           </tr>
       </tbody>
