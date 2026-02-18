@@ -14,6 +14,7 @@ wheels/
 # Virtual environments
 examples/*.log
 examples/*.json
+logs/*
 tests/config.yaml
 tests/*.log
 /*.py
@@ -26,6 +27,7 @@ dev_testing/*.log
 dev_testing/*.json
 dev_testing/test_api.sh
 dev_testing/api_hack.sh
+dev_testing/logs/*
 
 # Added by ggshield
 .cache_ggshield
@@ -44,64 +46,3 @@ dev_testing/api_hack.sh
 
 # Added by ggshield
 .cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-
-# Added by ggshield
-.cache_ggshield
-tests/.env.test

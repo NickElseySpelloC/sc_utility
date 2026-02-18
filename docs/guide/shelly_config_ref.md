@@ -1,14 +1,5 @@
 
 ```yaml
-# This is an example configuration file for the Spello Consulting utility library
-
-# Just an example section to show how to set up a section
-AmberAPI:
-  APIKey: This is not the real API key
-  BaseUrl: https://api.amber.com.au/v1
-  Timeout: 15
-
-# Settings for oen or more Shelly smart switches. See documentation for more details.
 ShellyDevices:
   AllowDebugLogging: True
   ResponseTimeout: 5
@@ -75,26 +66,6 @@ ShellyDevices:
       Meters:
         - Name: "Test Meter"
 
-
-Files:
-  # Name of the log file. Set to blak of None to disable logging
-  LogfileName: logfile.log
-  # How many lines of log file to keep. Set to 0 to disable log file truncation. Defaults to 10,000 if not specified 
-  LogfileMaxLines: 500
-  # How much information do we write to the log file. One of: none; error; warning; summary; detailed; debug, all. Defaults to detailed if not specified.
-  LogfileVerbosity: all
-  # How much information do we write to the console. One of: error; warning; summary; detailed; debug, all. Defaults to summary if not specified.
-  ConsoleVerbosity: detailed
-
-# Enter your settings here if you want to be emailed when there's a critical error 
-Email:
-  EnableEmail: True
-  SendEmailsTo: 
-  SMTPServer: smtp.gmail.com
-  SMTPPort: 587
-  SMTPUsername: 
-  SMTPPassword: 
-  SubjectPrefix: 
 ```
 
 The entries are used as follows:
@@ -118,7 +89,7 @@ The Devices key in the configuration block supports the following keys :
 | Parameter | Description | 
 |:--|:--|
 | Name | Your name for this device  |
-| Model | The model Shelly ID for this device. See the [Shelly Models List](shelly_models_list.md) for more. |
+| Model | The model Shelly ID for this device. See the **Shelly Models List** for more. |
 | Hostname | The network IP address or hostname for this device. |
 | ID | Your numeric ID for this device. |
 | Simulate | Set this to True if you don't have access to the device but still want to test your code. When True, this device will be in 'simulation' mode. Rather than make API calls to the device, the state will be written to and read from a local json file (with the same name as your Name entry). You can modify some of the values in this file to test your code. |

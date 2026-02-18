@@ -209,7 +209,7 @@ class SCCommon:
         raise RuntimeError(error_msg)
 
     @staticmethod
-    def select_file_location(file_name: str) -> Path | None:
+    def select_file_location(file_name: str, create_folder: bool = False) -> Path | None:
         """Select the file location for the given file name. It resolves an absolute path for the file_name as follows.
 
         1. If file_name is an absolute path, return it as a Path object.
@@ -223,41 +223,51 @@ class SCCommon:
 
         Args:
             file_name: The name of the file to locate. Can be just a file name, or a relative or absolute path.
+            create_folder: If True, create the parent folder if it does not exist. Default is False.
 
         Returns:
             file_path (Path): The full path to the file as a Path object. None if the file_name does not appear to be a path.
         """
+        return_file_path = None
+
         # Look at the file_name and see if it looks like a path
         if not SCCommon.is_probable_path(file_name):
             return None
 
         # Check to see if file_name is a full path or just a file name
-        file_path = Path(file_name)
+        return_file_path = Path(file_name)
 
         # Check if file_name is an absolute path, return this even if it does not exist
-        if file_path.is_absolute():
-            return file_path
+        if return_file_path.is_absolute():
+            SCCommon._create_folder_if_not_exists(return_file_path.parent) if create_folder else None
+            return return_file_path
 
         # Check if file_name contains any parent directories (i.e., is a relative path)
         # If so, return this even if it does not exist
-        if file_path.parent != Path("."):  # noqa: PTH201
+        if return_file_path.parent != Path("."):  # noqa: PTH201
             # It's a relative path
-            return (Path.cwd() / file_path).resolve()
+            return_file_path = (Path.cwd() / return_file_path).resolve()
+            SCCommon._create_folder_if_not_exists(return_file_path.parent) if create_folder else None
+            return return_file_path
 
         # Otherwise, assume it's just a file name and look for it in the current directory and the script directory
         current_dir = Path.cwd()
-        file_path = current_dir / file_name
-        if not file_path.exists():
+        return_file_path = current_dir / file_name
+        if not return_file_path.exists():
             try:
                 project_root_dir = SCCommon.get_project_root()
-                file_path = project_root_dir / file_name
+                return_file_path = project_root_dir / file_name
             except RuntimeError as e:
                 error_msg = f"Cannot determine project root to locate file '{file_name}': {e}"
                 raise RuntimeError(error_msg) from e
-        return file_path
+
+        if return_file_path:
+            SCCommon._create_folder_if_not_exists(return_file_path.parent) if create_folder else None
+
+        return return_file_path
 
     @staticmethod
-    def select_folder_location(folder_path: str | None = None, create_folder: bool = False) -> Path | None:  # noqa: FBT001, FBT002
+    def select_folder_location(folder_path: str | None = None, create_folder: bool = False) -> Path | None:
         """Return an absolute folder path for the given (relative) folder path.
 
         If folder_path is None, return the project root folder.
@@ -288,12 +298,8 @@ class SCCommon:
         if not selected_folder.is_absolute():
             selected_folder = (project_root / selected_folder).resolve()
 
-        if create_folder and not selected_folder.exists():
-            try:
-                selected_folder.mkdir(parents=True, exist_ok=True)
-            except OSError as e:
-                error_msg = f"Error creating folder '{selected_folder}': {e}"
-                raise RuntimeError(error_msg) from e
+        if create_folder:
+            SCCommon._create_folder_if_not_exists(selected_folder)
 
         return selected_folder
 
@@ -305,3 +311,20 @@ class SCCommon:
             The process ID of the current process.
         """
         return os.getpid()
+
+    @staticmethod
+    def _create_folder_if_not_exists(folder_path: Path) -> None:
+        """Create the folder if it does not exist.
+
+        Args:
+            folder_path: The path of the folder to create.
+
+        Raises:
+            RuntimeError: If folder creation fails.
+        """
+        if not folder_path.exists():
+            try:
+                folder_path.mkdir(parents=True, exist_ok=True)
+            except OSError as e:
+                error_msg = f"Error creating folder '{folder_path}': {e}"
+                raise RuntimeError(error_msg) from e
