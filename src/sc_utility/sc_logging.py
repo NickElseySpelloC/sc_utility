@@ -105,7 +105,7 @@ class SCLogger:
         self.file_logging_enabled = self.logfile_name is not None
 
         if self.file_logging_enabled and self.logfile_name is not None:
-            self.logfile_path = SCCommon.select_file_location(self.logfile_name)
+            self.logfile_path = SCCommon.select_file_location(self.logfile_name, create_folder=True)
 
             # Truncate the log file if it exists
             self._initialise_monitoring_logfile()
@@ -227,7 +227,7 @@ class SCLogger:
         # Store the email settings in the config object
         self.email_settings = email_settings
 
-    def send_email(self, subject: str, body: str | Path, test_mode: bool = False) -> bool:  # noqa: FBT001, FBT002, PLR0911, PLR0912, PLR0915
+    def send_email(self, subject: str, body: str | Path, test_mode: bool = False) -> bool:  # noqa: PLR0911, PLR0912, PLR0915
         """
         Sends an email using the SMTP server previously specified in register_email_settings().
 
@@ -346,7 +346,7 @@ class SCLogger:
         else:
             return True  # Email sent successfully
 
-    def log_fatal_error(self, message: str, report_stack: bool = False, calling_function: str | None = None) -> None:  # noqa: FBT001, FBT002
+    def log_fatal_error(self, message: str, report_stack: bool = False, calling_function: str | None = None) -> None:
         """
         Log a fatal error, send an email if configured to so and then exit the program.
 
