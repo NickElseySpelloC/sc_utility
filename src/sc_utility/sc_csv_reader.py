@@ -49,7 +49,7 @@ class CSVReader:
             If header_config has been supplied, validate it:
             1. Make sure it's a list of dictionaries.
             2. Ensure each header is a dictionary with 'name' and 'type' keys.
-            3. 'type' can be 'str', 'int', 'float', 'date' or 'datetime'.
+            3. 'type' can be 'str', 'int', 'float', 'date', 'datetime', 'time' or 'bool'.
             4. If 'date', 'datetime' or 'time', it can have an optional 'format' key.
             5. The only allowed attributes in the header dictionaries are 'name', 'type', 'format', 'match' and 'sort'
 
@@ -63,7 +63,7 @@ class CSVReader:
             return "header_config must be a list of dictionaries."
 
         allowed_keys = {"name", "type", "format", "match", "sort", "minimum"}
-        allowed_types = {"str", "int", "float", "date", "datetime", "time"}
+        allowed_types = {"str", "int", "float", "date", "datetime", "time", "bool"}
 
         for header in self.header_config:
             if not isinstance(header, dict):
@@ -184,6 +184,9 @@ class CSVReader:
                                 elif config["type"] == "int":
                                     # Convert Int strings to int
                                     row_dict[header] = int(row[i])
+                                elif config["type"] == "bool":
+                                    # Convert Boolean strings to bool
+                                    row_dict[header] = row[i].lower() in {"true", "1", "yes"}
                                 else:
                                     # Default to string type
                                     row_dict[header] = row[i]

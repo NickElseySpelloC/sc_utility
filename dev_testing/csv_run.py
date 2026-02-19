@@ -48,6 +48,10 @@ header_config = [
         "type": "time",
         "format": "%H:%M",
     },
+    {
+        "name": "IsValid",
+        "type": "bool",
+    },
 ]
 
 
@@ -61,6 +65,7 @@ def main():
             "Currency": "USD",
             "Price": 150.00,
             "Time": dt.time(9, 45),
+            "IsValid": True,
         },
         ]
 

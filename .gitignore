@@ -1,3 +1,5 @@
+.cache_ggshield
+
 # Python-generated files
 __pycache__/
 *.py[oc]
@@ -31,8 +33,7 @@ dev_testing/test_api.sh
 dev_testing/api_hack.sh
 dev_testing/logs/*
 
-# Added by ggshield
-.cache_ggshield
+
 
 # Added by ggshield
 .cache_ggshield
