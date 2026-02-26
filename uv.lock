@@ -732,7 +732,7 @@ socks = [
 
 [[package]]
 name = "sc-utility"
-version = "2.4.14"
+version = "2.4.18"
 source = { editable = "." }
 dependencies = [
     { name = "cerberus" },
@@ -740,7 +740,6 @@ dependencies = [
     { name = "mergedeep" },
     { name = "openpyxl" },
     { name = "pyowm" },
-    { name = "pytest-dotenv" },
     { name = "python-dateutil" },
     { name = "pyyaml" },
     { name = "requests" },
@@ -758,11 +757,13 @@ all = [
     { name = "pdoc" },
     { name = "pre-commit" },
     { name = "pytest" },
+    { name = "pytest-dotenv" },
     { name = "pytest-mock" },
 ]
 dev = [
     { name = "pre-commit" },
     { name = "pytest" },
+    { name = "pytest-dotenv" },
     { name = "pytest-mock" },
 ]
 docs = [
@@ -789,7 +790,7 @@ requires-dist = [
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.5.0" },
     { name = "pyowm", specifier = ">=3.3.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.5" },
-    { name = "pytest-dotenv", specifier = ">=0.5.2" },
+    { name = "pytest-dotenv", marker = "extra == 'dev'", specifier = ">=0.5.2" },
     { name = "pytest-mock", marker = "extra == 'dev'", specifier = ">=3.15.1" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
     { name = "pyyaml", specifier = ">=6.0.2" },

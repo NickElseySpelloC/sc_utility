@@ -67,6 +67,7 @@ env_files = [".env.test"]
 remote="~/Library/CloudStorage/Dropbox/Development/dev_setup/app_config/sc_utility"
 patterns = [
     ".env",
+    ".vscode/launch.json",
     "state_data/*",
     "logs/*",
     "dev_testing/*.yaml",

@@ -2,6 +2,7 @@
 
 import datetime as dt
 from pathlib import Path
+from warnings import deprecated
 
 
 class DateHelper:
@@ -13,6 +14,7 @@ class DateHelper:
     """
 
     @staticmethod
+    @deprecated("Use format() instead")
     def format_date(date_obj: dt.date | dt.datetime, date_format: str = "%Y-%m-%d") -> str | None:
         """
         Format a date object to a string.
@@ -27,6 +29,57 @@ class DateHelper:
         if date_obj is None:
             return None
         return date_obj.strftime(date_format)
+
+    @staticmethod
+    def format(dt_obj: dt.date | dt.datetime | dt.time, format_str: str | None = None) -> str | None:
+        """
+        Format a date object to a string.
+
+        If format_str is None, then dt_obj will use the default format according to it's type:
+           date: %Y-%m-%d
+           datetime: %Y-%m-%d %H:%M:%S
+           time: %H:%M:%S
+
+        If format_str is "ISO" then the ISO 8601 format will be used.
+            date: %Y-%m-%d
+            datetime: %Y-%m-%dT%H:%M:%S[TZ]
+            time: %H:%M:%S
+        The timezone will be included in the datetime string if it's included in dt_obj
+
+        Args:
+            dt_obj (date | datetime | time): The date, datetime, or time object to format.
+            format_str (str, optional): The format string to use for formatting the date, datetime, or time.
+
+        Returns:
+            formatted_str: The datetime object formatted as a string, or None if dt_obj is None or an unsupported type.
+        """
+        if dt_obj is None:
+            return None
+        if not isinstance(dt_obj, (dt.date, dt.datetime, dt.time)):
+            return None
+        if format_str is None:
+            if isinstance(dt_obj, dt.datetime):
+                if dt_obj.tzinfo is not None:
+                    format_str = "%Y-%m-%d %H:%M:%S%z"
+                else:
+                    format_str = "%Y-%m-%d %H:%M:%S"
+            elif isinstance(dt_obj, dt.date):
+                format_str = "%Y-%m-%d"
+            elif isinstance(dt_obj, dt.time):
+                format_str = "%H:%M:%S"
+        elif format_str.upper() == "ISO":
+            # use .isoformat() instead of strftime for ISO format to ensure correct formatting of timezone-aware datetimes
+            if isinstance(dt_obj, dt.datetime):
+                if dt_obj.tzinfo is not None:
+                    format_str = "%Y-%m-%dT%H:%M:%S%z"
+                else:
+                    format_str = "%Y-%m-%dT%H:%M:%S"
+            elif isinstance(dt_obj, dt.date):
+                format_str = "%Y-%m-%d"
+            elif isinstance(dt_obj, dt.time):
+                format_str = "%H:%M:%S"
+
+        return dt_obj.strftime(format_str)
 
     @staticmethod
     def parse_date(date_str: str, date_format: str = "%Y-%m-%d") -> dt.date | dt.datetime | None:
