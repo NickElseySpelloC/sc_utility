@@ -45,6 +45,7 @@ class DateHelper:  # noqa: PLR0904
             msg = f"Invalid keyword arguments for timedelta in DateHelper.add(dt_obj={dt_obj}, kwargs={kwargs}): {e}"
             raise TypeError(msg) from e
 
+
     @staticmethod
     def add_date(dt_obj: dt.date, **kwargs) -> dt.date:
         """
@@ -349,7 +350,6 @@ class DateHelper:  # noqa: PLR0904
         """
         return DateHelper.extract(dt_str, format_str=format_str, hide_tz=hide_tz, dt_type=dt.datetime)  # type: ignore[call-arg]
 
-
     @staticmethod
     def extract_time(dt_str: str, format_str: str | None = None, hide_tz: bool = False) -> dt.time:
         """
@@ -368,7 +368,7 @@ class DateHelper:  # noqa: PLR0904
         return DateHelper.extract(dt_str, format_str=format_str, hide_tz=hide_tz, dt_type=dt.time)  # type: ignore[call-arg]
 
     @staticmethod
-    def format(dt_obj: dt.date | dt.datetime | dt.time, format_str: str | None = None, hide_tz: bool = True) -> str | None:
+    def format(dt_obj: dt.date | dt.datetime | dt.time, format_str: str | None = None, hide_tz: bool = True) -> str:
         """
         Format a date object to a string.
 
@@ -390,13 +390,15 @@ class DateHelper:  # noqa: PLR0904
             format_str (str, optional): The format string to use for formatting the date, datetime, or time.
             hide_tz (bool, optional): Whether to hide the timezone information in the formatted string. Only applies to datetime objects when format_str is None. Defaults to True.
 
+        Raises:
+            ValueError: If dt_obj is None or if format_str is not a valid format string for the type of dt_obj.
+
         Returns:
             formatted_str: The datetime object formatted as a string, or None if dt_obj is None or an unsupported type.
         """
-        if dt_obj is None:
-            return None
-        if not isinstance(dt_obj, (dt.date, dt.datetime, dt.time)):
-            return None
+        if dt_obj is None or not isinstance(dt_obj, (dt.date, dt.datetime, dt.time)):
+            error_msg = f"Invalid input for DateHelper.format(dt_obj={dt_obj}, format_str={format_str}): dt_obj must be provided and be a valid type."
+            raise ValueError(error_msg)
         if format_str is None:
             if isinstance(dt_obj, dt.datetime):
                 if dt_obj.tzinfo is not None and not hide_tz:
@@ -414,8 +416,9 @@ class DateHelper:  # noqa: PLR0904
 
         try:
             return dt_obj.strftime(format_str)
-        except ValueError:
-            return None
+        except ValueError as e:
+            error_msg = f"Invalid format string for DateHelper.format(dt_obj={dt_obj}, format_str={format_str}): {e}"
+            raise ValueError(error_msg) from e
 
     @staticmethod
     def get_file_date(file_path: str | Path) -> dt.date | None:

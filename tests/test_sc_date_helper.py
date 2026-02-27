@@ -283,7 +283,7 @@ def test_today_utc():
 
 # test_add()
 # test_format()
-test_extract()
+# test_extract()
 # test_add_timezone()
 # test_get_file_date()
 # test_get_file_datetime()
