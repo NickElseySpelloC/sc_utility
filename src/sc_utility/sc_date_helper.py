@@ -45,6 +45,56 @@ class DateHelper:  # noqa: PLR0904
             raise TypeError(msg) from e
 
     @staticmethod
+    def add_date(dt_obj: dt.date, **kwargs) -> dt.date:
+        """
+        Add a timedelta to a date object.
+
+        Args:
+            dt_obj (date): The date object to which the timedelta will be added.
+            **kwargs (keyword arguments): The keyword arguments to pass to the timedelta constructor (e.g., days=1, hours=2).
+
+        Raises:
+            TypeError: If dt_obj is not a date object, or if the keyword arguments are not valid for a timedelta.
+
+        Returns:
+            result (date): A new date object with the added timedelta.
+        """
+        if dt_obj is None or not isinstance(dt_obj, dt.date):
+            msg = f"Invalid data type passed DateHelper.add_date({dt_obj}). Expected a date object."
+            raise TypeError(msg)
+
+        try:
+            return dt_obj + dt.timedelta(**kwargs)
+        except TypeError as e:
+            msg = f"Invalid keyword arguments for timedelta in DateHelper.add_date(dt_obj={dt_obj}, kwargs={kwargs}): {e}"
+            raise TypeError(msg) from e
+
+    @staticmethod
+    def add_datetime(dt_obj: dt.datetime, **kwargs) -> dt.datetime:
+        """
+        Add a timedelta to a datetime object.
+
+        Args:
+            dt_obj (datetime): The datetime object to which the timedelta will be added.
+            **kwargs (keyword arguments): The keyword arguments to pass to the timedelta constructor (e.g., days=1, hours=2).
+
+        Raises:
+            TypeError: If dt_obj is not a datetime object, or if the keyword arguments are not valid for a timedelta.
+
+        Returns:
+            result (datetime): A new datetime object with the added timedelta.
+        """
+        if dt_obj is None or not isinstance(dt_obj, dt.datetime):
+            msg = f"Invalid data type passed DateHelper.add_datetime({dt_obj}). Expected a datetime object."
+            raise TypeError(msg)
+
+        try:
+            return dt_obj + dt.timedelta(**kwargs)
+        except TypeError as e:
+            msg = f"Invalid keyword arguments for timedelta in DateHelper.add_datetime(dt_obj={dt_obj}, kwargs={kwargs}): {e}"
+            raise TypeError(msg) from e
+
+    @staticmethod
     def add_timezone(dt_obj: dt.datetime, tzinfo: dt.tzinfo | None = None) -> dt.datetime:
         """
         Add timezone information to a datetime object.
@@ -120,7 +170,7 @@ class DateHelper:  # noqa: PLR0904
         return dt_obj.astimezone(tz=tzinfo)
 
     @staticmethod
-    def days_between(start_date: dt.date | dt.datetime, end_date: dt.date | dt.datetime) -> int | None:
+    def days_between(start_date: dt.date | dt.datetime, end_date: dt.date | dt.datetime) -> int:
         """
         Calculate the number of days between two date or datetime objects.
 
@@ -128,11 +178,15 @@ class DateHelper:  # noqa: PLR0904
             start_date (date): The start date.
             end_date (date): The end date.
 
+        Raises:
+            TypeError: If start_date or end_date is not a date or datetime object.
+
         Returns:
             difference (int): The number of days between the two dates, or None if either date is None.
         """
         if start_date is None or end_date is None:
-            return None
+            error_msg = f"Invalid input for DateHelper.days_between(start_date={start_date}, end_date={end_date}): Both start_date and end_date must be provided."
+            raise TypeError(error_msg)
         if isinstance(start_date, dt.datetime):
             start_date = start_date.date()
         if isinstance(end_date, dt.datetime):
@@ -140,7 +194,7 @@ class DateHelper:  # noqa: PLR0904
         return (end_date - start_date).days
 
     @staticmethod
-    def extract(dt_str: str, format_str: str | None = None, hide_tz: bool = False) -> dt.date | dt.datetime | dt.time | None:  # noqa: PLR0912
+    def extract(dt_str: str, format_str: str | None = None, hide_tz: bool = False, dt_type: type | None = None) -> dt.date | dt.datetime | dt.time:  # noqa: PLR0912, PLR0915
         """
         Extract a date or datetime from a string.
 
@@ -152,24 +206,40 @@ class DateHelper:  # noqa: PLR0904
             dt_str (str): The string to extract the date, datetime, or time from.
             format_str (Optional[str], optional): The format string to use for parsing the date, datetime, or time. If None, the function will attempt to parse the string using common date and datetime formats.
             hide_tz (bool, optional): Whether to remove timezone information from the extracted datetime object. Defaults to False.
+            dt_type (type, optional): The type of object to extract (date, datetime, or time). If None, the function will attempt to parse the string as a datetime first, then a date, then a time.
+
+        Raises:
+            ValueError: If the string cannot be parsed using the provided format_str or the default formats.
 
         Returns:
             result (date | datetime | time): A date, datetime or time object extracted from the string, or None if no date or datetime could be extracted.
         """
         return_dt_obj = None
         if format_str is not None:
-            try:
-                if format_str.upper() == "ISO":
+            if format_str.upper() == "ISO":
+                # Try parsing as datetime first, then date, then time
+                try:
                     return_dt_obj = dt.datetime.fromisoformat(dt_str)
-                else:
+                except ValueError:
+                    try:
+                        return_dt_obj = dt.date.fromisoformat(dt_str)
+                    except ValueError:
+                        try:
+                            return_dt_obj = dt.time.fromisoformat(dt_str)
+                        except ValueError as e:
+                            error_msg = f"Could not parse date/datetime/time from string '{dt_str}' using ISO format: {e}"
+                            raise ValueError(error_msg) from e
+            else:
+                try:
                     format_class = DateHelper._classify_format_str(format_str)
                     return_dt_obj = dt.datetime.strptime(dt_str, format_str)  # noqa: DTZ007
                     if format_class == "date":
                         return_dt_obj = return_dt_obj.date()
                     elif format_class == "time":
                         return_dt_obj = return_dt_obj.time()
-            except ValueError:
-                return None
+                except ValueError as e:
+                    error_msg = f"Could not parse date/datetime/time from string '{dt_str}' using format '{format_str}': {e}"
+                    raise ValueError(error_msg) from e
         else:
             # Try parsing as datetime first, then date, then time
             try:
@@ -194,7 +264,8 @@ class DateHelper:  # noqa: PLR0904
                 pass
 
         if return_dt_obj is None:
-            return None
+            error_msg = f"Could not parse date/datetime/time from string '{dt_str}' using the default formats."
+            raise ValueError(error_msg)
 
         # If we have a datetime object with timezone info and hide_tz is True, remove the timezone info before returning the datetime object.
         if isinstance(return_dt_obj, dt.datetime):
