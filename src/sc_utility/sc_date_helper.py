@@ -1,5 +1,6 @@
 """Some basic shorts for handling dates."""
 
+import contextlib
 import datetime as dt
 import json
 from pathlib import Path
@@ -200,71 +201,108 @@ class DateHelper:  # noqa: PLR0904
 
         format_str is optional. If not provided, the function will attempt to parse the string using the 'friendly date, datetime and time formats (see the format() function).
         If format_str is provided, it will be used to parse the string. If format_str is "ISO", the function will attempt to parse the string using the ISO 8601 format.
-        If the string cannot be parsed using the provided format_str or the default formats, the function will return None.
+        If the string cannot be parsed using the provided format_str or the default formats, the function will raise a ValueError.
 
         Args:
             dt_str (str): The string to extract the date, datetime, or time from.
             format_str (Optional[str], optional): The format string to use for parsing the date, datetime, or time. If None, the function will attempt to parse the string using common date and datetime formats.
             hide_tz (bool, optional): Whether to remove timezone information from the extracted datetime object. Defaults to False.
-            dt_type (type, optional): The type of object to extract (date, datetime, or time). If None, the function will attempt to parse the string as a datetime first, then a date, then a time.
+            dt_type (type, optional): The type of object to extract (dt.date, dt.datetime, or dt.time). If provided, only that type will be attempted. If None, the function will attempt to parse the string as a datetime first, then a date, then a time.
 
         Raises:
             ValueError: If the string cannot be parsed using the provided format_str or the default formats.
 
         Returns:
-            result (date | datetime | time): A date, datetime or time object extracted from the string, or None if no date or datetime could be extracted.
+            result (date | datetime | time): A date, datetime or time object extracted from the string.
         """
         return_dt_obj = None
-        if format_str is not None:
+        if format_str is not None:  # noqa: PLR1702
             if format_str.upper() == "ISO":
-                # Try parsing as datetime first, then date, then time
-                try:
-                    return_dt_obj = dt.datetime.fromisoformat(dt_str)
-                except ValueError:
+                # If dt_type is specified, only try parsing as that type
+                if dt_type is dt.datetime:
+                    try:
+                        return_dt_obj = dt.datetime.fromisoformat(dt_str)
+                    except ValueError as e:
+                        error_msg = f"Could not parse datetime from string '{dt_str}' using ISO format: {e}"
+                        raise ValueError(error_msg) from e
+                elif dt_type is dt.date:
                     try:
                         return_dt_obj = dt.date.fromisoformat(dt_str)
+                    except ValueError as e:
+                        error_msg = f"Could not parse date from string '{dt_str}' using ISO format: {e}"
+                        raise ValueError(error_msg) from e
+                elif dt_type is dt.time:
+                    try:
+                        return_dt_obj = dt.time.fromisoformat(dt_str)
+                    except ValueError as e:
+                        error_msg = f"Could not parse time from string '{dt_str}' using ISO format: {e}"
+                        raise ValueError(error_msg) from e
+                else:
+                    # Try parsing as datetime first, then date, then time
+                    try:
+                        return_dt_obj = dt.datetime.fromisoformat(dt_str)
                     except ValueError:
                         try:
-                            return_dt_obj = dt.time.fromisoformat(dt_str)
-                        except ValueError as e:
-                            error_msg = f"Could not parse date/datetime/time from string '{dt_str}' using ISO format: {e}"
-                            raise ValueError(error_msg) from e
+                            return_dt_obj = dt.date.fromisoformat(dt_str)
+                        except ValueError:
+                            try:
+                                return_dt_obj = dt.time.fromisoformat(dt_str)
+                            except ValueError as e:
+                                error_msg = f"Could not parse date/datetime/time from string '{dt_str}' using ISO format: {e}"
+                                raise ValueError(error_msg) from e
             else:
                 try:
-                    format_class = DateHelper._classify_format_str(format_str)
-                    return_dt_obj = dt.datetime.strptime(dt_str, format_str)  # noqa: DTZ007
-                    if format_class == "date":
-                        return_dt_obj = return_dt_obj.date()
-                    elif format_class == "time":
-                        return_dt_obj = return_dt_obj.time()
+                    # If dt_type is specified, use it; otherwise classify the format string
+                    if dt_type is not None:
+                        return_dt_obj = dt.datetime.strptime(dt_str, format_str)  # noqa: DTZ007
+                        if dt_type is dt.date:
+                            return_dt_obj = return_dt_obj.date()
+                        elif dt_type is dt.time:
+                            return_dt_obj = return_dt_obj.time()
+                        # else dt_type is dt.datetime, keep as is
+                    else:
+                        format_class = DateHelper._classify_format_str(format_str)
+                        return_dt_obj = dt.datetime.strptime(dt_str, format_str)  # noqa: DTZ007
+                        if format_class == "date":
+                            return_dt_obj = return_dt_obj.date()
+                        elif format_class == "time":
+                            return_dt_obj = return_dt_obj.time()
                 except ValueError as e:
                     error_msg = f"Could not parse date/datetime/time from string '{dt_str}' using format '{format_str}': {e}"
                     raise ValueError(error_msg) from e
-        else:
-            # Try parsing as datetime first, then date, then time
-            try:
-                return dt.datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S%z")
-            except ValueError:
-                pass
-            try:
-                return dt.datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")  # noqa: DTZ007
-            except ValueError:
-                pass
-            try:
-                return dt.datetime.strptime(dt_str, "%Y-%m-%d").date()  # noqa: DTZ007
-            except ValueError:
-                pass
-            try:
-                return dt.datetime.strptime(dt_str, "%H:%M:%S.%f").time()  # noqa: DTZ007
-            except ValueError:
-                pass
-            try:
-                return dt.datetime.strptime(dt_str, "%H:%M:%S").time()  # noqa: DTZ007
-            except ValueError:
-                pass
+        else:  # noqa: PLR5501
+            # If dt_type is specified, only try parsing as that type
+            if dt_type is dt.datetime:
+                with contextlib.suppress(ValueError):
+                    return_dt_obj = dt.datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S%z")
+                if return_dt_obj is None:
+                    with contextlib.suppress(ValueError):
+                        return_dt_obj = dt.datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")  # noqa: DTZ007
+            elif dt_type is dt.date:
+                with contextlib.suppress(ValueError):
+                    return_dt_obj = dt.datetime.strptime(dt_str, "%Y-%m-%d").date()  # noqa: DTZ007
+            elif dt_type is dt.time:
+                with contextlib.suppress(ValueError):
+                    return_dt_obj = dt.datetime.strptime(dt_str, "%H:%M:%S.%f").time()  # noqa: DTZ007
+                if return_dt_obj is None:
+                    with contextlib.suppress(ValueError):
+                        return_dt_obj = dt.datetime.strptime(dt_str, "%H:%M:%S").time()  # noqa: DTZ007
+            else:
+                # Try parsing as datetime first, then date, then time
+                with contextlib.suppress(ValueError):
+                    return dt.datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S%z")
+                with contextlib.suppress(ValueError):
+                    return dt.datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")  # noqa: DTZ007
+                with contextlib.suppress(ValueError):
+                    return dt.datetime.strptime(dt_str, "%Y-%m-%d").date()  # noqa: DTZ007
+                with contextlib.suppress(ValueError):
+                    return dt.datetime.strptime(dt_str, "%H:%M:%S.%f").time()  # noqa: DTZ007
+                with contextlib.suppress(ValueError):
+                    return dt.datetime.strptime(dt_str, "%H:%M:%S").time()  # noqa: DTZ007
 
         if return_dt_obj is None:
-            error_msg = f"Could not parse date/datetime/time from string '{dt_str}' using the default formats."
+            type_hint = f" as {dt_type.__name__}" if dt_type else ""
+            error_msg = f"Could not parse date/datetime/time from string '{dt_str}'{type_hint} using the default formats."
             raise ValueError(error_msg)
 
         # If we have a datetime object with timezone info and hide_tz is True, remove the timezone info before returning the datetime object.
@@ -276,6 +314,58 @@ class DateHelper:  # noqa: PLR0904
                 return_dt_obj = return_dt_obj.replace(tzinfo=local_tz)
 
         return return_dt_obj
+
+    @staticmethod
+    def extract_date(dt_str: str, format_str: str | None = None, hide_tz: bool = False) -> dt.date:
+        """
+        Extract a date from a string.
+
+        See extract() for more details.
+
+        Args:
+            dt_str (str): The string to extract the date from.
+            format_str (Optional[str], optional): The format string to use for parsing the date. Defaults to None, which will attempt to parse using common date formats.
+            hide_tz (bool, optional): Whether to remove timezone information from the extracted datetime object. Defaults to False. Only applies if format_str is None or does not specify a date-only format.
+
+        Returns:
+            result (date): A date object extracted from the string.
+        """
+        return DateHelper.extract(dt_str, format_str=format_str, hide_tz=hide_tz, dt_type=dt.date)  # type: ignore[call-arg]
+
+    @staticmethod
+    def extract_datetime(dt_str: str, format_str: str | None = None, hide_tz: bool = False) -> dt.datetime:
+        """
+        Extract a date from a string.
+
+        See extract() for more details.
+
+        Args:
+            dt_str (str): The string to extract the datetime from.
+            format_str (Optional[str], optional): The format string to use for parsing the datetime. Defaults to None, which will attempt to parse using common datetime formats.
+            hide_tz (bool, optional): Whether to remove timezone information from the extracted datetime object. Defaults to False. Only applies if format_str is None or does not specify a datetime-only format.
+
+        Returns:
+            result (datetime): A datetime object extracted from the string.
+        """
+        return DateHelper.extract(dt_str, format_str=format_str, hide_tz=hide_tz, dt_type=dt.datetime)  # type: ignore[call-arg]
+
+
+    @staticmethod
+    def extract_time(dt_str: str, format_str: str | None = None, hide_tz: bool = False) -> dt.time:
+        """
+        Extract a time from a string.
+
+        See extract() for more details.
+
+        Args:
+            dt_str (str): The string to extract the time from.
+            format_str (Optional[str], optional): The format string to use for parsing the time. Defaults to None, which will attempt to parse using common time formats.
+            hide_tz (bool, optional): Whether to remove timezone information from the extracted time object. Defaults to False. Only applies if format_str is None or does not specify a time-only format.
+
+        Returns:
+            result (time): A time object extracted from the string.
+        """
+        return DateHelper.extract(dt_str, format_str=format_str, hide_tz=hide_tz, dt_type=dt.time)  # type: ignore[call-arg]
 
     @staticmethod
     def format(dt_obj: dt.date | dt.datetime | dt.time, format_str: str | None = None, hide_tz: bool = True) -> str | None:

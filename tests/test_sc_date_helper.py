@@ -75,6 +75,14 @@ def test_extract():
     assert isinstance(DateHelper.extract(datetime_str, format_str="ISO"), dt.datetime), "Should return a datetime object when format_str indicates a datetime"
     assert isinstance(DateHelper.extract(time_str, format_str="ISO"), dt.time), "Should return a time object when format_str indicates a time"
 
+    assert isinstance(DateHelper.extract(date_str, dt_type=dt.date), dt.date), "Should return a date object when format_str indicates a date"
+    assert isinstance(DateHelper.extract(datetime_str, dt_type=dt.datetime), dt.datetime), "Should return a datetime object when format_str indicates a datetime"
+    assert isinstance(DateHelper.extract(time_str, dt_type=dt.time), dt.time), "Should return a time object when format_str indicates a time"
+
+    assert isinstance(DateHelper.extract_date(date_str), dt.date), "Should return a date object when format_str indicates a date"
+    assert isinstance(DateHelper.extract_datetime(datetime_str), dt.datetime), "Should return a datetime object when format_str indicates a datetime"
+    assert isinstance(DateHelper.extract_time(time_str), dt.time), "Should return a time object when format_str indicates a time"
+
 
 def test_add_timezone():
     """Test adding timezone to a datetime."""
