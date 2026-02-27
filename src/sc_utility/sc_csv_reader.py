@@ -167,15 +167,15 @@ class CSVReader:
                                 if config["type"] == "date":
                                     # Convert date strings to time objects
                                     date_format = config.get("format", "%Y-%m-%d")
-                                    row_dict[header] = DateHelper.parse_date(row[i], date_format)
+                                    row_dict[header] = DateHelper.extract(row[i], date_format)
                                 elif config["type"] == "datetime":
                                     # Convert datetime strings to datetime objects
                                     datetime_format = config.get("format", "%Y-%m-%d %H:%M:%S")
-                                    row_dict[header] = dt.datetime.strptime(row[i], datetime_format)  # noqa: DTZ007
+                                    row_dict[header] = DateHelper.extract(row[i], datetime_format)
                                 elif config["type"] == "time":
                                     # Convert time strings to time objects
                                     time_format = config.get("format", "%H:%M:%S")
-                                    row_dict[header] = dt.datetime.strptime(row[i], time_format).time()  # noqa: DTZ007
+                                    row_dict[header] = DateHelper.extract(row[i], time_format)
                                 elif config["type"] == "float":
                                     # Convert float strings to float and round if specified
                                     row_dict[header] = float(row[i])
@@ -330,7 +330,8 @@ class CSVReader:
                 if field_type == "date":
                     cutoff = DateHelper.today_add_days(-max_days)
                 elif field_type == "datetime":
-                    cutoff = DateHelper.now().replace(tzinfo=None) + dt.timedelta(days=-max_days)
+                    cutoff = DateHelper.add(DateHelper.now(), days=-max_days)
+                    cutoff = DateHelper.remove_timezone(cutoff)  # pyright: ignore[reportArgumentType] # Remove timezone info for comparison
                 else:
                     continue  # Skip if field type is not date or datetime
             elif isinstance(minimum_value, (dt.date, dt.datetime)):
@@ -339,7 +340,8 @@ class CSVReader:
                 if field_type == "date":
                     cutoff = DateHelper.today_add_days(-minimum_value)
                 elif field_type == "datetime":
-                    cutoff = DateHelper.now().replace(tzinfo=None) + dt.timedelta(days=-minimum_value)
+                    cutoff = DateHelper.add(DateHelper.now(), days=-minimum_value)
+                    cutoff = DateHelper.remove_timezone(cutoff)  # pyright: ignore[reportArgumentType]
                 else:
                     continue  # Skip if field type is not date or datetime
             else:

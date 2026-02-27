@@ -2010,7 +2010,7 @@ class ShellyControl:
                             # If we have a mock rate set, override the energy value based on the rate and current UNIX time
                             if device_meter.get("MockRate", 0) > 0:
                                 # get the number of seconds sine 1/9/2025
-                                local_tz = dt.datetime.now().astimezone().tzinfo
+                                local_tz = DateHelper.get_local_timezone()
                                 elapsed_sec = (DateHelper.now() - dt.datetime(2025, 1, 1, 0, 0, 0, tzinfo=local_tz)).total_seconds()
 
                                 # Generate a mock meter reading based on elapsed seconds since 1/9/2025 and the MockRate

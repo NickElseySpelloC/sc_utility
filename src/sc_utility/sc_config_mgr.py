@@ -12,6 +12,7 @@ from cerberus import Validator
 from mergedeep import merge
 
 from sc_utility.sc_common import SCCommon
+from sc_utility.sc_date_helper import DateHelper
 from sc_utility.validation_schema import yaml_config_validation
 
 
@@ -139,14 +140,7 @@ class SCConfigManager:
         if not self.config_path:
             return None
 
-        # get the last modified time of the config file
-        local_tz = dt.datetime.now().astimezone().tzinfo
-
-        last_modified = self.config_path.stat().st_mtime
-        # Convert last_modified to a datetime object
-        last_modified_dt = dt.datetime.fromtimestamp(last_modified, tz=local_tz)
-
-        return last_modified_dt
+        return DateHelper.get_file_datetime(self.config_path)
 
     def check_for_config_changes(self, last_check: dt.datetime) -> dt.datetime | None:
         """Check if the configuration file has changed. If it has, reload the configuration.

@@ -125,6 +125,7 @@ def test_trim_csv_data():
     try:
         csv_reader = CSVReader(CSV_FILE, header_config)
         csv_data = csv_reader.read_csv()
+
         if not csv_data:
             print("CSV data is empty, cannot trim data.")
             sys.exit(1)
@@ -154,3 +155,6 @@ def test_write_csv():
         sys.exit(1)
     else:
         assert result, "write_csv() shoudl return True"
+
+
+# test_trim_csv_data()

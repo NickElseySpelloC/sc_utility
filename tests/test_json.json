@@ -2,9 +2,9 @@
     "string": "Hello, World!",
     "integer": 42,
     "float": 123.456,
-    "datetime": "2026-02-19T17:37:29.629230+11:00",
+    "datetime": "2026-02-27T22:20:10.838340+11:00",
     "datetime__datatype": "datetime",
-    "date": "2026-02-19",
+    "date": "2026-02-27",
     "date__datatype": "date",
     "api_mode": "Live Prices",
     "api_mode__enum": "tests.test_sc_json_encoder.APIMode.LIVE"

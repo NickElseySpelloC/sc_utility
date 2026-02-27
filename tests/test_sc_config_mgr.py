@@ -1,5 +1,4 @@
 """pytest for SCConfigManager class."""
-import datetime as dt
 import sys
 
 from sc_utility import DateHelper, SCConfigManager
@@ -51,7 +50,7 @@ def test_load_config():
 def test_check_for_config_changes():
     """Test checking for changes in the configuration file."""
     # Create a fake last check time well in the past
-    last_check = DateHelper.now() - dt.timedelta(days=365)
+    last_check = DateHelper.add(DateHelper.now(), days=-365)
     assert config.check_for_config_changes(last_check) is not None, "Configuration changes were not detected"
 
     print("Configuration changes detected successfully.")
@@ -77,3 +76,6 @@ def test_get_logger_settings():
     assert "logfile_name" in logger_settings, "Logger settings should contain 'logfile_name'"
 
     print("Logger settings retrieved successfully:", logger_settings)
+
+
+# test_check_for_config_changes()

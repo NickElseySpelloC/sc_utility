@@ -1,6 +1,5 @@
 """Manual testing code for the sc_utility libraries. Should not be included in the distrbution."""
 
-import datetime as dt  # noqa: F401
 import platform
 import sys
 from time import sleep

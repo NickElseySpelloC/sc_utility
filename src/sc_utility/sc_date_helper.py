@@ -20,7 +20,7 @@ class DateHelper:  # noqa: PLR0904
     """
 
     @staticmethod
-    def add(dt_obj: dt.date | dt.datetime, **kwargs) -> dt.date | dt.datetime | dt.time | None:
+    def add(dt_obj: dt.date | dt.datetime, **kwargs) -> dt.date | dt.datetime:
         """
         Add a timedelta to a date or datetime object.
 
@@ -32,7 +32,7 @@ class DateHelper:  # noqa: PLR0904
             TypeError: If dt_obj is not a date or datetime object, or if the keyword arguments are not valid for a timedelta.
 
         Returns:
-            result (date | datetime): A new date or datetime object with the added timedelta, or None if dt_obj is None or not a date/datetime object.
+            result (date | datetime): A new date or datetime object with the added timedelta.
         """
         if dt_obj is None or not isinstance(dt_obj, (dt.date, dt.datetime)):
             msg = f"Invalid data type passed DateHelper.add({dt_obj}). Expected a date or datetime object."
@@ -67,6 +67,32 @@ class DateHelper:  # noqa: PLR0904
         return dt_obj.replace(tzinfo=tzinfo)
 
     @staticmethod
+    def combine(date_obj: dt.date, time_obj: dt.time, tzinfo: dt.tzinfo | None = None) -> dt.datetime:
+        """
+        Combine a date object and a time object into a datetime object.
+
+        Args:
+            date_obj (date): The date object to combine.
+            time_obj (time): The time object to combine.
+            tzinfo (tzinfo, optional): The timezone information to add to the combined datetime object. Defaults to the local timezone if not provided.
+
+        Raises:
+            TypeError: If date_obj is not a date object, or if time_obj is not a time object.
+
+        Returns:
+            result (datetime): A datetime object combining the date and time, with the specified timezone information.
+        """
+        if date_obj is None or not isinstance(date_obj, dt.date):
+            msg = f"Invalid data type for date_obj in DateHelper.combine(date_obj={date_obj}, time_obj={time_obj}): Expected a date object."
+            raise TypeError(msg)
+        if time_obj is None or not isinstance(time_obj, dt.time):
+            msg = f"Invalid data type for time_obj in DateHelper.combine(date_obj={date_obj}, time_obj={time_obj}): Expected a time object."
+            raise TypeError(msg)
+        if tzinfo is None:
+            tzinfo = DateHelper.get_local_timezone()
+        return dt.datetime.combine(date_obj, time_obj, tzinfo=tzinfo)
+
+    @staticmethod
     def days_between(start_date: dt.date | dt.datetime, end_date: dt.date | dt.datetime) -> int | None:
         """
         Calculate the number of days between two date or datetime objects.
@@ -87,7 +113,7 @@ class DateHelper:  # noqa: PLR0904
         return (end_date - start_date).days
 
     @staticmethod
-    def extract(dt_str: str, format_str: str | None = None, hide_tz: bool = False) -> dt.date | dt.datetime | dt.time | None:
+    def extract(dt_str: str, format_str: str | None = None, hide_tz: bool = False) -> dt.date | dt.datetime | dt.time | None:  # noqa: PLR0912
         """
         Extract a date or datetime from a string.
 
@@ -101,7 +127,7 @@ class DateHelper:  # noqa: PLR0904
             hide_tz (bool, optional): Whether to remove timezone information from the extracted datetime object. Defaults to False.
 
         Returns:
-            result (date | datetime): A date or datetime object extracted from the string, or None if no date or datetime could be extracted.
+            result (date | datetime | time): A date, datetime or time object extracted from the string, or None if no date or datetime could be extracted.
         """
         return_dt_obj = None
         if format_str is not None:
@@ -109,7 +135,12 @@ class DateHelper:  # noqa: PLR0904
                 if format_str.upper() == "ISO":
                     return_dt_obj = dt.datetime.fromisoformat(dt_str)
                 else:
+                    format_class = DateHelper._classify_format_str(format_str)
                     return_dt_obj = dt.datetime.strptime(dt_str, format_str)  # noqa: DTZ007
+                    if format_class == "date":
+                        return_dt_obj = return_dt_obj.date()
+                    elif format_class == "time":
+                        return_dt_obj = return_dt_obj.time()
             except ValueError:
                 return None
         else:
@@ -324,6 +355,24 @@ class DateHelper:  # noqa: PLR0904
             return True
 
     @staticmethod
+    def midnight(dt_date: dt.date | None = None, tzinfo: dt.tzinfo | None = None) -> dt.datetime:
+        """
+        Get today's date at midnight.
+
+        Args:
+            dt_date (date, optional): The date for which to get midnight. If None, today's date will be used.
+            tzinfo (tzinfo, optional): The timezone information to use for getting today's date at midnight. Defaults to the local timezone if not provided.
+
+        Returns:
+            result (datetime): Today's date at midnight as a datetime object, using the local timezone.
+        """
+        if tzinfo is None:
+            tzinfo = DateHelper.get_local_timezone()
+        if dt_date is None:
+            dt_date = DateHelper.today(tzinfo=tzinfo)
+        return DateHelper.combine(dt_date, dt.time(0, 0, 0), tzinfo=tzinfo)
+
+    @staticmethod
     def now(tzinfo: dt.tzinfo | None = None) -> dt.datetime:
         """
         Get today's date and time.
@@ -511,24 +560,101 @@ class DateHelper:  # noqa: PLR0904
     # ==================================== INTERNAL FUNCTIONS ====================================
 
     @staticmethod
-    def _get_frozen_time() -> dt.datetime | None:
+    def _get_frozen_time() -> dt.datetime | None:  # noqa: PLR0915
         """
         See if we need to return a frozen time for testing purposes.
 
         If a frozen time is set, it will be returned instead of the current time. See the documentation for the freeze time feature for more details.
 
         Returns:
-            result (datetime): The datetime to use instead of the current time.
+            result (datetime): The datetime to use instead of the current time, or None if no freeze time is configured.
         """
+        freeze_time_file = DateHelper._find_freeze_time_file()
+        if freeze_time_file is None:
+            return None
+
+        try:
+            with freeze_time_file.open("r") as f:
+                config = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            return None
+
+        # Handle freeze_time (takes priority over offset_time)
+        freeze_time_str = config.get("freeze_time")
+        if freeze_time_str:
+            try:
+                # Parse the freeze_time datetime (ISO format, timezone optional)
+                frozen_dt = dt.datetime.fromisoformat(freeze_time_str)
+
+                # Add local timezone if missing
+                if frozen_dt.tzinfo is None:
+                    frozen_dt = frozen_dt.replace(tzinfo=DateHelper.get_local_timezone())
+
+                # Handle one_time feature
+                one_time = config.get("one_time", False)
+                if one_time:
+                    # Calculate offset from current time to frozen time
+                    actual_now = dt.datetime.now(tz=DateHelper.get_local_timezone())
+                    time_diff = frozen_dt - actual_now
+
+                    # Convert to the largest appropriate unit
+                    total_seconds = time_diff.total_seconds()
+
+                    # Determine the best unit and amount
+                    if abs(total_seconds) >= 86400:  # days
+                        offset_amount = total_seconds / 86400
+                        offset_unit = "days"
+                    elif abs(total_seconds) >= 3600:  # hours
+                        offset_amount = total_seconds / 3600
+                        offset_unit = "hours"
+                    elif abs(total_seconds) >= 60:  # minutes
+                        offset_amount = total_seconds / 60
+                        offset_unit = "minutes"
+                    else:  # seconds
+                        offset_amount = total_seconds
+                        offset_unit = "seconds"
+
+                    # Update the config: remove freeze_time, add offset_time
+                    config["freeze_time"] = None
+                    config["one_time"] = False
+                    config["offset_time_unit"] = offset_unit
+                    config["offset_time_amount"] = offset_amount
+
+                    # Write back to file
+                    try:
+                        with freeze_time_file.open("w") as f:
+                            json.dump(config, f, indent=4)
+                    except OSError:
+                        pass  # If we can't write, just continue
+            except (ValueError, TypeError):
+                pass  # Invalid datetime format, fall through to offset_time
+            else:
+                return frozen_dt
+
+        # Handle offset_time
+        offset_unit = config.get("offset_time_unit")
+        offset_amount = config.get("offset_time_amount")
+
+        if offset_unit and offset_amount is not None:
+            try:
+                # Create timedelta with the specified unit and amount
+                kwargs = {offset_unit: offset_amount}
+                offset = dt.timedelta(**kwargs)
+
+                actual_now = dt.datetime.now(tz=DateHelper.get_local_timezone())
+                return actual_now + offset
+            except (TypeError, ValueError):
+                pass  # Invalid offset parameters
+
         return None
 
     @staticmethod
-    def _find_freeze_time_file() -> dict:
+    def _find_freeze_time_file() -> Path | None:
         """
-        Look for a file named "freeze_time.json" in the current working directory, project root folder or the logs folder, and return its contents as a dictionary.
+        Look for a file named "freeze_time.json" in the current working directory, project root folder or the logs folder.
 
         Returns:
-            result (dict): The contents of the "freeze_time.json" file as a dictionary, or an empty dictionary if the file is not found.
+            result (Path | None): The path to the "freeze_time.json" file if found, otherwise None.
         """
         current_dir = Path.cwd()
         project_root = SCCommon.get_project_root()
@@ -536,10 +662,28 @@ class DateHelper:  # noqa: PLR0904
         for folder in [current_dir, project_root, logs_dir]:
             freeze_time_file = folder / "freeze_time.json"
             if freeze_time_file.exists():
-                try:
+                return freeze_time_file
+        return None
 
-                    with freeze_time_file.open() as f:
-                        return json.load(f)
-                except (OSError, json.JSONDecodeError):
-                    return {}
-        return {}
+    @staticmethod
+    def _classify_format_str(format_str: str) -> str:
+        """
+        Classify the format string as "date", "datetime", or "time" based on its content.
+
+        Args:
+            format_str (str | None): The format string to classify.
+
+        Returns:
+            result (str): The classification of the format string ("date", "datetime", or "time").
+        """
+        date_format_tokens = ["%Y", "%y", "%B", "%m", "%A", "%a", "%d", "%j"]
+        time_format_tokens = ["%H", "%I", "%p", "%M", "%S", "%f", "%z", "%Z"]
+        if format_str is None:
+            return "datetime"
+        if any(x in format_str for x in date_format_tokens):
+            if any(x in format_str for x in time_format_tokens):
+                return "datetime"
+            return "date"
+        if any(x in format_str for x in time_format_tokens):
+            return "time"
+        return "datetime"

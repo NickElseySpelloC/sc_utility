@@ -529,6 +529,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_date_helper.DateHelper.combine" class="md-nav__link">
+    <span class="md-ellipsis">
+      combine
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_date_helper.DateHelper.days_between" class="md-nav__link">
     <span class="md-ellipsis">
       days_between
@@ -613,6 +622,15 @@
   <a href="#sc_utility.sc_date_helper.DateHelper.is_valid_time" class="md-nav__link">
     <span class="md-ellipsis">
       is_valid_time
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_date_helper.DateHelper.midnight" class="md-nav__link">
+    <span class="md-ellipsis">
+      midnight
     </span>
   </a>
   
@@ -925,6 +943,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sc_utility.sc_date_helper.DateHelper.combine" class="md-nav__link">
+    <span class="md-ellipsis">
+      combine
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sc_utility.sc_date_helper.DateHelper.days_between" class="md-nav__link">
     <span class="md-ellipsis">
       days_between
@@ -1009,6 +1036,15 @@
   <a href="#sc_utility.sc_date_helper.DateHelper.is_valid_time" class="md-nav__link">
     <span class="md-ellipsis">
       is_valid_time
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sc_utility.sc_date_helper.DateHelper.midnight" class="md-nav__link">
+    <span class="md-ellipsis">
+      midnight
     </span>
   </a>
   
@@ -1259,7 +1295,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A new date or datetime object with the added timedelta, or None if dt_obj is None or not a date/datetime object.</p>
+                <p>A new date or datetime object with the added timedelta.</p>
               </div>
             </td>
           </tr>
@@ -1481,6 +1517,137 @@
 <div class="doc doc-object doc-function">
 
 
+<h2 id="sc_utility.sc_date_helper.DateHelper.combine" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">combine</span><span class="p">(</span><span class="n">date_obj</span><span class="p">,</span> <span class="n">time_obj</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Combine a date object and a time object into a datetime object.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>date_obj</code>
+            </td>
+            <td>
+                  <code><span title="date">date</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The date object to combine.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>time_obj</code>
+            </td>
+            <td>
+                  <code><span title="time">time</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The time object to combine.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tzinfo</code>
+            </td>
+            <td>
+                  <code><span title="tzinfo">tzinfo</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The timezone information to add to the combined datetime object. Defaults to the local timezone if not provided.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If date_obj is not a date object, or if time_obj is not a time object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>result</code></td>            <td>
+                  <code><span title="datetime">datetime</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A datetime object combining the date and time, with the specified timezone information.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h2 id="sc_utility.sc_date_helper.DateHelper.days_between" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">days_between</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span></code>
 
@@ -1665,11 +1832,11 @@ If the string cannot be parsed using the provided format_str or the default form
       <tbody>
           <tr class="doc-section-item">
 <td><code>result</code></td>            <td>
-                  <code><span title="date">date</span> | <span title="datetime">datetime</span></code>
+                  <code><span title="date">date</span> | <span title="datetime">datetime</span> | <span title="time">time</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A date or datetime object extracted from the string, or None if no date or datetime could be extracted.</p>
+                <p>A date, datetime or time object extracted from the string, or None if no date or datetime could be extracted.</p>
               </div>
             </td>
           </tr>
@@ -2357,6 +2524,98 @@ The timezone will be included in the datetime string if it's included in dt_obj.
             <td>
               <div class="doc-md-description">
                 <p>True if the time string is valid, False otherwise.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="sc_utility.sc_date_helper.DateHelper.midnight" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">midnight</span><span class="p">(</span><span class="n">dt_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Get today's date at midnight.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>dt_date</code>
+            </td>
+            <td>
+                  <code><span title="date">date</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The date for which to get midnight. If None, today's date will be used.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tzinfo</code>
+            </td>
+            <td>
+                  <code><span title="tzinfo">tzinfo</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The timezone information to use for getting today's date at midnight. Defaults to the local timezone if not provided.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>result</code></td>            <td>
+                  <code><span title="datetime">datetime</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Today's date at midnight as a datetime object, using the local timezone.</p>
               </div>
             </td>
           </tr>
