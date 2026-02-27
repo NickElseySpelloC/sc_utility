@@ -93,6 +93,33 @@ class DateHelper:  # noqa: PLR0904
         return dt.datetime.combine(date_obj, time_obj, tzinfo=tzinfo)
 
     @staticmethod
+    def convert_timezone(dt_obj: dt.datetime, tzinfo: dt.tzinfo | None = None) -> dt.datetime:
+        """
+        Convert a datetime object to a different timezone.
+
+        Args:
+            dt_obj (datetime): The datetime object to convert. Defaults to the local timezone if not provided.
+            tzinfo (tzinfo): The timezone to which the datetime object will be converted. Defaults to the local timezone if not provided.
+
+        Raises:
+            TypeError: If dt_obj is not a datetime object or if tzinfo is not a tzinfo object.
+
+        Returns:
+            result (datetime): A new datetime object representing the same moment in time as dt_obj, but with the specified timezone information.
+        """
+        if dt_obj is None or not isinstance(dt_obj, dt.datetime):
+            msg = f"Invalid data type for dt_obj in DateHelper.convert_timezone(dt_obj={dt_obj}, tzinfo={tzinfo}): Expected a datetime object."
+            raise TypeError(msg)
+        if tzinfo is None:
+            tzinfo = DateHelper.get_local_timezone()
+        if dt_obj.tzinfo is None:
+            dt_obj = DateHelper.add_timezone(dt_obj, tzinfo=tzinfo)
+        if dt_obj.tzinfo == tzinfo:
+            return dt_obj
+
+        return dt_obj.astimezone(tz=tzinfo)
+
+    @staticmethod
     def days_between(start_date: dt.date | dt.datetime, end_date: dt.date | dt.datetime) -> int | None:
         """
         Calculate the number of days between two date or datetime objects.
