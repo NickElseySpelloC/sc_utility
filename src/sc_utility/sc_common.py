@@ -188,6 +188,15 @@ class SCCommon:
     def get_project_root(marker_files=("pyproject.toml", ".project_root", "uv.lock", ".git")) -> Path:
         """Return the root folder of the Python project.
 
+        By default, this function looks for marker files like pyproject.toml, .project_root, uv.lock, or .git to
+        identify the project root. It starts from the directory of this file and walks upwards until it finds one
+        of the marker files. If it cannot find any of the marker files, it raises a RuntimeError.
+
+        If the environment variable SC_UTILITY_PROJECT_ROOT is set, it will check if that path exists and is a directory,
+        and return it as the project root if so. This allows users to override the automatic detection of the project
+        root if needed (e.g., if they have an unusual project structure or want to use the utility in a different project
+        without copying this file).
+
         Args:
             marker_files (tuple): A tuple of file names that indicate the project root.
 
@@ -197,6 +206,14 @@ class SCCommon:
         Returns:
             root_dir (Path): The root folder of the Python project as a Path object.
         """
+        path = None
+        env_path = os.environ.get("SC_UTILITY_PROJECT_ROOT")        # Issue 32
+        if env_path:
+            path = Path(env_path).resolve()
+        if path and path.exists() and path.is_dir():
+            return path
+
+        # Default behaviour is to look for the project root based on the location of this file and the presence of marker files. This allows the utility to be used in other projects without requiring users
         path = Path(__file__).resolve()
 
         # Walk upwards until we find a marker file
@@ -206,6 +223,8 @@ class SCCommon:
                     return parent
 
         error_msg = f"Project root not found. Looked for markers: {marker_files}"
+        if env_path:
+            error_msg += f" (also checked SC_UTILITY_PROJECT_ROOT={env_path})"
         raise RuntimeError(error_msg)
 
     @staticmethod

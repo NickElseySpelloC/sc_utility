@@ -45,7 +45,6 @@ class DateHelper:  # noqa: PLR0904
             msg = f"Invalid keyword arguments for timedelta in DateHelper.add(dt_obj={dt_obj}, kwargs={kwargs}): {e}"
             raise TypeError(msg) from e
 
-
     @staticmethod
     def add_date(dt_obj: dt.date, **kwargs) -> dt.date:
         """

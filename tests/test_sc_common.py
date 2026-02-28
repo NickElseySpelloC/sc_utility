@@ -1,5 +1,6 @@
 """Unit tests for the sc_common module."""
 
+import os
 import subprocess  # noqa: S404
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -125,6 +126,22 @@ def test_check_internet_connection():
     assert SCCommon.check_internet_connection() is True  # This will depend on your actual internet connection
 
 
+def test_get_project_root():
+    """Test get_project_root."""
+    root = SCCommon.get_project_root()
+    assert root is not None
+    assert root.is_dir()
+    assert (root / "src").is_dir() or (root / "README.md").is_file()  # Check for common project files
+
+    # Test environment variable override
+    special_dir = "/Users/nick/dev/sc_utility"
+    os.environ["SC_UTILITY_PROJECT_ROOT"] = special_dir
+    root = SCCommon.get_project_root()
+    assert root is not None
+    assert root.is_dir()
+    assert root == Path(special_dir)
+
+
 def test_is_probable_path_absolute_path():
     """Test is_probable_path with absolute paths."""
     assert SCCommon.is_probable_path("/usr/bin/python") is True
@@ -196,3 +213,4 @@ def test_get_process_id_integration():
 
 # test_select_file_location_absolute_path()
 # test_select_file_location_relative_path()
+# test_get_project_root()
