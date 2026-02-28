@@ -1194,6 +1194,13 @@
     <div class="doc doc-contents ">
 
         <p>Return the root folder of the Python project.</p>
+<p>By default, this function looks for marker files like pyproject.toml, .project_root, uv.lock, or .git to
+identify the project root. It starts from the directory of this file and walks upwards until it finds one
+of the marker files. If it cannot find any of the marker files, it raises a RuntimeError.</p>
+<p>If the environment variable SC_UTILITY_PROJECT_ROOT is set, it will check if that path exists and is a directory,
+and return it as the project root if so. This allows users to override the automatic detection of the project
+root if needed (e.g., if they have an unusual project structure or want to use the utility in a different project
+without copying this file).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
