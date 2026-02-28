@@ -331,7 +331,7 @@ class CSVReader:
                     cutoff = DateHelper.today_add_days(-max_days)
                 elif field_type == "datetime":
                     cutoff = DateHelper.add(DateHelper.now(), days=-max_days)
-                    cutoff = DateHelper.remove_timezone(cutoff)  # pyright: ignore[reportArgumentType] # Remove timezone info for comparison
+                    # cutoff = DateHelper.remove_timezone(cutoff)  # Issue 33
                 else:
                     continue  # Skip if field type is not date or datetime
             elif isinstance(minimum_value, (dt.date, dt.datetime)):
@@ -341,7 +341,7 @@ class CSVReader:
                     cutoff = DateHelper.today_add_days(-minimum_value)
                 elif field_type == "datetime":
                     cutoff = DateHelper.add(DateHelper.now(), days=-minimum_value)
-                    cutoff = DateHelper.remove_timezone(cutoff)  # pyright: ignore[reportArgumentType]
+                    # cutoff = DateHelper.remove_timezone(cutoff)   # Issue 33
                 else:
                     continue  # Skip if field type is not date or datetime
             else:
