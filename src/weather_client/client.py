@@ -7,7 +7,7 @@ from weather_client.providers.open_meteo_provider import OpenMeteoProvider
 from weather_client.providers.owm_provider import OWMProvider
 
 if TYPE_CHECKING:
-    from weather_client.models import WeatherReading, WeatherStation
+    from weather_client.models import WeatherData
 
 
 class WeatherClient:
@@ -24,29 +24,63 @@ class WeatherClient:
         self._owm = OWMProvider(owm_api_key) if owm_api_key else None
         self._open_meteo = OpenMeteoProvider()
 
-    def get_weather(
-        self,
-    ) -> tuple[WeatherReading, list[WeatherReading], WeatherStation]:
+    def get_weather(self, first_choice: str | None = None, owm_api_key: str | None = None) -> WeatherData:
         """Fetch weather data from providers, falling back as needed.
 
-        Returns:
-            A tuple of (current reading, list of hourly readings, weather station info).
-        """
-        if self._owm:
-            try:
-                return self._owm.fetch(self.latitude, self.longitude)
-            except Exception:  # noqa: BLE001, S110
-                # Provider failures should fall back to Open-Meteo.
-                # This includes cases where OWM One Call is not available for the key/tier.
-                pass
-        return self._open_meteo.fetch(self.latitude, self.longitude)
+        This method will try to get the current and forecast weather data from the following providers in order:
+        1. OpenWeatherMap v3 "One Call" service (if a valid API key is available that has a one-call subscription)
+        2. OpenWeatherMap v2.5 free service (if a valid OWM free API key is available)
+        3. Open-Meteo (as a fallback if OWM fails or is unavailable)
 
-    def get_open_meteo_weather(
-        self,
-    ) -> tuple[WeatherReading, list[WeatherReading], WeatherStation]:
+        The preferred provider order can be influenced by the `first_choice` argument, but the method will automatically
+        fall back to the next provider if the first choice fails for any reason (e.g., network error, API error, invalid API key).
+
+        Args:
+            first_choice(str | None): Optional string indicating the preferred weather provider ("owm" or "open_meteo").
+            owm_api_key(str | None): Optional OpenWeatherMap API key to use for this fetch.
+                         If provided, it will override the client's default key for this call.
+
+        Returns:
+            A WeatherData object containing the current reading, list of hourly readings, and weather station info.
+        """
+        if first_choice == "owm" or (first_choice is None and self._owm):
+            try:
+                return self.get_open_weather_map_weather(owm_api_key=owm_api_key)
+            except Exception:  # noqa: BLE001, S110
+                pass
+            return self.get_open_meteo_weather()
+
+        try:
+            return self.get_open_meteo_weather()
+        except Exception:  # noqa: BLE001, S110
+            pass
+        return self.get_open_weather_map_weather(owm_api_key=owm_api_key)
+
+    def get_open_weather_map_weather(self, owm_api_key: str | None = None) -> WeatherData:
+        """Fetch weather data from OpenWeatherMap.
+
+        Args:
+            owm_api_key: Optional OpenWeatherMap API key to use for this fetch.
+                         If provided, it will override the client's default key for this call.
+
+        Raises:
+            RuntimeError: If the OWM API key is not set or if the request fails.
+
+        Returns:
+            A WeatherData object containing the current reading, list of hourly readings, and weather station info.
+        """
+        if owm_api_key:
+            self._owm = OWMProvider(owm_api_key)
+
+        if self._owm:
+            return self._owm.fetch(self.latitude, self.longitude)
+        error_msg = "OpenWeatherMap API key is required for this method."
+        raise RuntimeError(error_msg)
+
+    def get_open_meteo_weather(self) -> WeatherData:
         """Fetch weather data from Open Meteo.
 
         Returns:
-            A tuple of (current reading, list of hourly readings, weather station info).
+            A WeatherData object containing the current reading, list of hourly readings, and weather station info.
         """
         return self._open_meteo.fetch(self.latitude, self.longitude)

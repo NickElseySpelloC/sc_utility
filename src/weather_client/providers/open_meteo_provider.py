@@ -24,6 +24,13 @@ class OpenMeteoProvider:
     def fetch(
         self, lat: float, lon: float
     ) -> tuple[WeatherReading, list[WeatherReading], WeatherStation]:
+        """
+        Fetch weather data from Open-Meteo for the given latitude and longitude.
+
+        For now, raise a not implemented error. Implementation will be added in a future PR using the openmeteo-requests library, which will be added as a dependency in the next PR.
+        """  # noqa: DOC201
+        error_msg = "Open-Meteo provider is not yet implemented. This will be added in a future PR."
+        raise NotImplementedError(error_msg)
         url = (
             "https://api.open-meteo.com/v1/forecast"
             f"?latitude={lat}&longitude={lon}"

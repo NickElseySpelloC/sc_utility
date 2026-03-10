@@ -15,24 +15,27 @@ forecast data points available.
 import os
 import sys
 from pathlib import Path
+from pprint import pprint
 
 # Allow running this example directly from a src/ layout checkout.
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from weather_client import WeatherClient
 
-api_key = os.environ.get("OWM_API_KEY")
+api_key = os.environ.get("OWM_API_KEY_V3")
 client = WeatherClient(
     latitude=-33.7234659,
     longitude=151.0965371,
     owm_api_key=api_key,
 )
 
-current, hourly, station = client.get_weather()
-# current, hourly, station = client.get_open_meteo_weather()
+weather_data = client.get_weather()
 
 print("\n\nWeather data for Sydney, Australia (lat: -33.86, lon: 151.21)")
 print(f"Using APU key: {api_key}")
-print(f"Current weather: {current}")
-print(f"Station: {station}")
-print(len(hourly), "hourly points")
+print("Current weather:")
+pprint(weather_data.current, indent=4)
+print(f"Station: {weather_data.station}")
+print(len(weather_data.hourly), "hourly points")
+for hour in weather_data.hourly[:5]:  # Print the first 5 hourly forecasts
+    pprint(hour, indent=4)
