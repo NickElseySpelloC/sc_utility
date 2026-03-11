@@ -566,6 +566,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#weather_client.WeatherClient.get_open_weather_map_weather" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_open_weather_map_weather
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#weather_client.WeatherClient.get_weather" class="md-nav__link">
     <span class="md-ellipsis">
       get_weather
@@ -730,6 +739,15 @@
   <a href="#weather_client.WeatherClient.get_open_meteo_weather" class="md-nav__link">
     <span class="md-ellipsis">
       get_open_meteo_weather
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#weather_client.WeatherClient.get_open_weather_map_weather" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_open_weather_map_weather
     </span>
   </a>
   
@@ -927,11 +945,107 @@ class WeatherStation:
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="tuple">tuple</span>[<span title="weather_client.models.WeatherReading">WeatherReading</span>, <span title="list">list</span>[<span title="weather_client.models.WeatherReading">WeatherReading</span>], <span title="weather_client.models.WeatherStation">WeatherStation</span>]</code>
+                  <code><span title="weather_client.models.WeatherData">WeatherData</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A tuple of (current reading, list of hourly readings, weather station info).</p>
+                <p>A WeatherData object containing the current reading, list of hourly readings, and weather station info.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="weather_client.WeatherClient.get_open_weather_map_weather" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_open_weather_map_weather</span><span class="p">(</span><span class="n">owm_api_key</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Fetch weather data from OpenWeatherMap.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>owm_api_key</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional OpenWeatherMap API key to use for this fetch.
+         If provided, it will override the client's default key for this call.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the OWM API key is not set or if the request fails.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="weather_client.models.WeatherData">WeatherData</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A WeatherData object containing the current reading, list of hourly readings, and weather station info.</p>
               </div>
             </td>
           </tr>
@@ -947,7 +1061,7 @@ class WeatherStation:
 
 
 <h2 id="weather_client.WeatherClient.get_weather" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_weather</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">get_weather</span><span class="p">(</span><span class="n">first_choice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">owm_api_key</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -955,6 +1069,83 @@ class WeatherStation:
     <div class="doc doc-contents ">
 
         <p>Fetch weather data from providers, falling back as needed.</p>
+<p>This method will try to get the current and forecast weather data from the following providers in order:
+1. OpenWeatherMap v3 "One Call" service (if a valid API key is available that has a one-call subscription)
+2. OpenWeatherMap v2.5 free service (if a valid OWM free API key is available)
+3. Open-Meteo (as a fallback if OWM fails or is unavailable)</p>
+<p>The preferred provider order can be influenced by the <code>first_choice</code> argument, but the method will automatically
+fall back to the next provider if the first choice fails for any reason (e.g., network error, API error, invalid API key).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>first_choice</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional string indicating the preferred weather provider ("owm" or "open_meteo").</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>owm_api_key</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional OpenWeatherMap API key to use for this fetch.
+         If provided, it will override the client's default key for this call.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If all providers fail to fetch weather data.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -968,11 +1159,11 @@ class WeatherStation:
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="tuple">tuple</span>[<span title="weather_client.models.WeatherReading">WeatherReading</span>, <span title="list">list</span>[<span title="weather_client.models.WeatherReading">WeatherReading</span>], <span title="weather_client.models.WeatherStation">WeatherStation</span>]</code>
+                  <code><span title="weather_client.models.WeatherData">WeatherData</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A tuple of (current reading, list of hourly readings, weather station info).</p>
+                <p>A WeatherData object containing the current reading, list of hourly readings, and weather station info.</p>
               </div>
             </td>
           </tr>
