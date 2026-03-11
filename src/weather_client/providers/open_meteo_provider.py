@@ -6,7 +6,14 @@ from typing import Any
 
 import requests
 
-from weather_client.models import WeatherReading, WeatherStation, Wind
+from weather_client.models import (
+    SkyCondition,
+    Temperature,
+    WeatherData,
+    WeatherReading,
+    WeatherStation,
+    Wind,
+)
 
 WEATHER_CODE_MAP = {
     0: "clear sky",
@@ -23,7 +30,7 @@ WEATHER_CODE_MAP = {
 class OpenMeteoProvider:
     def fetch(
         self, lat: float, lon: float
-    ) -> tuple[WeatherReading, list[WeatherReading], WeatherStation]:
+    ) -> WeatherData:
         """
         Fetch weather data from Open-Meteo for the given latitude and longitude.
 

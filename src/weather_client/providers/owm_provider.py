@@ -30,7 +30,7 @@ class OWMProvider:
         self._owm = OWM(api_key)
         self._mgr = self._owm.weather_manager()
 
-    def fetch(self, lat: float, lon: float) -> WeatherData:
+    def fetch(self, lat: float, lon: float) -> WeatherData:  # noqa: PLR0914
         """Fetch weather data from OpenWeatherMap.
 
         Args:
@@ -39,7 +39,7 @@ class OWMProvider:
 
         Raises:
             RuntimeError: If the OWM API key is not set or if the request fails.
-            NotImplementedError: If the OWM API key does not have access to the One Call API.
+            UnauthorizedError: If the OWM API key is invalid or does not have access to the One Call API.
 
         Returns:
             A WeatherData object containing the current reading, list of hourly readings, and weather station info.
@@ -49,9 +49,9 @@ class OWMProvider:
         except UnauthorizedError as e:
             # Many "free" OpenWeatherMap keys don't have access to One Call.
             # Fall back to free-tier endpoints (current + 5-day/3-hour forecast).
-            error_msg = "Not implemented"
-            raise NotImplementedError(error_msg) from e
             # return self._fetch_free(lat, lon)
+            error_msg = f"Unauthorized access to OpenWeatherMap One Call API: {e}"
+            raise UnauthorizedError(error_msg) from e  # TO DO: Change this one free version implemented
         except APIRequestError as e:
             error_msg = f"OpenWeatherMap request failed: {e}"
             raise RuntimeError(error_msg) from e
@@ -59,43 +59,51 @@ class OWMProvider:
         local_tz = datetime.now().astimezone().tzinfo
         utc_now = datetime.now(UTC)
         time_now = datetime.now(tz=local_tz)
-        current = one_call.current
-        hourly = one_call.forecast_hourly or []
-        daily = one_call.forecast_daily or []
+
+        # Get the API response data
+        hourly_data = one_call.forecast_hourly or []
+        daily_data = one_call.forecast_daily or []
+        today_data = daily_data[0] if daily_data else None
 
         # Build up the current reading. The One Call API doesn't provide high/low or feels-like for the current weather, so those will be None.
+        current_data = one_call.current
         current_sky = SkyCondition(
-            title=current.status,
-            description=current.detailed_status,
-            icon_code=current.weather_icon_name,
-            icon_png_url=self._get_icon_url(current.weather_icon_name),
-            cloud_cover=current.clouds / 100 if current.clouds is not None else None,
-            visibility=current.visibility_distance,
-            uv_index=current.uvi / 100 if current.uvi is not None else None)
+            title=current_data.status,
+            description=current_data.detailed_status,
+            icon_code=current_data.weather_icon_name,
+            icon_png_url=self._get_icon_url(current_data.weather_icon_name),
+            cloud_cover=current_data.clouds / 100 if current_data.clouds is not None else None,
+            visibility=current_data.visibility_distance,
+            uv_index=current_data.uvi / 100 if current_data.uvi is not None else None)
 
         current_reading = WeatherReading(
             utc_time=utc_now,
             local_time=utc_now.astimezone(),
-            temperature=Temperature(reading=current.temperature("celsius")["temp"]),
+            temperature=Temperature(
+                reading=current_data.temperature("celsius")["temp"],
+                high=today_data.temperature("celsius")["max"] if today_data else None,
+                low=today_data.temperature("celsius")["min"] if today_data else None,
+                feels_like=today_data.temperature("celsius")["feels_like_day"] if today_data else None,
+            ),
             sky=current_sky,
             wind=Wind(
-                speed=self._covert_wind_speed(current.wind()["speed"]),
-                deg=current.wind().get("deg"),
-                gust=self._covert_wind_speed(current.wind().get("gust", 0.0)) if "gust" in current.wind() else None,
+                speed=self._covert_wind_speed(current_data.wind()["speed"]),
+                deg=current_data.wind().get("deg"),
+                gust=self._covert_wind_speed(current_data.wind().get("gust", 0.0)) if "gust" in current_data.wind() else None,
             ),
-            summary=current.detailed_status,
-            precip_probability=current.precipitation_probability if current.precipitation_probability is not None else None,
-            rain=self._get_rain(current, "all"),
-            pressure=current.pressure["press"] if current.pressure else None,
-            humidity=current.humidity / 100 if current.humidity is not None else None,
-            dew_point=current.dewpoint("celsius") if current.dewpoint else None,
-            sunrise=self._convert_unix_time_to_datetime(current.sunrise_time("unix")) if current.sunrise_time() else None,
-            sunset=self._convert_unix_time_to_datetime(current.sunset_time("unix")) if current.sunset_time() else None,
+            summary=current_data.detailed_status,   # We dould be getting this from today_data.summary, but pyowm currently doesn't return this. Raised issue 455.
+            precip_probability=current_data.precipitation_probability if current_data.precipitation_probability is not None else None,
+            rain=self._get_rain(today_data, "all"),
+            pressure=current_data.pressure["press"] if current_data.pressure else None,
+            humidity=current_data.humidity / 100 if current_data.humidity is not None else None,
+            dew_point=self._convert_kelvin_to_celsius(current_data.dewpoint) if current_data.dewpoint else None,
+            sunrise=self._convert_unix_time_to_datetime(current_data.sunrise_time("unix"), get_local=True) if current_data.sunrise_time() else None,  # pyright: ignore[reportArgumentType]
+            sunset=self._convert_unix_time_to_datetime(current_data.sunset_time("unix"), get_local=True) if current_data.sunset_time() else None,  # pyright: ignore[reportArgumentType]
         )
 
         # Build up the hourly reading
         hourly: list[WeatherReading] = []
-        for hour in one_call.forecast_hourly or []:
+        for hour in hourly_data:
             utc_timestamp = self._convert_unix_time_to_datetime(hour.ref_time)
             local_timestamp = self._convert_unix_time_to_datetime(hour.ref_time, get_local=True)
             if local_timestamp < time_now:
@@ -119,10 +127,54 @@ class OWMProvider:
                         feels_like=hour.temperature("celsius").get("feels_like")),
                     sky=hour_sky,
                     wind=Wind(speed=self._covert_wind_speed(hour.wind()["speed"]), deg=hour.wind().get("deg")),
+                    summary=hour.detailed_status,   # We dould be getting this from today_data.summary, but pyowm currently doesn't return this. Raised issue 455.
+                    precip_probability=hour.precipitation_probability if hour.precipitation_probability is not None else None,
+                    rain=self._get_rain(hour, "1hr"),
+                    pressure=hour.pressure["press"] if hour.pressure else None,
+                    humidity=hour.humidity / 100 if hour.humidity is not None else None,
+                    dew_point=self._convert_kelvin_to_celsius(hour.dewpoint) if hour.dewpoint else None,
+                    sunrise=self._convert_unix_time_to_datetime(current_data.sunrise_time("unix"), get_local=True) if current_data.sunrise_time() else None,  # pyright: ignore[reportArgumentType]
+                    sunset=self._convert_unix_time_to_datetime(current_data.sunset_time("unix"), get_local=True) if current_data.sunset_time() else None,  # pyright: ignore[reportArgumentType]
                 )
             )
 
         daily: list[WeatherReading] = []
+        for day in daily_data:
+            utc_timestamp = self._convert_unix_time_to_datetime(day.ref_time)
+            local_timestamp = self._convert_unix_time_to_datetime(day.ref_time, get_local=True)
+            if local_timestamp < time_now:
+                continue
+
+            day_sky = SkyCondition(
+                title=day.status,
+                description=day.detailed_status,
+                icon_code=day.weather_icon_name,
+                icon_png_url=self._get_icon_url(day.weather_icon_name),
+                cloud_cover=day.clouds / 100 if day.clouds is not None else None,
+                visibility=day.visibility_distance,
+                uv_index=day.uvi / 100 if day.uvi is not None else None)
+
+            daily.append(
+                WeatherReading(
+                    utc_time=utc_timestamp,
+                    local_time=local_timestamp,
+                    temperature=Temperature(
+                        reading=day.temperature("celsius")["day"],
+                        high=day.temperature("celsius")["max"],
+                        low=day.temperature("celsius")["min"],
+                        feels_like=day.temperature("celsius").get("feels_like_day")),
+                    sky=day_sky,
+                    wind=Wind(speed=self._covert_wind_speed(day.wind()["speed"]), deg=day.wind().get("deg")),
+                    summary=day.detailed_status,   # We dould be getting this from today_data.summary, but pyowm currently doesn't return this. Raised issue 455.
+                    precip_probability=day.precipitation_probability if day.precipitation_probability is not None else None,
+                    rain=self._get_rain(day, "all"),
+                    pressure=day.pressure["press"] if day.pressure else None,
+                    humidity=day.humidity / 100 if day.humidity is not None else None,
+                    dew_point=self._convert_kelvin_to_celsius(day.dewpoint) if day.dewpoint else None,
+                    sunrise=self._convert_unix_time_to_datetime(current_data.sunrise_time("unix"), get_local=True) if current_data.sunrise_time() else None,  # pyright: ignore[reportArgumentType]
+                    sunset=self._convert_unix_time_to_datetime(current_data.sunset_time("unix"), get_local=True) if current_data.sunset_time() else None,  # pyright: ignore[reportArgumentType]
+                )
+            )
 
         station = WeatherStation("OpenWeatherMap One Call API", lat, lon)
 
@@ -136,6 +188,8 @@ class OWMProvider:
     #     Args:
     #         lat (float): Latitude of the location.
     #         lon (float): Longitude of the location.
+
+    # raise except UnauthorizedError <<<<<<<<<<<<<<<<<
 
     #     Returns:
     #         tuple[WeatherReading, list[WeatherReading], WeatherStation]: Current reading, hourly forecast, and station info.
@@ -226,7 +280,7 @@ class OWMProvider:
         Returns:
             float: Wind speed in kilometers per hour.
         """
-        return wind * 3.6
+        return round(wind * 3.6, 2)
 
     @staticmethod
     def _get_rain(rain_data: list[Weather] | Weather | None, key: str) -> float | None:
@@ -253,7 +307,7 @@ class OWMProvider:
 
         rain = src_weather.rain
         if rain and key in rain:
-            return float(rain[key])
+            return round(float(rain[key]), 2)
         return None
 
     @staticmethod
@@ -287,3 +341,15 @@ class OWMProvider:
         if get_local:
             dt = dt.astimezone()
         return dt
+
+    @staticmethod
+    def _convert_kelvin_to_celsius(kelvin_temp: float) -> float:
+        """Convert a temperature from Kelvin to Celsius.
+
+        Args:
+            kelvin_temp (float): The temperature in Kelvin.
+
+        Returns:
+            float: The temperature converted to Celsius.
+        """
+        return round(kelvin_temp - 273.15, 2)

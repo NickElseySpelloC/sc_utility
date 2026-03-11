@@ -29,13 +29,18 @@ client = WeatherClient(
     owm_api_key=api_key,
 )
 
-weather_data = client.get_weather()
+weather_data = client.get_weather(first_choice="owm")
 
 print("\n\nWeather data for Sydney, Australia (lat: -33.86, lon: 151.21)")
 print(f"Using APU key: {api_key}")
 print("Current weather:")
 pprint(weather_data.current, indent=4)
 print(f"Station: {weather_data.station}")
+
 print(len(weather_data.hourly), "hourly points")
-for hour in weather_data.hourly[:5]:  # Print the first 5 hourly forecasts
+for hour in weather_data.hourly[:4]:  # Print the first 4 hourly forecasts
     pprint(hour, indent=4)
+
+print(len(weather_data.daily), "daily points")
+for day in weather_data.daily[:4]:  # Print the first 4 daily forecasts
+    pprint(day, indent=4)

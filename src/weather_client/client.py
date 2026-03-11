@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from pyowm.commons.exceptions import UnauthorizedError
+
 from weather_client.providers.open_meteo_provider import OpenMeteoProvider
 from weather_client.providers.owm_provider import OWMProvider
 
@@ -40,21 +42,31 @@ class WeatherClient:
             owm_api_key(str | None): Optional OpenWeatherMap API key to use for this fetch.
                          If provided, it will override the client's default key for this call.
 
+        Raises:
+            RuntimeError: If all providers fail to fetch weather data.
+
         Returns:
             A WeatherData object containing the current reading, list of hourly readings, and weather station info.
         """
         if first_choice == "owm" or (first_choice is None and self._owm):
             try:
                 return self.get_open_weather_map_weather(owm_api_key=owm_api_key)
-            except Exception:  # noqa: BLE001, S110
-                pass
-            return self.get_open_meteo_weather()
+            except UnauthorizedError:
+                return self.get_open_meteo_weather()
+            except RuntimeError as e:
+                error_msg = f"OpenWeatherMap fetch failed: {e}."
+                raise RuntimeError(error_msg) from e
 
         try:
             return self.get_open_meteo_weather()
-        except Exception:  # noqa: BLE001, S110
-            pass
-        return self.get_open_weather_map_weather(owm_api_key=owm_api_key)
+        except NotImplementedError as e:
+            error_msg = f"Open-Meteo fetch failed: {e}. No other providers available."
+            raise RuntimeError(error_msg) from e
+        except RuntimeError as e:
+            error_msg = f"Open-Meteo fetch failed: {e}. No other providers available."
+            raise RuntimeError(error_msg) from e
+        except Exception:  # Return OWM data if Open-Meteo fails for any other reason  # noqa: BLE001
+            return self.get_open_weather_map_weather(owm_api_key=owm_api_key)
 
     def get_open_weather_map_weather(self, owm_api_key: str | None = None) -> WeatherData:
         """Fetch weather data from OpenWeatherMap.
