@@ -804,6 +804,7 @@
   class SkyCondition:
       title: str                          # A short title for the sky condition (e.g., &quot;Clear&quot;, &quot;Cloudy&quot;, &quot;Rain&quot;).
       description: str                    # A more detailed description of the sky condition (e.g., &quot;Clear sky&quot;, &quot;Overcast clouds&quot;, &quot;Light rain&quot;).
+      icon: str | None = None              # An optional emoji representing the sky condition (e.g., &quot;☀️&quot; for clear, &quot;☁️&quot; for cloudy, &quot;🌧️&quot; for rain).
       icon_code: str | None = None        # A code representing the sky condition, which can be used to look up an appropriate icon, e.g., 10d
       icon_png_url: str | None = None     # A URL to a PNG image representing the sky condition.
       cloud_cover: int | None = None      # The percentage of cloud cover (0 to 1)
@@ -815,6 +816,7 @@
   class Wind:
       speed: float
       deg: float | None
+      direction: str | None = None
       gust: float | None = None
       units: str = &quot;km/h&quot;
 

@@ -7,9 +7,9 @@ https://nickelseyspelloc.github.io/sc_utility/reference/weather_client/
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any  # noqa: F401
 
-import requests
+import requests  # noqa: F401
 from pyowm import OWM
 from pyowm.commons.exceptions import APIRequestError, UnauthorizedError
 from pyowm.weatherapi30.weather import Weather
@@ -22,6 +22,34 @@ from weather_client.models import (
     WeatherStation,
     Wind,
 )
+
+_SKY_ICONS: list[tuple[str, str]] = [
+    # Exact / most-specific first
+    ("thunderstorm", "⛈️"),
+    ("heavy rain", "🌧️"),
+    ("shower rain", "🌧️"),
+    ("rain", "🌧️"),
+    ("drizzle", "🌦️"),
+    ("snow", "❄️"),
+    ("sleet", "🌨️"),
+    ("fog", "🌫️"),
+    ("mist", "🌫️"),
+    ("haze", "🌫️"),
+    ("smoke", "🌫️"),
+    ("sand", "🌫️"),
+    ("dust", "🌫️"),
+    ("overcast", "☁️"),
+    ("broken clouds", "⛅"),
+    ("scattered clouds", "⛅"),
+    ("partly cloudy", "⛅"),
+    ("few clouds", "🌤️"),
+    ("mainly clear", "🌤️"),
+    ("clear", "☀️"),
+]
+
+
+_COMPASS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+            "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
 
 
 class OWMProvider:
@@ -70,6 +98,7 @@ class OWMProvider:
         current_sky = SkyCondition(
             title=current_data.status,
             description=current_data.detailed_status,
+            icon=self._sky_to_icon(current_data.detailed_status),
             icon_code=current_data.weather_icon_name,
             icon_png_url=self._get_icon_url(current_data.weather_icon_name),
             cloud_cover=current_data.clouds / 100 if current_data.clouds is not None else None,
@@ -89,6 +118,7 @@ class OWMProvider:
             wind=Wind(
                 speed=self._covert_wind_speed(current_data.wind()["speed"]),
                 deg=current_data.wind().get("deg"),
+                direction=self._deg_to_compass(current_data.wind().get("deg")),
                 gust=self._covert_wind_speed(current_data.wind().get("gust", 0.0)) if "gust" in current_data.wind() else None,
             ),
             summary=current_data.detailed_status,   # We dould be getting this from today_data.summary, but pyowm currently doesn't return this. Raised issue 455.
@@ -112,6 +142,7 @@ class OWMProvider:
             hour_sky = SkyCondition(
                 title=hour.status,
                 description=hour.detailed_status,
+                icon=self._sky_to_icon(hour.detailed_status),
                 icon_code=hour.weather_icon_name,
                 icon_png_url=self._get_icon_url(hour.weather_icon_name),
                 cloud_cover=hour.clouds / 100 if hour.clouds is not None else None,
@@ -126,7 +157,10 @@ class OWMProvider:
                         reading=hour.temperature("celsius")["temp"],
                         feels_like=hour.temperature("celsius").get("feels_like")),
                     sky=hour_sky,
-                    wind=Wind(speed=self._covert_wind_speed(hour.wind()["speed"]), deg=hour.wind().get("deg")),
+                    wind=Wind(
+                        speed=self._covert_wind_speed(hour.wind()["speed"]),
+                        deg=hour.wind().get("deg"),
+                        direction=self._deg_to_compass(hour.wind().get("deg"))),
                     summary=hour.detailed_status,   # We dould be getting this from today_data.summary, but pyowm currently doesn't return this. Raised issue 455.
                     precip_probability=hour.precipitation_probability if hour.precipitation_probability is not None else None,
                     rain=self._get_rain(hour, "1hr"),
@@ -148,6 +182,7 @@ class OWMProvider:
             day_sky = SkyCondition(
                 title=day.status,
                 description=day.detailed_status,
+                icon=self._sky_to_icon(day.detailed_status),
                 icon_code=day.weather_icon_name,
                 icon_png_url=self._get_icon_url(day.weather_icon_name),
                 cloud_cover=day.clouds / 100 if day.clouds is not None else None,
@@ -164,7 +199,10 @@ class OWMProvider:
                         low=day.temperature("celsius")["min"],
                         feels_like=day.temperature("celsius").get("feels_like_day")),
                     sky=day_sky,
-                    wind=Wind(speed=self._covert_wind_speed(day.wind()["speed"]), deg=day.wind().get("deg")),
+                    wind=Wind(
+                        speed=self._covert_wind_speed(day.wind()["speed"]),
+                        deg=day.wind().get("deg"),
+                        direction=self._deg_to_compass(day.wind().get("deg"))),
                     summary=day.detailed_status,   # We dould be getting this from today_data.summary, but pyowm currently doesn't return this. Raised issue 455.
                     precip_probability=day.precipitation_probability if day.precipitation_probability is not None else None,
                     rain=self._get_rain(day, "all"),
@@ -232,6 +270,7 @@ class OWMProvider:
     #         wind=Wind(
     #             speed=_as_float(current_wind.get("speed", 0.0), field="wind.speed"),
     #             deg=(float(current_wind["deg"]) if "deg" in current_wind else None),
+    #             direction=self._deg_to_compass(current_data.wind().get("deg")),
     #             gusts=_as_float(current_wind["gust"], field="wind.gust") if "gust" in current_wind else None,
     #         ),
     #     )
@@ -262,6 +301,7 @@ class OWMProvider:
     #                 wind=Wind(
     #                     speed=_as_float(wind.get("speed", 0.0), field="forecast.wind.speed"),
     #                     deg=(float(wind["deg"]) if "deg" in wind else None),
+    #                     direction=self._deg_to_compass(float(wind["deg"])) if "deg" in wind else None,
     #                     gusts=_as_float(wind["gust"], field="forecast.wind.gust") if "gust" in wind else None,
     #                 ),
     #             )
@@ -353,3 +393,17 @@ class OWMProvider:
             float: The temperature converted to Celsius.
         """
         return round(kelvin_temp - 273.15, 2)
+
+    @staticmethod
+    def _deg_to_compass(deg: float | None) -> str:
+        if deg is None:
+            return ""
+        return _COMPASS[round(deg / 22.5) % 16]
+
+    @staticmethod
+    def _sky_to_icon(sky: str) -> str:
+        sky_lower = sky.lower()
+        for keyword, icon in _SKY_ICONS:
+            if keyword in sky_lower:
+                return icon
+        return "🌡️"

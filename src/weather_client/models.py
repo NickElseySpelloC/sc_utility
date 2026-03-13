@@ -16,6 +16,7 @@ class Temperature:
 class SkyCondition:
     title: str                          # A short title for the sky condition (e.g., "Clear", "Cloudy", "Rain").
     description: str                    # A more detailed description of the sky condition (e.g., "Clear sky", "Overcast clouds", "Light rain").
+    icon: str | None = None              # An optional emoji representing the sky condition (e.g., "☀️" for clear, "☁️" for cloudy, "🌧️" for rain).
     icon_code: str | None = None        # A code representing the sky condition, which can be used to look up an appropriate icon, e.g., 10d
     icon_png_url: str | None = None     # A URL to a PNG image representing the sky condition.
     cloud_cover: int | None = None      # The percentage of cloud cover (0 to 1)
@@ -27,6 +28,7 @@ class SkyCondition:
 class Wind:
     speed: float
     deg: float | None
+    direction: str | None = None
     gust: float | None = None
     units: str = "km/h"
 
