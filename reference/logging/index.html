@@ -968,15 +968,16 @@
     <div class="doc doc-contents ">
 
         <p>Initializes the logger with configuration settings.</p>
-<p>The structure of logger_settings is as follows:
-{
+<p>The structure of logger_settings is as follows:</p>
+<pre><code>{
     "logfile_name": Optional[str],  # The name of the log file. If None, no file logging will be done.
     "file_verbosity": Optional[str],  # Verbosity level for file logging
     "console_verbosity": Optional[str],  # Verbosity level for console logging
     "max_lines": Optional[int],  # Maximum number of lines to keep in the log file
     "log_process_id": Optional[bool],  # If True, include the process ID in log messages. Defaults to False.
     "log_thread_id": Optional[bool],  # If True, include the thread ID in log messages. Defaults to False.
-}</p>
+}
+</code></pre>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1416,13 +1417,14 @@
 
         <p>Registers email settings for sending emails.</p>
 <p>Use the SCConfigManager.get_email_settings() method to get a dictionary containing the email settings. Otherwise, you can pass a
-dictionary directly to this method with these keys:
-    SendEmailsTo: str, the email address to send emails to
-    SMTPServer: str, the SMTP server address
-    SMTPPort: int, the SMTP server port (optional, defaults to 587)
-    SMTPUsername: str, the username for the SMTP server
-    SMTPPassword: str, the password for the SMTP server (preferably an App Password)
-    SubjectPrefix: str, a prefix for email subjects (optional, default to None)</p>
+dictionary directly to this method with these keys:</p>
+<pre><code>SendEmailsTo: str, the email address to send emails to
+SMTPServer: str, the SMTP server address
+SMTPPort: int, the SMTP server port (optional, defaults to 587)
+SMTPUsername: str, the username for the SMTP server
+SMTPPassword: str, the password for the SMTP server (preferably an App Password)
+SubjectPrefix: str, a prefix for email subjects (optional, default to None)
+</code></pre>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1667,11 +1669,13 @@ entity will be ignored until the issue is cleared.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The body of the email. This argument can be one of 4 things:
-1. A string containing the HTML body of the email
-2. A string or Path containing the path to an HTML file to read the body from
-3. A string containing the text body of the email
-4. A string or Path containing the path to an text file to read the body from</p>
+                <p>The body of the email. This argument can be one of 4 things:</p>
+<ol>
+<li>A string containing the HTML body of the email</li>
+<li>A string or Path containing the path to an HTML file to read the body from</li>
+<li>A string containing the text body of the email</li>
+<li>A string or Path containing the path to an text file to read the body from</li>
+</ol>
               </div>
             </td>
             <td>
